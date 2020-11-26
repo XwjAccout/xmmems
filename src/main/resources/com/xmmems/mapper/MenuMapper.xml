@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmmems.mapper.MenuMapper" >
+  <resultMap id="BaseResultMap" type="com.xmmems.domain.role.Menu" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="pcode" property="pcode" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="level" property="level" jdbcType="CHAR" />
+    <result column="type" property="type" jdbcType="CHAR" />
+    <result column="icon" property="icon" jdbcType="VARCHAR" />
+    <result column="rank" property="rank" jdbcType="DECIMAL" />
+    <result column="createAt" property="createAt" jdbcType="TIMESTAMP" />
+    <result column="isvalid" property="isvalid" jdbcType="CHAR" />
+    <result column="newUrl" property="newUrl" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, name, code, pcode, url, level, type, icon, rank, createAt, isvalid, newUrl
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.xmmems.domain.role.MenuExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from menu
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from menu
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from menu
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.xmmems.domain.role.Menu" >
+    insert into menu (id, name, code, 
+      pcode, url, level, type, 
+      icon, rank, createAt, 
+      isvalid)
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, 
+      #{pcode,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR}, #{level,jdbcType=CHAR}, #{type,jdbcType=CHAR}, 
+      #{icon,jdbcType=VARCHAR}, #{rank,jdbcType=DECIMAL}, #{createAt,jdbcType=TIMESTAMP}, 
+      #{isvalid,jdbcType=CHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.xmmems.domain.role.Menu" >
+    insert into menu
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="code != null" >
+        code,
+      </if>
+      <if test="pcode != null" >
+        pcode,
+      </if>
+      <if test="url != null" >
+        url,
+      </if>
+      <if test="level != null" >
+        level,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="icon != null" >
+        icon,
+      </if>
+      <if test="rank != null" >
+        rank,
+      </if>
+      <if test="createAt != null" >
+        createAt,
+      </if>
+      <if test="isvalid != null" >
+        isvalid,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null" >
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="pcode != null" >
+        #{pcode,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null" >
+        #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="level != null" >
+        #{level,jdbcType=CHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=CHAR},
+      </if>
+      <if test="icon != null" >
+        #{icon,jdbcType=VARCHAR},
+      </if>
+      <if test="rank != null" >
+        #{rank,jdbcType=DECIMAL},
+      </if>
+      <if test="createAt != null" >
+        #{createAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isvalid != null" >
+        #{isvalid,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xmmems.domain.role.Menu" >
+    update menu
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null" >
+        code = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="pcode != null" >
+        pcode = #{pcode,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null" >
+        url = #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="level != null" >
+        level = #{level,jdbcType=CHAR},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=CHAR},
+      </if>
+      <if test="icon != null" >
+        icon = #{icon,jdbcType=VARCHAR},
+      </if>
+      <if test="rank != null" >
+        rank = #{rank,jdbcType=DECIMAL},
+      </if>
+      <if test="createAt != null" >
+        createAt = #{createAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isvalid != null" >
+        isvalid = #{isvalid,jdbcType=CHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xmmems.domain.role.Menu" >
+    update menu
+    set name = #{name,jdbcType=VARCHAR},
+      code = #{code,jdbcType=VARCHAR},
+      pcode = #{pcode,jdbcType=VARCHAR},
+      url = #{url,jdbcType=VARCHAR},
+      level = #{level,jdbcType=CHAR},
+      type = #{type,jdbcType=CHAR},
+      icon = #{icon,jdbcType=VARCHAR},
+      rank = #{rank,jdbcType=DECIMAL},
+      createAt = #{createAt,jdbcType=TIMESTAMP},
+      isvalid = #{isvalid,jdbcType=CHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectAll" resultType="com.xmmems.domain.role.Menu">
+    SELECT <include refid="Base_Column_List" /> FROM menu ORDER BY rank ASC
+  </select>
+</mapper>

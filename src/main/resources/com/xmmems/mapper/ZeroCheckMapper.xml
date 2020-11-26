@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmmems.mapper.ZeroCheckMapper">
+    <resultMap id="BaseResultMap" type="com.xmmems.domain.ZeroCheck">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="genTime" property="genTime" jdbcType="TIMESTAMP"/>
+        <result column="siteId" property="siteId" jdbcType="INTEGER"/>
+        <result column="siteName" property="siteName" jdbcType="VARCHAR"/>
+        <result column="concentration" property="concentration" jdbcType="VARCHAR"/>
+        <result column="spanvalues" property="spanvalues" jdbcType="VARCHAR"/>
+        <result column="checkdata" property="checkdata" jdbcType="VARCHAR"/>
+        <result column="itemName" property="itemName" jdbcType="VARCHAR"/>
+        <result column="itemId" property="itemId" jdbcType="INTEGER"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="unit" property="unit" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+    id, DISTINCT DATE_FORMAT(genTime,'%Y-%m-%d %h') genTime, siteId, siteName, concentration, spanvalues, checkdata, itemName, itemId,unit,
+    type
+  </sql>
+    <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.xmmems.domain.ZeroCheckExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from zero_check
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from zero_check
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from zero_check
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <insert id="insert" parameterType="com.xmmems.domain.ZeroCheck">
+    insert into zero_check (id, genTime, siteId,
+      siteName, concentration, spanvalues,
+      checkdata, itemName, itemId,
+      type,unit)
+    values (#{id,jdbcType=INTEGER}, #{genTime,jdbcType=TIMESTAMP}, #{siteId,jdbcType=INTEGER},
+      #{siteName,jdbcType=VARCHAR}, #{concentration,jdbcType=VARCHAR}, #{spanvalues,jdbcType=VARCHAR},
+      #{checkdata,jdbcType=VARCHAR}, #{itemName,jdbcType=VARCHAR}, #{itemId,jdbcType=INTEGER},
+      #{type,jdbcType=INTEGER} ,#{unit,jdbcType=VARCHAR})
+  </insert>
+    <insert id="insertSelective" parameterType="com.xmmems.domain.ZeroCheck">
+        insert into zero_check
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="genTime != null">
+                genTime,
+            </if>
+            <if test="siteId != null">
+                siteId,
+            </if>
+            <if test="siteName != null">
+                siteName,
+            </if>
+            <if test="concentration != null">
+                concentration,
+            </if>
+            <if test="spanvalues != null">
+                spanvalues,
+            </if>
+            <if test="checkdata != null">
+                checkdata,
+            </if>
+            <if test="itemName != null">
+                itemName,
+            </if>
+            <if test="itemId != null">
+                itemId,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="genTime != null">
+                #{genTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="siteId != null">
+                #{siteId,jdbcType=INTEGER},
+            </if>
+            <if test="siteName != null">
+                #{siteName,jdbcType=VARCHAR},
+            </if>
+            <if test="concentration != null">
+                #{concentration,jdbcType=VARCHAR},
+            </if>
+            <if test="spanvalues != null">
+                #{spanvalues,jdbcType=VARCHAR},
+            </if>
+            <if test="checkdata != null">
+                #{checkdata,jdbcType=VARCHAR},
+            </if>
+            <if test="itemName != null">
+                #{itemName,jdbcType=VARCHAR},
+            </if>
+            <if test="itemId != null">
+                #{itemId,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.xmmems.domain.ZeroCheck">
+        update zero_check
+        <set>
+            <if test="genTime != null">
+                genTime = #{genTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="siteId != null">
+                siteId = #{siteId,jdbcType=INTEGER},
+            </if>
+            <if test="siteName != null">
+                siteName = #{siteName,jdbcType=VARCHAR},
+            </if>
+            <if test="concentration != null">
+                concentration = #{concentration,jdbcType=VARCHAR},
+            </if>
+            <if test="spanvalues != null">
+                spanvalues = #{spanvalues,jdbcType=VARCHAR},
+            </if>
+            <if test="checkdata != null">
+                checkdata = #{checkdata,jdbcType=VARCHAR},
+            </if>
+            <if test="itemName != null">
+                itemName = #{itemName,jdbcType=VARCHAR},
+            </if>
+            <if test="itemId != null">
+                itemId = #{itemId,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=INTEGER},
+            </if>
+            <if test="unit != null">
+                unit = #{unit,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.xmmems.domain.ZeroCheck">
+    update zero_check
+    set genTime = #{genTime,jdbcType=TIMESTAMP},
+      siteId = #{siteId,jdbcType=INTEGER},
+      siteName = #{siteName,jdbcType=VARCHAR},
+      concentration = #{concentration,jdbcType=VARCHAR},
+      spanvalues = #{spanvalues,jdbcType=VARCHAR},
+      checkdata = #{checkdata,jdbcType=VARCHAR},
+      itemName = #{itemName,jdbcType=VARCHAR},
+      itemId = #{itemId,jdbcType=INTEGER},
+      unit = #{unit,jdbcType=VARCHAR},
+      type = #{type,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+    <select id="findGenTime" resultType="com.xmmems.domain.ZeroCheck">
+        select * from zero_check where genTime like concat('%','${gtnTime}','%') and siteId=#{siteId} and type=#{type} and itemId=#{itemId}
+    </select>
+
+    <select id="selectZeroData" resultType="com.xmmems.domain.ZeroCheck">
+      SELECT
+    *
+      FROM
+      `zero_check`
+      WHERE `type` = #{type} AND siteId = #{siteId} AND genTime >= #{start} AND genTime &lt;= #{end} ORDER BY genTime DESC
+    </select>
+
+    <select id="selectStandardVerification" resultType="java.util.Map">
+      SELECT DISTINCT DATE_FORMAT(genTime,'%Y-%m-%d %T') genTime, `concentration`, `spanvalues`, `checkdata`, `itemId`,itemName
+      FROM `zero_check` WHERE `type`=2  AND siteId = #{siteId} AND itemId = #{itemId} AND genTime >= #{start} AND genTime &lt; #{end}
+      ORDER BY genTime DESC;
+    </select>
+
+    <select id="blankTest" resultType="java.util.Map">
+        SELECT DISTINCT DATE_FORMAT(genTime,'%Y-%m-%d %T') genTime, `concentration`, `spanvalues`, `checkdata`, `itemId`,itemName
+        FROM `zero_check` WHERE `type`=1  AND siteId = #{siteId} AND itemId = #{itemId} AND genTime >= #{start} AND genTime &lt; #{end}
+        ORDER BY genTime DESC;
+    </select>
+    <select id="site" resultType="java.util.Map">
+        SELECT siteId,siteName FROM zero_check GROUP BY siteId,siteName
+    </select>
+</mapper>

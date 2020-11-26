@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmmems.mapper.TempManaymetaYz01Mapper" >
+  <resultMap id="BaseResultMap" type="com.xmmems.domain.temp.TempManaymetaYz01" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="yz_cate" property="yz_cate" jdbcType="VARCHAR" />
+    <result column="siteName" property="siteName" jdbcType="VARCHAR" />
+    <result column="rate" property="rate" jdbcType="VARCHAR" />
+    <result column="temp" property="temp" jdbcType="VARCHAR" />
+    <result column="ph" property="ph" jdbcType="VARCHAR" />
+    <result column="rjy" property="rjy" jdbcType="VARCHAR" />
+    <result column="ddl" property="ddl" jdbcType="VARCHAR" />
+    <result column="zd" property="zd" jdbcType="VARCHAR" />
+    <result column="gmsy" property="gmsy" jdbcType="VARCHAR" />
+    <result column="zl" property="zl" jdbcType="VARCHAR" />
+    <result column="ad" property="ad" jdbcType="VARCHAR" />
+    <result column="fhw" property="fhw" jdbcType="VARCHAR" />
+    <result column="ge" property="ge" jdbcType="VARCHAR" />
+    <result column="q" property="q" jdbcType="VARCHAR" />
+    <result column="cu" property="cu" jdbcType="VARCHAR" />
+    <result column="zn" property="zn" jdbcType="VARCHAR" />
+    <result column="l" property="l" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, yz_cate, siteName, rate, temp, ph, rjy, ddl, zd, gmsy, zl, ad, fhw, ge, q, cu, 
+    zn, l
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.xmmems.domain.temp.TempManaymetaYz01Example" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from temp_manaymeta_yz_01
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from temp_manaymeta_yz_01
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from temp_manaymeta_yz_01
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.xmmems.domain.temp.TempManaymetaYz01" >
+    insert into temp_manaymeta_yz_01 (id, yz_cate, siteName, 
+      rate, temp, ph, rjy, 
+      ddl, zd, gmsy, zl, 
+      ad, fhw, ge, q, 
+      cu, zn, l)
+    values (#{id,jdbcType=INTEGER}, #{yz_cate,jdbcType=VARCHAR}, #{siteName,jdbcType=VARCHAR}, 
+      #{rate,jdbcType=VARCHAR}, #{temp,jdbcType=VARCHAR}, #{ph,jdbcType=VARCHAR}, #{rjy,jdbcType=VARCHAR}, 
+      #{ddl,jdbcType=VARCHAR}, #{zd,jdbcType=VARCHAR}, #{gmsy,jdbcType=VARCHAR}, #{zl,jdbcType=VARCHAR}, 
+      #{ad,jdbcType=VARCHAR}, #{fhw,jdbcType=VARCHAR}, #{ge,jdbcType=VARCHAR}, #{q,jdbcType=VARCHAR}, 
+      #{cu,jdbcType=VARCHAR}, #{zn,jdbcType=VARCHAR}, #{l,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.xmmems.domain.temp.TempManaymetaYz01" >
+    insert into temp_manaymeta_yz_01
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="yz_cate != null" >
+        yz_cate,
+      </if>
+      <if test="siteName != null" >
+        siteName,
+      </if>
+      <if test="rate != null" >
+        rate,
+      </if>
+      <if test="temp != null" >
+        temp,
+      </if>
+      <if test="ph != null" >
+        ph,
+      </if>
+      <if test="rjy != null" >
+        rjy,
+      </if>
+      <if test="ddl != null" >
+        ddl,
+      </if>
+      <if test="zd != null" >
+        zd,
+      </if>
+      <if test="gmsy != null" >
+        gmsy,
+      </if>
+      <if test="zl != null" >
+        zl,
+      </if>
+      <if test="ad != null" >
+        ad,
+      </if>
+      <if test="fhw != null" >
+        fhw,
+      </if>
+      <if test="ge != null" >
+        ge,
+      </if>
+      <if test="q != null" >
+        q,
+      </if>
+      <if test="cu != null" >
+        cu,
+      </if>
+      <if test="zn != null" >
+        zn,
+      </if>
+      <if test="l != null" >
+        l,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="yz_cate != null" >
+        #{yz_cate,jdbcType=VARCHAR},
+      </if>
+      <if test="siteName != null" >
+        #{siteName,jdbcType=VARCHAR},
+      </if>
+      <if test="rate != null" >
+        #{rate,jdbcType=VARCHAR},
+      </if>
+      <if test="temp != null" >
+        #{temp,jdbcType=VARCHAR},
+      </if>
+      <if test="ph != null" >
+        #{ph,jdbcType=VARCHAR},
+      </if>
+      <if test="rjy != null" >
+        #{rjy,jdbcType=VARCHAR},
+      </if>
+      <if test="ddl != null" >
+        #{ddl,jdbcType=VARCHAR},
+      </if>
+      <if test="zd != null" >
+        #{zd,jdbcType=VARCHAR},
+      </if>
+      <if test="gmsy != null" >
+        #{gmsy,jdbcType=VARCHAR},
+      </if>
+      <if test="zl != null" >
+        #{zl,jdbcType=VARCHAR},
+      </if>
+      <if test="ad != null" >
+        #{ad,jdbcType=VARCHAR},
+      </if>
+      <if test="fhw != null" >
+        #{fhw,jdbcType=VARCHAR},
+      </if>
+      <if test="ge != null" >
+        #{ge,jdbcType=VARCHAR},
+      </if>
+      <if test="q != null" >
+        #{q,jdbcType=VARCHAR},
+      </if>
+      <if test="cu != null" >
+        #{cu,jdbcType=VARCHAR},
+      </if>
+      <if test="zn != null" >
+        #{zn,jdbcType=VARCHAR},
+      </if>
+      <if test="l != null" >
+        #{l,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xmmems.domain.temp.TempManaymetaYz01" >
+    update temp_manaymeta_yz_01
+    <set >
+      <if test="yz_cate != null" >
+        yz_cate = #{yz_cate,jdbcType=VARCHAR},
+      </if>
+      <if test="siteName != null" >
+        siteName = #{siteName,jdbcType=VARCHAR},
+      </if>
+      <if test="rate != null" >
+        rate = #{rate,jdbcType=VARCHAR},
+      </if>
+      <if test="temp != null" >
+        temp = #{temp,jdbcType=VARCHAR},
+      </if>
+      <if test="ph != null" >
+        ph = #{ph,jdbcType=VARCHAR},
+      </if>
+      <if test="rjy != null" >
+        rjy = #{rjy,jdbcType=VARCHAR},
+      </if>
+      <if test="ddl != null" >
+        ddl = #{ddl,jdbcType=VARCHAR},
+      </if>
+      <if test="zd != null" >
+        zd = #{zd,jdbcType=VARCHAR},
+      </if>
+      <if test="gmsy != null" >
+        gmsy = #{gmsy,jdbcType=VARCHAR},
+      </if>
+      <if test="zl != null" >
+        zl = #{zl,jdbcType=VARCHAR},
+      </if>
+      <if test="ad != null" >
+        ad = #{ad,jdbcType=VARCHAR},
+      </if>
+      <if test="fhw != null" >
+        fhw = #{fhw,jdbcType=VARCHAR},
+      </if>
+      <if test="ge != null" >
+        ge = #{ge,jdbcType=VARCHAR},
+      </if>
+      <if test="q != null" >
+        q = #{q,jdbcType=VARCHAR},
+      </if>
+      <if test="cu != null" >
+        cu = #{cu,jdbcType=VARCHAR},
+      </if>
+      <if test="zn != null" >
+        zn = #{zn,jdbcType=VARCHAR},
+      </if>
+      <if test="l != null" >
+        l = #{l,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xmmems.domain.temp.TempManaymetaYz01" >
+    update temp_manaymeta_yz_01
+    set yz_cate = #{yz_cate,jdbcType=VARCHAR},
+      siteName = #{siteName,jdbcType=VARCHAR},
+      rate = #{rate,jdbcType=VARCHAR},
+      temp = #{temp,jdbcType=VARCHAR},
+      ph = #{ph,jdbcType=VARCHAR},
+      rjy = #{rjy,jdbcType=VARCHAR},
+      ddl = #{ddl,jdbcType=VARCHAR},
+      zd = #{zd,jdbcType=VARCHAR},
+      gmsy = #{gmsy,jdbcType=VARCHAR},
+      zl = #{zl,jdbcType=VARCHAR},
+      ad = #{ad,jdbcType=VARCHAR},
+      fhw = #{fhw,jdbcType=VARCHAR},
+      ge = #{ge,jdbcType=VARCHAR},
+      q = #{q,jdbcType=VARCHAR},
+      cu = #{cu,jdbcType=VARCHAR},
+      zn = #{zn,jdbcType=VARCHAR},
+      l = #{l,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

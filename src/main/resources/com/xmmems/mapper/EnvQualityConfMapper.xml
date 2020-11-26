@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmmems.mapper.EnvQualityConfMapper" >
+  <resultMap id="BaseResultMap" type="com.xmmems.domain.env.EnvQualityConf" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="kpiName" property="kpiName" jdbcType="VARCHAR" />
+    <result column="level" property="level" jdbcType="VARCHAR" />
+    <result column="minVal" property="minVal" jdbcType="VARCHAR" />
+    <result column="maxVal" property="maxVal" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, kpiName, level, minVal, maxVal, remark
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.xmmems.domain.env.EnvQualityConfExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from env_quality_conf
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from env_quality_conf
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from env_quality_conf
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.xmmems.domain.env.EnvQualityConf" >
+    insert into env_quality_conf (id, kpiName, level, 
+      minVal, maxVal, remark
+      )
+    values (#{id,jdbcType=INTEGER}, #{kpiName,jdbcType=VARCHAR}, #{level,jdbcType=VARCHAR}, 
+      #{minVal,jdbcType=VARCHAR}, #{maxVal,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.xmmems.domain.env.EnvQualityConf" >
+    insert into env_quality_conf
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="kpiName != null" >
+        kpiName,
+      </if>
+      <if test="level != null" >
+        level,
+      </if>
+      <if test="minVal != null" >
+        minVal,
+      </if>
+      <if test="maxVal != null" >
+        maxVal,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="kpiName != null" >
+        #{kpiName,jdbcType=VARCHAR},
+      </if>
+      <if test="level != null" >
+        #{level,jdbcType=VARCHAR},
+      </if>
+      <if test="minVal != null" >
+        #{minVal,jdbcType=VARCHAR},
+      </if>
+      <if test="maxVal != null" >
+        #{maxVal,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xmmems.domain.env.EnvQualityConf" >
+    update env_quality_conf
+    <set >
+      <if test="kpiName != null" >
+        kpiName = #{kpiName,jdbcType=VARCHAR},
+      </if>
+      <if test="level != null" >
+        level = #{level,jdbcType=VARCHAR},
+      </if>
+      <if test="minVal != null" >
+        minVal = #{minVal,jdbcType=VARCHAR},
+      </if>
+      <if test="maxVal != null" >
+        maxVal = #{maxVal,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xmmems.domain.env.EnvQualityConf" >
+    update env_quality_conf
+    set kpiName = #{kpiName,jdbcType=VARCHAR},
+      level = #{level,jdbcType=VARCHAR},
+      minVal = #{minVal,jdbcType=VARCHAR},
+      maxVal = #{maxVal,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="getEnvQualityConfDTOList" resultType="com.xmmems.dto.EnvQualityConfDTO">
+      SELECT b.id AS itemId,
+       kpiName AS itemName,
+       `level`,
+       minVal,
+       maxVal,
+       CASE `level`
+         WHEN 'I' THEN 1
+         WHEN 'II' THEN 2
+         WHEN 'III' THEN 3
+         WHEN 'IV' THEN 4
+         WHEN 'V' THEN 5
+         WHEN '劣V' THEN 6
+         ELSE 999
+       END AS levelNum
+      FROM   env_quality_conf a, base_item b
+      WHERE  a.kpiName = b.name
+    </select>
+</mapper>

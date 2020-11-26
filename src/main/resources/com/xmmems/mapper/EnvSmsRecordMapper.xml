@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmmems.mapper.EnvSmsRecordMapper" >
+  <resultMap id="BaseResultMap" type="com.xmmems.domain.env.EnvSmsRecord" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="sendStatus" property="sendStatus" jdbcType="CHAR" />
+    <result column="addTime" property="addTime" jdbcType="TIMESTAMP" />
+    <result column="sendTime" property="sendTime" jdbcType="TIMESTAMP" />
+    <result column="warnType" property="warnType" jdbcType="CHAR" />
+    <result column="warnRecordId" property="warnRecordId" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.xmmems.domain.env.EnvSmsRecordWithBLOBs" extends="BaseResultMap" >
+    <result column="content" property="content" jdbcType="LONGVARCHAR" />
+    <result column="receiveTel" property="receiveTel" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, sendStatus, addTime, sendTime, warnType, warnRecordId
+  </sql>
+  <sql id="Blob_Column_List" >
+    content, receiveTel
+  </sql>
+  <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="com.xmmems.domain.env.EnvSmsRecordExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from env_sms_record
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.xmmems.domain.env.EnvSmsRecordExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from env_sms_record
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from env_sms_record
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from env_sms_record
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.xmmems.domain.env.EnvSmsRecordWithBLOBs" >
+    insert into env_sms_record (id, sendStatus, addTime, 
+      sendTime, warnType, warnRecordId, 
+      content, receiveTel)
+    values (#{id,jdbcType=INTEGER}, #{sendStatus,jdbcType=CHAR}, #{addTime,jdbcType=TIMESTAMP}, 
+      #{sendTime,jdbcType=TIMESTAMP}, #{warnType,jdbcType=CHAR}, #{warnRecordId,jdbcType=INTEGER}, 
+      #{content,jdbcType=LONGVARCHAR}, #{receiveTel,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.xmmems.domain.env.EnvSmsRecordWithBLOBs" >
+    insert into env_sms_record
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="sendStatus != null" >
+        sendStatus,
+      </if>
+      <if test="addTime != null" >
+        addTime,
+      </if>
+      <if test="sendTime != null" >
+        sendTime,
+      </if>
+      <if test="warnType != null" >
+        warnType,
+      </if>
+      <if test="warnRecordId != null" >
+        warnRecordId,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+      <if test="receiveTel != null" >
+        receiveTel,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="sendStatus != null" >
+        #{sendStatus,jdbcType=CHAR},
+      </if>
+      <if test="addTime != null" >
+        #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sendTime != null" >
+        #{sendTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="warnType != null" >
+        #{warnType,jdbcType=CHAR},
+      </if>
+      <if test="warnRecordId != null" >
+        #{warnRecordId,jdbcType=INTEGER},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="receiveTel != null" >
+        #{receiveTel,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xmmems.domain.env.EnvSmsRecordWithBLOBs" >
+    update env_sms_record
+    <set >
+      <if test="sendStatus != null" >
+        sendStatus = #{sendStatus,jdbcType=CHAR},
+      </if>
+      <if test="addTime != null" >
+        addTime = #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sendTime != null" >
+        sendTime = #{sendTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="warnType != null" >
+        warnType = #{warnType,jdbcType=CHAR},
+      </if>
+      <if test="warnRecordId != null" >
+        warnRecordId = #{warnRecordId,jdbcType=INTEGER},
+      </if>
+      <if test="content != null" >
+        content = #{content,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="receiveTel != null" >
+        receiveTel = #{receiveTel,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.xmmems.domain.env.EnvSmsRecordWithBLOBs" >
+    update env_sms_record
+    set sendStatus = #{sendStatus,jdbcType=CHAR},
+      addTime = #{addTime,jdbcType=TIMESTAMP},
+      sendTime = #{sendTime,jdbcType=TIMESTAMP},
+      warnType = #{warnType,jdbcType=CHAR},
+      warnRecordId = #{warnRecordId,jdbcType=INTEGER},
+      content = #{content,jdbcType=LONGVARCHAR},
+      receiveTel = #{receiveTel,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xmmems.domain.env.EnvSmsRecord" >
+    update env_sms_record
+    set sendStatus = #{sendStatus,jdbcType=CHAR},
+      addTime = #{addTime,jdbcType=TIMESTAMP},
+      sendTime = #{sendTime,jdbcType=TIMESTAMP},
+      warnType = #{warnType,jdbcType=CHAR},
+      warnRecordId = #{warnRecordId,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmmems.mapper.EnvHourDataMapper" >
+  <resultMap id="BaseResultMap" type="com.xmmems.domain.env.EnvHourData" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="siteId" property="siteId" jdbcType="INTEGER" />
+    <result column="siteName" property="siteName" jdbcType="VARCHAR" />
+    <result column="genTime" property="genTime" jdbcType="TIMESTAMP" />
+    <result column="handle" property="handle" jdbcType="CHAR" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.xmmems.domain.env.EnvHourData" extends="BaseResultMap" >
+    <result column="content" property="content" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, siteId, siteName, genTime, handle
+  </sql>
+  <sql id="Blob_Column_List" >
+    content
+  </sql>
+  <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="com.xmmems.domain.env.EnvHourDataExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from env_hour_data
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.xmmems.domain.env.EnvHourDataExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from env_hour_data
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from env_hour_data
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from env_hour_data
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.xmmems.domain.env.EnvHourData" >
+    insert into env_hour_data (id, siteId, siteName,
+      genTime, handle, content
+      )
+    values (#{id,jdbcType=INTEGER}, #{siteId,jdbcType=INTEGER}, #{siteName,jdbcType=VARCHAR},
+      #{genTime,jdbcType=TIMESTAMP}, #{handle,jdbcType=CHAR}, #{content,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.xmmems.domain.env.EnvHourData" >
+    insert into env_hour_data
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="siteId != null" >
+        siteId,
+      </if>
+      <if test="siteName != null" >
+        siteName,
+      </if>
+      <if test="genTime != null" >
+        genTime,
+      </if>
+      <if test="handle != null" >
+        handle,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="siteId != null" >
+        #{siteId,jdbcType=INTEGER},
+      </if>
+      <if test="siteName != null" >
+        #{siteName,jdbcType=VARCHAR},
+      </if>
+      <if test="genTime != null" >
+        #{genTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="handle != null" >
+        #{handle,jdbcType=CHAR},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xmmems.domain.env.EnvHourData" >
+    update env_hour_data
+    <set >
+      <if test="siteId != null" >
+        siteId = #{siteId,jdbcType=INTEGER},
+      </if>
+      <if test="siteName != null" >
+        siteName = #{siteName,jdbcType=VARCHAR},
+      </if>
+      <if test="genTime != null" >
+        genTime = #{genTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="handle != null" >
+        handle = #{handle,jdbcType=CHAR},
+      </if>
+      <if test="content != null" >
+        content = #{content,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.xmmems.domain.env.EnvHourData" >
+    update env_hour_data
+    set siteId = #{siteId,jdbcType=INTEGER},
+      siteName = #{siteName,jdbcType=VARCHAR},
+      genTime = #{genTime,jdbcType=TIMESTAMP},
+      handle = #{handle,jdbcType=CHAR},
+      content = #{content,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xmmems.domain.env.EnvHourData" >
+    update env_hour_data
+    set siteId = #{siteId,jdbcType=INTEGER},
+      siteName = #{siteName,jdbcType=VARCHAR},
+      genTime = #{genTime,jdbcType=TIMESTAMP},
+      handle = #{handle,jdbcType=CHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <update id="updateHandle">
+        update env_hour_data set handle = '1' where id = #{id}
+    </update>
+
+  <select id="monitorReportDayGetData" resultType="java.util.HashMap">
+        select content,siteName,DATE_FORMAT(genTime,'%Y-%m-%d %H:00:00') moniterTime
+        from env_hour_data where siteId=#{siteId} and genTime >= #{startTime} and genTime &lt;= #{endTime}
+    </select>
+
+  <select id="selectContentByInSiteName" resultType="java.util.LinkedHashMap">
+    <foreach collection="siteNameList" item="siteName" open="(" close=")" separator=")union all(">
+      SELECT siteName,content
+      FROM env_hour_data
+      WHERE siteName = #{siteName}
+      ORDER BY genTime DESC
+      LIMIT 8
+    </foreach>
+  </select>
+
+  <select id="select1000" resultType="com.xmmems.domain.env.EnvHourData">
+        select
+          `id`,
+          `siteId`,
+          `siteName`,
+          `genTime`,
+          `content`,
+          `handle`
+        from
+          `env_hour_data` where handle = '0' order by genTime desc
+        limit 300 ;
+    </select>
+  <select id="selectHistoryData" resultType="java.util.Map">
+
+    <choose>
+      <when test="order=='ASC' ">
+        select *,DATE_FORMAT(genTime,'%Y-%m-%d %H:00:00') moniterTime  from env_hour_data where  genTime &lt;= #{endTime} and  genTime >= #{startTime} and  siteId = #{siteId} order by genTime asc
+      </when>
+      <otherwise>
+        select *,DATE_FORMAT(genTime,'%Y-%m-%d %H:00:00') moniterTime  from env_hour_data where  genTime &lt;= #{endTime} and  genTime >= #{startTime} and  siteId = #{siteId} order by genTime desc
+      </otherwise>
+    </choose>
+
+  </select>
+  <select id="selectContent" resultType="java.lang.String">
+    SELECT content FROM `env_hour_data` WHERE siteId = #{siteId} AND genTime >=#{start} AND genTime &lt;=#{end}
+  </select>
+</mapper>

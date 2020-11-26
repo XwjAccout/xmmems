@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmmems.mapper.CounterchargeLogMapper" >
+  <resultMap id="BaseResultMap" type="com.xmmems.domain.CounterchargeLog" >
+    <result column="QN" property="QN" jdbcType="VARCHAR" />
+    <result column="CNName" property="CNName" jdbcType="VARCHAR" />
+    <result column="RealName" property="realName" jdbcType="VARCHAR" />
+    <result column="RCTime" property="RCTime" jdbcType="VARCHAR" />
+    <result column="ip" property="ip" jdbcType="VARCHAR" />
+    <result column="QnRtn" property="qnRtn" jdbcType="INTEGER" />
+    <result column="ExrRtn" property="exrRtn" jdbcType="INTEGER" />
+    <result column="CPData" property="CPData" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    QN, CNName, RealName, RCTime, ip, QnRtn, ExrRtn, CPData
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.xmmems.domain.CounterchargeLogExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from countercharge_log
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <insert id="insert" parameterType="com.xmmems.domain.CounterchargeLog" >
+    insert into countercharge_log (QN, CNName, RealName, 
+      RCTime, ip, QnRtn, 
+      ExrRtn, CPData)
+    values (#{QN,jdbcType=VARCHAR}, #{CNName,jdbcType=VARCHAR}, #{realName,jdbcType=VARCHAR}, 
+      #{RCTime,jdbcType=VARCHAR}, #{ip,jdbcType=VARCHAR}, #{qnRtn,jdbcType=INTEGER}, 
+      #{exrRtn,jdbcType=INTEGER}, #{CPData,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.xmmems.domain.CounterchargeLog" >
+    insert into countercharge_log
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="QN != null" >
+        QN,
+      </if>
+      <if test="CNName != null" >
+        CNName,
+      </if>
+      <if test="realName != null" >
+        RealName,
+      </if>
+      <if test="RCTime != null" >
+        RCTime,
+      </if>
+      <if test="ip != null" >
+        ip,
+      </if>
+      <if test="qnRtn != null" >
+        QnRtn,
+      </if>
+      <if test="exrRtn != null" >
+        ExrRtn,
+      </if>
+      <if test="CPData != null" >
+        CPData,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="QN != null" >
+        #{QN,jdbcType=VARCHAR},
+      </if>
+      <if test="CNName != null" >
+        #{CNName,jdbcType=VARCHAR},
+      </if>
+      <if test="realName != null" >
+        #{realName,jdbcType=VARCHAR},
+      </if>
+      <if test="RCTime != null" >
+        #{RCTime,jdbcType=VARCHAR},
+      </if>
+      <if test="ip != null" >
+        #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="qnRtn != null" >
+        #{qnRtn,jdbcType=INTEGER},
+      </if>
+      <if test="exrRtn != null" >
+        #{exrRtn,jdbcType=INTEGER},
+      </if>
+      <if test="CPData != null" >
+        #{CPData,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xmmems.domain.CounterchargeLog" >
+    update countercharge_log
+    <set >
+      <if test="QN != null" >
+        #{QN,jdbcType=VARCHAR},
+      </if>
+      <if test="CNName != null" >
+        #{CNName,jdbcType=VARCHAR},
+      </if>
+      <if test="realName != null" >
+        #{realName,jdbcType=VARCHAR},
+      </if>
+      <if test="RCTime != null" >
+        #{RCTime,jdbcType=VARCHAR},
+      </if>
+      <if test="ip != null" >
+        #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="qnRtn != null" >
+        #{qnRtn,jdbcType=INTEGER},
+      </if>
+      <if test="exrRtn != null" >
+        #{exrRtn,jdbcType=INTEGER},
+      </if>
+      <if test="CPData != null" >
+        #{CPData,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where QN = #{QN,jdbcType=VARCHAR}
+  </update>
+</mapper>

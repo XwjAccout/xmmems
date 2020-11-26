@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmmems.mapper.RepositoryMapper" >
+  <resultMap id="BaseResultMap" type="com.xmmems.domain.Repository" >
+    <result column="essayClass" property="essayClass" jdbcType="VARCHAR" />
+    <result column="essayTitle" property="essayTitle" jdbcType="VARCHAR" />
+    <result column="author" property="author" jdbcType="VARCHAR" />
+    <result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    essayClass, essayTitle, author, createTime, type
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.xmmems.domain.RepositoryExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from repository
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <insert id="insert" parameterType="com.xmmems.domain.Repository" >
+    insert into repository (essayClass, essayTitle, author, 
+      createTime, type)
+    values (#{essayClass,jdbcType=VARCHAR}, #{essayTitle,jdbcType=VARCHAR}, #{author,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{type,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.xmmems.domain.Repository" >
+    insert into repository
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="essayClass != null" >
+        essayClass,
+      </if>
+      <if test="essayTitle != null" >
+        essayTitle,
+      </if>
+      <if test="author != null" >
+        author,
+      </if>
+      <if test="createTime != null" >
+        createTime,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="essayClass != null" >
+        #{essayClass,jdbcType=VARCHAR},
+      </if>
+      <if test="essayTitle != null" >
+        #{essayTitle,jdbcType=VARCHAR},
+      </if>
+      <if test="author != null" >
+        #{author,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+</mapper>
