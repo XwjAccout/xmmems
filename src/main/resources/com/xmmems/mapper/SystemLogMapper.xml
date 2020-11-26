@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmmems.mapper.SystemLogMapper" >
+  <resultMap id="BaseResultMap" type="com.xmmems.domain.SystemLog" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="requestip" property="requestip" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="CHAR" />
+    <result column="userid" property="userid" jdbcType="VARCHAR" />
+    <result column="description" property="description" jdbcType="VARCHAR" />
+    <result column="actiondate" property="actiondate" jdbcType="DATE" />
+    <result column="exceptioncode" property="exceptioncode" jdbcType="VARCHAR" />
+    <result column="actionmethod" property="actionmethod" jdbcType="VARCHAR" />
+    <result column="params" property="params" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.xmmems.domain.SystemLog" extends="BaseResultMap" >
+    <result column="exceptiondetail" property="exceptiondetail" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, requestip, type, userid, description, actiondate, exceptioncode, actionmethod, 
+    params
+  </sql>
+  <sql id="Blob_Column_List" >
+    exceptiondetail
+  </sql>
+  <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="com.xmmems.domain.SystemLogExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from systemlog
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.xmmems.domain.SystemLogExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from systemlog
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from systemlog
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from systemlog
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.xmmems.domain.SystemLog" >
+    insert into systemlog (id, requestip, type, 
+      userid, description, actiondate, 
+      exceptioncode, actionmethod, params, 
+      exceptiondetail)
+    values (#{id,jdbcType=INTEGER}, #{requestip,jdbcType=VARCHAR}, #{type,jdbcType=CHAR}, 
+      #{userid,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{actiondate,jdbcType=DATE}, 
+      #{exceptioncode,jdbcType=VARCHAR}, #{actionmethod,jdbcType=VARCHAR}, #{params,jdbcType=VARCHAR}, 
+      #{exceptiondetail,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.xmmems.domain.SystemLog" >
+    insert into systemlog
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="requestip != null" >
+        requestip,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="userid != null" >
+        userid,
+      </if>
+      <if test="description != null" >
+        description,
+      </if>
+      <if test="actiondate != null" >
+        actiondate,
+      </if>
+      <if test="exceptioncode != null" >
+        exceptioncode,
+      </if>
+      <if test="actionmethod != null" >
+        actionmethod,
+      </if>
+      <if test="params != null" >
+        params,
+      </if>
+      <if test="exceptiondetail != null" >
+        exceptiondetail,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="requestip != null" >
+        #{requestip,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=CHAR},
+      </if>
+      <if test="userid != null" >
+        #{userid,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="actiondate != null" >
+        #{actiondate,jdbcType=DATE},
+      </if>
+      <if test="exceptioncode != null" >
+        #{exceptioncode,jdbcType=VARCHAR},
+      </if>
+      <if test="actionmethod != null" >
+        #{actionmethod,jdbcType=VARCHAR},
+      </if>
+      <if test="params != null" >
+        #{params,jdbcType=VARCHAR},
+      </if>
+      <if test="exceptiondetail != null" >
+        #{exceptiondetail,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xmmems.domain.SystemLog" >
+    update systemlog
+    <set >
+      <if test="requestip != null" >
+        requestip = #{requestip,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=CHAR},
+      </if>
+      <if test="userid != null" >
+        userid = #{userid,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="actiondate != null" >
+        actiondate = #{actiondate,jdbcType=DATE},
+      </if>
+      <if test="exceptioncode != null" >
+        exceptioncode = #{exceptioncode,jdbcType=VARCHAR},
+      </if>
+      <if test="actionmethod != null" >
+        actionmethod = #{actionmethod,jdbcType=VARCHAR},
+      </if>
+      <if test="params != null" >
+        params = #{params,jdbcType=VARCHAR},
+      </if>
+      <if test="exceptiondetail != null" >
+        exceptiondetail = #{exceptiondetail,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.xmmems.domain.SystemLog" >
+    update systemlog
+    set requestip = #{requestip,jdbcType=VARCHAR},
+      type = #{type,jdbcType=CHAR},
+      userid = #{userid,jdbcType=VARCHAR},
+      description = #{description,jdbcType=VARCHAR},
+      actiondate = #{actiondate,jdbcType=DATE},
+      exceptioncode = #{exceptioncode,jdbcType=VARCHAR},
+      actionmethod = #{actionmethod,jdbcType=VARCHAR},
+      params = #{params,jdbcType=VARCHAR},
+      exceptiondetail = #{exceptiondetail,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xmmems.domain.SystemLog" >
+    update systemlog
+    set requestip = #{requestip,jdbcType=VARCHAR},
+      type = #{type,jdbcType=CHAR},
+      userid = #{userid,jdbcType=VARCHAR},
+      description = #{description,jdbcType=VARCHAR},
+      actiondate = #{actiondate,jdbcType=DATE},
+      exceptioncode = #{exceptioncode,jdbcType=VARCHAR},
+      actionmethod = #{actionmethod,jdbcType=VARCHAR},
+      params = #{params,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

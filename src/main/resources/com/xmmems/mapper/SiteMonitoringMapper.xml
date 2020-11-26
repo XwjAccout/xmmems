@@ -1,0 +1,671 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmmems.mapper.SiteMonitoringMapper" >
+  <resultMap id="BaseResultMap" type="com.xmmems.domain.site.SiteMonitoring" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="siteName" property="siteName" jdbcType="VARCHAR" />
+    <result column="ad" property="ad" jdbcType="VARCHAR" />
+    <result column="deviceID" property="deviceID" jdbcType="INTEGER" />
+    <result column="recordingTime" property="recordingTime" jdbcType="TIMESTAMP" />
+    <result column="moniTime" property="moniTime" jdbcType="TIMESTAMP" />
+    <result column="equipmentState" property="equipmentState" jdbcType="VARCHAR" />
+    <result column="communicationStatus" property="communicationStatus" jdbcType="VARCHAR" />
+    <result column="dataSource" property="dataSource" jdbcType="VARCHAR" />
+    <result column="reservedAIN1" property="reservedAIN1" jdbcType="VARCHAR" />
+    <result column="accumulatedRainfall" property="accumulatedRainfall" jdbcType="VARCHAR" />
+    <result column="rainfallIntensity" property="rainfallIntensity" jdbcType="VARCHAR" />
+    <result column="five_minuteRainfall" property="five_minuteRainfall" jdbcType="VARCHAR" />
+    <result column="rainfallDuring" property="rainfallDuring" jdbcType="VARCHAR" />
+    <result column="dailyPrecipitation" property="dailyPrecipitation" jdbcType="VARCHAR" />
+    <result column="ten_dayRainfall" property="ten_dayRainfall" jdbcType="VARCHAR" />
+    <result column="monthlyRainfall" property="monthlyRainfall" jdbcType="VARCHAR" />
+    <result column="valueCOD" property="valueCOD" jdbcType="VARCHAR" />
+    <result column="zdz" property="zdz" jdbcType="VARCHAR" />
+    <result column="valueTOC" property="valueTOC" jdbcType="VARCHAR" />
+    <result column="probeTemperature" property="probeTemperature" jdbcType="VARCHAR" />
+    <result column="atmosphericPressure" property="atmosphericPressure" jdbcType="VARCHAR" />
+    <result column="batteryPercentage" property="batteryPercentage" jdbcType="VARCHAR" />
+    <result column="externalVoltage" property="externalVoltage" jdbcType="VARCHAR" />
+    <result column="pressure" property="pressure" jdbcType="VARCHAR" />
+    <result column="depth" property="depth" jdbcType="VARCHAR" />
+    <result column="rjy" property="rjy" jdbcType="VARCHAR" />
+    <result column="oxygenPartialPressure" property="oxygenPartialPressure" jdbcType="VARCHAR" />
+    <result column="zd" property="zd" jdbcType="VARCHAR" />
+    <result column="temperature" property="temperature" jdbcType="VARCHAR" />
+    <result column="ddl" property="ddl" jdbcType="VARCHAR" />
+    <result column="salinity" property="salinity" jdbcType="VARCHAR" />
+    <result column="totalDissolvedSolid" property="totalDissolvedSolid" jdbcType="VARCHAR" />
+    <result column="resistivity" property="resistivity" jdbcType="VARCHAR" />
+    <result column="waterDensity" property="waterDensity" jdbcType="VARCHAR" />
+    <result column="ph" property="ph" jdbcType="VARCHAR" />
+    <result column="potentialREDOX" property="potentialREDOX" jdbcType="VARCHAR" />
+    <result column="rainGaugeFault" property="rainGaugeFault" jdbcType="VARCHAR" />
+    <result column="rainClearAddress" property="rainClearAddress" jdbcType="VARCHAR" />
+    <result column="communicationFailureCODanalyzer" property="communicationFailureCODanalyzer" jdbcType="VARCHAR" />
+    <result column="waterQualityAnalyzer" property="waterQualityAnalyzer" jdbcType="VARCHAR" />
+    <result column="waterUpLevelAlarm" property="waterUpLevelAlarm" jdbcType="VARCHAR" />
+    <result column="waterDownLevelAlarm" property="waterDownLevelAlarm" jdbcType="VARCHAR" />
+    <result column="doorSwitch" property="doorSwitch" jdbcType="VARCHAR" />
+    <result column="powerDetect" property="powerDetect" jdbcType="VARCHAR" />
+    <result column="faultAIN1" property="faultAIN1" jdbcType="VARCHAR" />
+    <result column="upperLimitAlarmAIN1" property="upperLimitAlarmAIN1" jdbcType="VARCHAR" />
+    <result column="lowerLimitAlarmAIN1" property="lowerLimitAlarmAIN1" jdbcType="VARCHAR" />
+    <result column="waterLevelState" property="waterLevelState" jdbcType="VARCHAR" />
+    <result column="waterLevel" property="waterLevel" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, siteName, ad, deviceID, recordingTime, moniTime, equipmentState, communicationStatus, 
+    dataSource, reservedAIN1, accumulatedRainfall, rainfallIntensity, five_minuteRainfall, 
+    rainfallDuring, dailyPrecipitation, ten_dayRainfall, monthlyRainfall, valueCOD, zdz, 
+    valueTOC, probeTemperature, atmosphericPressure, batteryPercentage, externalVoltage, 
+    pressure, depth, rjy, oxygenPartialPressure, zd, temperature, ddl, salinity, totalDissolvedSolid, 
+    resistivity, waterDensity, ph, potentialREDOX, rainGaugeFault, rainClearAddress, 
+    communicationFailureCODanalyzer, waterQualityAnalyzer, waterUpLevelAlarm, waterDownLevelAlarm, 
+    doorSwitch, powerDetect, faultAIN1, upperLimitAlarmAIN1, lowerLimitAlarmAIN1, waterLevelState, 
+    waterLevel
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.xmmems.domain.site.SiteMonitoringExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from site_monitoring
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from site_monitoring
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from site_monitoring
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.xmmems.domain.site.SiteMonitoring" >
+    insert into site_monitoring (id, siteName, ad, 
+      deviceID, recordingTime, moniTime, 
+      equipmentState, communicationStatus, dataSource, 
+      reservedAIN1, accumulatedRainfall, rainfallIntensity, 
+      five_minuteRainfall, rainfallDuring, dailyPrecipitation, 
+      ten_dayRainfall, monthlyRainfall, valueCOD, 
+      zdz, valueTOC, probeTemperature, 
+      atmosphericPressure, batteryPercentage, 
+      externalVoltage, pressure, depth, 
+      rjy, oxygenPartialPressure, zd, 
+      temperature, ddl, salinity, 
+      totalDissolvedSolid, resistivity, waterDensity, 
+      ph, potentialREDOX, rainGaugeFault, 
+      rainClearAddress, communicationFailureCODanalyzer, 
+      waterQualityAnalyzer, waterUpLevelAlarm, 
+      waterDownLevelAlarm, doorSwitch, powerDetect, 
+      faultAIN1, upperLimitAlarmAIN1, lowerLimitAlarmAIN1, 
+      waterLevelState, waterLevel)
+    values (#{id,jdbcType=INTEGER}, #{siteName,jdbcType=VARCHAR}, #{ad,jdbcType=VARCHAR}, 
+      #{deviceID,jdbcType=INTEGER}, #{recordingTime,jdbcType=TIMESTAMP}, #{moniTime,jdbcType=TIMESTAMP}, 
+      #{equipmentState,jdbcType=VARCHAR}, #{communicationStatus,jdbcType=VARCHAR}, #{dataSource,jdbcType=VARCHAR}, 
+      #{reservedAIN1,jdbcType=VARCHAR}, #{accumulatedRainfall,jdbcType=VARCHAR}, #{rainfallIntensity,jdbcType=VARCHAR}, 
+      #{five_minuteRainfall,jdbcType=VARCHAR}, #{rainfallDuring,jdbcType=VARCHAR}, #{dailyPrecipitation,jdbcType=VARCHAR}, 
+      #{ten_dayRainfall,jdbcType=VARCHAR}, #{monthlyRainfall,jdbcType=VARCHAR}, #{valueCOD,jdbcType=VARCHAR}, 
+      #{zdz,jdbcType=VARCHAR}, #{valueTOC,jdbcType=VARCHAR}, #{probeTemperature,jdbcType=VARCHAR}, 
+      #{atmosphericPressure,jdbcType=VARCHAR}, #{batteryPercentage,jdbcType=VARCHAR}, 
+      #{externalVoltage,jdbcType=VARCHAR}, #{pressure,jdbcType=VARCHAR}, #{depth,jdbcType=VARCHAR}, 
+      #{rjy,jdbcType=VARCHAR}, #{oxygenPartialPressure,jdbcType=VARCHAR}, #{zd,jdbcType=VARCHAR}, 
+      #{temperature,jdbcType=VARCHAR}, #{ddl,jdbcType=VARCHAR}, #{salinity,jdbcType=VARCHAR}, 
+      #{totalDissolvedSolid,jdbcType=VARCHAR}, #{resistivity,jdbcType=VARCHAR}, #{waterDensity,jdbcType=VARCHAR}, 
+      #{ph,jdbcType=VARCHAR}, #{potentialREDOX,jdbcType=VARCHAR}, #{rainGaugeFault,jdbcType=VARCHAR}, 
+      #{rainClearAddress,jdbcType=VARCHAR}, #{communicationFailureCODanalyzer,jdbcType=VARCHAR}, 
+      #{waterQualityAnalyzer,jdbcType=VARCHAR}, #{waterUpLevelAlarm,jdbcType=VARCHAR}, 
+      #{waterDownLevelAlarm,jdbcType=VARCHAR}, #{doorSwitch,jdbcType=VARCHAR}, #{powerDetect,jdbcType=VARCHAR}, 
+      #{faultAIN1,jdbcType=VARCHAR}, #{upperLimitAlarmAIN1,jdbcType=VARCHAR}, #{lowerLimitAlarmAIN1,jdbcType=VARCHAR}, 
+      #{waterLevelState,jdbcType=VARCHAR}, #{waterLevel,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.xmmems.domain.site.SiteMonitoring" >
+    insert into site_monitoring
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="siteName != null" >
+        siteName,
+      </if>
+      <if test="ad != null" >
+        ad,
+      </if>
+      <if test="deviceID != null" >
+        deviceID,
+      </if>
+      <if test="recordingTime != null" >
+        recordingTime,
+      </if>
+      <if test="moniTime != null" >
+        moniTime,
+      </if>
+      <if test="equipmentState != null" >
+        equipmentState,
+      </if>
+      <if test="communicationStatus != null" >
+        communicationStatus,
+      </if>
+      <if test="dataSource != null" >
+        dataSource,
+      </if>
+      <if test="reservedAIN1 != null" >
+        reservedAIN1,
+      </if>
+      <if test="accumulatedRainfall != null" >
+        accumulatedRainfall,
+      </if>
+      <if test="rainfallIntensity != null" >
+        rainfallIntensity,
+      </if>
+      <if test="five_minuteRainfall != null" >
+        five_minuteRainfall,
+      </if>
+      <if test="rainfallDuring != null" >
+        rainfallDuring,
+      </if>
+      <if test="dailyPrecipitation != null" >
+        dailyPrecipitation,
+      </if>
+      <if test="ten_dayRainfall != null" >
+        ten_dayRainfall,
+      </if>
+      <if test="monthlyRainfall != null" >
+        monthlyRainfall,
+      </if>
+      <if test="valueCOD != null" >
+        valueCOD,
+      </if>
+      <if test="zdz != null" >
+        zdz,
+      </if>
+      <if test="valueTOC != null" >
+        valueTOC,
+      </if>
+      <if test="probeTemperature != null" >
+        probeTemperature,
+      </if>
+      <if test="atmosphericPressure != null" >
+        atmosphericPressure,
+      </if>
+      <if test="batteryPercentage != null" >
+        batteryPercentage,
+      </if>
+      <if test="externalVoltage != null" >
+        externalVoltage,
+      </if>
+      <if test="pressure != null" >
+        pressure,
+      </if>
+      <if test="depth != null" >
+        depth,
+      </if>
+      <if test="rjy != null" >
+        rjy,
+      </if>
+      <if test="oxygenPartialPressure != null" >
+        oxygenPartialPressure,
+      </if>
+      <if test="zd != null" >
+        zd,
+      </if>
+      <if test="temperature != null" >
+        temperature,
+      </if>
+      <if test="ddl != null" >
+        ddl,
+      </if>
+      <if test="salinity != null" >
+        salinity,
+      </if>
+      <if test="totalDissolvedSolid != null" >
+        totalDissolvedSolid,
+      </if>
+      <if test="resistivity != null" >
+        resistivity,
+      </if>
+      <if test="waterDensity != null" >
+        waterDensity,
+      </if>
+      <if test="ph != null" >
+        ph,
+      </if>
+      <if test="potentialREDOX != null" >
+        potentialREDOX,
+      </if>
+      <if test="rainGaugeFault != null" >
+        rainGaugeFault,
+      </if>
+      <if test="rainClearAddress != null" >
+        rainClearAddress,
+      </if>
+      <if test="communicationFailureCODanalyzer != null" >
+        communicationFailureCODanalyzer,
+      </if>
+      <if test="waterQualityAnalyzer != null" >
+        waterQualityAnalyzer,
+      </if>
+      <if test="waterUpLevelAlarm != null" >
+        waterUpLevelAlarm,
+      </if>
+      <if test="waterDownLevelAlarm != null" >
+        waterDownLevelAlarm,
+      </if>
+      <if test="doorSwitch != null" >
+        doorSwitch,
+      </if>
+      <if test="powerDetect != null" >
+        powerDetect,
+      </if>
+      <if test="faultAIN1 != null" >
+        faultAIN1,
+      </if>
+      <if test="upperLimitAlarmAIN1 != null" >
+        upperLimitAlarmAIN1,
+      </if>
+      <if test="lowerLimitAlarmAIN1 != null" >
+        lowerLimitAlarmAIN1,
+      </if>
+      <if test="waterLevelState != null" >
+        waterLevelState,
+      </if>
+      <if test="waterLevel != null" >
+        waterLevel,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="siteName != null" >
+        #{siteName,jdbcType=VARCHAR},
+      </if>
+      <if test="ad != null" >
+        #{ad,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceID != null" >
+        #{deviceID,jdbcType=INTEGER},
+      </if>
+      <if test="recordingTime != null" >
+        #{recordingTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="moniTime != null" >
+        #{moniTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="equipmentState != null" >
+        #{equipmentState,jdbcType=VARCHAR},
+      </if>
+      <if test="communicationStatus != null" >
+        #{communicationStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="dataSource != null" >
+        #{dataSource,jdbcType=VARCHAR},
+      </if>
+      <if test="reservedAIN1 != null" >
+        #{reservedAIN1,jdbcType=VARCHAR},
+      </if>
+      <if test="accumulatedRainfall != null" >
+        #{accumulatedRainfall,jdbcType=VARCHAR},
+      </if>
+      <if test="rainfallIntensity != null" >
+        #{rainfallIntensity,jdbcType=VARCHAR},
+      </if>
+      <if test="five_minuteRainfall != null" >
+        #{five_minuteRainfall,jdbcType=VARCHAR},
+      </if>
+      <if test="rainfallDuring != null" >
+        #{rainfallDuring,jdbcType=VARCHAR},
+      </if>
+      <if test="dailyPrecipitation != null" >
+        #{dailyPrecipitation,jdbcType=VARCHAR},
+      </if>
+      <if test="ten_dayRainfall != null" >
+        #{ten_dayRainfall,jdbcType=VARCHAR},
+      </if>
+      <if test="monthlyRainfall != null" >
+        #{monthlyRainfall,jdbcType=VARCHAR},
+      </if>
+      <if test="valueCOD != null" >
+        #{valueCOD,jdbcType=VARCHAR},
+      </if>
+      <if test="zdz != null" >
+        #{zdz,jdbcType=VARCHAR},
+      </if>
+      <if test="valueTOC != null" >
+        #{valueTOC,jdbcType=VARCHAR},
+      </if>
+      <if test="probeTemperature != null" >
+        #{probeTemperature,jdbcType=VARCHAR},
+      </if>
+      <if test="atmosphericPressure != null" >
+        #{atmosphericPressure,jdbcType=VARCHAR},
+      </if>
+      <if test="batteryPercentage != null" >
+        #{batteryPercentage,jdbcType=VARCHAR},
+      </if>
+      <if test="externalVoltage != null" >
+        #{externalVoltage,jdbcType=VARCHAR},
+      </if>
+      <if test="pressure != null" >
+        #{pressure,jdbcType=VARCHAR},
+      </if>
+      <if test="depth != null" >
+        #{depth,jdbcType=VARCHAR},
+      </if>
+      <if test="rjy != null" >
+        #{rjy,jdbcType=VARCHAR},
+      </if>
+      <if test="oxygenPartialPressure != null" >
+        #{oxygenPartialPressure,jdbcType=VARCHAR},
+      </if>
+      <if test="zd != null" >
+        #{zd,jdbcType=VARCHAR},
+      </if>
+      <if test="temperature != null" >
+        #{temperature,jdbcType=VARCHAR},
+      </if>
+      <if test="ddl != null" >
+        #{ddl,jdbcType=VARCHAR},
+      </if>
+      <if test="salinity != null" >
+        #{salinity,jdbcType=VARCHAR},
+      </if>
+      <if test="totalDissolvedSolid != null" >
+        #{totalDissolvedSolid,jdbcType=VARCHAR},
+      </if>
+      <if test="resistivity != null" >
+        #{resistivity,jdbcType=VARCHAR},
+      </if>
+      <if test="waterDensity != null" >
+        #{waterDensity,jdbcType=VARCHAR},
+      </if>
+      <if test="ph != null" >
+        #{ph,jdbcType=VARCHAR},
+      </if>
+      <if test="potentialREDOX != null" >
+        #{potentialREDOX,jdbcType=VARCHAR},
+      </if>
+      <if test="rainGaugeFault != null" >
+        #{rainGaugeFault,jdbcType=VARCHAR},
+      </if>
+      <if test="rainClearAddress != null" >
+        #{rainClearAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="communicationFailureCODanalyzer != null" >
+        #{communicationFailureCODanalyzer,jdbcType=VARCHAR},
+      </if>
+      <if test="waterQualityAnalyzer != null" >
+        #{waterQualityAnalyzer,jdbcType=VARCHAR},
+      </if>
+      <if test="waterUpLevelAlarm != null" >
+        #{waterUpLevelAlarm,jdbcType=VARCHAR},
+      </if>
+      <if test="waterDownLevelAlarm != null" >
+        #{waterDownLevelAlarm,jdbcType=VARCHAR},
+      </if>
+      <if test="doorSwitch != null" >
+        #{doorSwitch,jdbcType=VARCHAR},
+      </if>
+      <if test="powerDetect != null" >
+        #{powerDetect,jdbcType=VARCHAR},
+      </if>
+      <if test="faultAIN1 != null" >
+        #{faultAIN1,jdbcType=VARCHAR},
+      </if>
+      <if test="upperLimitAlarmAIN1 != null" >
+        #{upperLimitAlarmAIN1,jdbcType=VARCHAR},
+      </if>
+      <if test="lowerLimitAlarmAIN1 != null" >
+        #{lowerLimitAlarmAIN1,jdbcType=VARCHAR},
+      </if>
+      <if test="waterLevelState != null" >
+        #{waterLevelState,jdbcType=VARCHAR},
+      </if>
+      <if test="waterLevel != null" >
+        #{waterLevel,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xmmems.domain.site.SiteMonitoring" >
+    update site_monitoring
+    <set >
+      <if test="siteName != null" >
+        siteName = #{siteName,jdbcType=VARCHAR},
+      </if>
+      <if test="ad != null" >
+        ad = #{ad,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceID != null" >
+        deviceID = #{deviceID,jdbcType=INTEGER},
+      </if>
+      <if test="recordingTime != null" >
+        recordingTime = #{recordingTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="moniTime != null" >
+        moniTime = #{moniTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="equipmentState != null" >
+        equipmentState = #{equipmentState,jdbcType=VARCHAR},
+      </if>
+      <if test="communicationStatus != null" >
+        communicationStatus = #{communicationStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="dataSource != null" >
+        dataSource = #{dataSource,jdbcType=VARCHAR},
+      </if>
+      <if test="reservedAIN1 != null" >
+        reservedAIN1 = #{reservedAIN1,jdbcType=VARCHAR},
+      </if>
+      <if test="accumulatedRainfall != null" >
+        accumulatedRainfall = #{accumulatedRainfall,jdbcType=VARCHAR},
+      </if>
+      <if test="rainfallIntensity != null" >
+        rainfallIntensity = #{rainfallIntensity,jdbcType=VARCHAR},
+      </if>
+      <if test="five_minuteRainfall != null" >
+        five_minuteRainfall = #{five_minuteRainfall,jdbcType=VARCHAR},
+      </if>
+      <if test="rainfallDuring != null" >
+        rainfallDuring = #{rainfallDuring,jdbcType=VARCHAR},
+      </if>
+      <if test="dailyPrecipitation != null" >
+        dailyPrecipitation = #{dailyPrecipitation,jdbcType=VARCHAR},
+      </if>
+      <if test="ten_dayRainfall != null" >
+        ten_dayRainfall = #{ten_dayRainfall,jdbcType=VARCHAR},
+      </if>
+      <if test="monthlyRainfall != null" >
+        monthlyRainfall = #{monthlyRainfall,jdbcType=VARCHAR},
+      </if>
+      <if test="valueCOD != null" >
+        valueCOD = #{valueCOD,jdbcType=VARCHAR},
+      </if>
+      <if test="zdz != null" >
+        zdz = #{zdz,jdbcType=VARCHAR},
+      </if>
+      <if test="valueTOC != null" >
+        valueTOC = #{valueTOC,jdbcType=VARCHAR},
+      </if>
+      <if test="probeTemperature != null" >
+        probeTemperature = #{probeTemperature,jdbcType=VARCHAR},
+      </if>
+      <if test="atmosphericPressure != null" >
+        atmosphericPressure = #{atmosphericPressure,jdbcType=VARCHAR},
+      </if>
+      <if test="batteryPercentage != null" >
+        batteryPercentage = #{batteryPercentage,jdbcType=VARCHAR},
+      </if>
+      <if test="externalVoltage != null" >
+        externalVoltage = #{externalVoltage,jdbcType=VARCHAR},
+      </if>
+      <if test="pressure != null" >
+        pressure = #{pressure,jdbcType=VARCHAR},
+      </if>
+      <if test="depth != null" >
+        depth = #{depth,jdbcType=VARCHAR},
+      </if>
+      <if test="rjy != null" >
+        rjy = #{rjy,jdbcType=VARCHAR},
+      </if>
+      <if test="oxygenPartialPressure != null" >
+        oxygenPartialPressure = #{oxygenPartialPressure,jdbcType=VARCHAR},
+      </if>
+      <if test="zd != null" >
+        zd = #{zd,jdbcType=VARCHAR},
+      </if>
+      <if test="temperature != null" >
+        temperature = #{temperature,jdbcType=VARCHAR},
+      </if>
+      <if test="ddl != null" >
+        ddl = #{ddl,jdbcType=VARCHAR},
+      </if>
+      <if test="salinity != null" >
+        salinity = #{salinity,jdbcType=VARCHAR},
+      </if>
+      <if test="totalDissolvedSolid != null" >
+        totalDissolvedSolid = #{totalDissolvedSolid,jdbcType=VARCHAR},
+      </if>
+      <if test="resistivity != null" >
+        resistivity = #{resistivity,jdbcType=VARCHAR},
+      </if>
+      <if test="waterDensity != null" >
+        waterDensity = #{waterDensity,jdbcType=VARCHAR},
+      </if>
+      <if test="ph != null" >
+        ph = #{ph,jdbcType=VARCHAR},
+      </if>
+      <if test="potentialREDOX != null" >
+        potentialREDOX = #{potentialREDOX,jdbcType=VARCHAR},
+      </if>
+      <if test="rainGaugeFault != null" >
+        rainGaugeFault = #{rainGaugeFault,jdbcType=VARCHAR},
+      </if>
+      <if test="rainClearAddress != null" >
+        rainClearAddress = #{rainClearAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="communicationFailureCODanalyzer != null" >
+        communicationFailureCODanalyzer = #{communicationFailureCODanalyzer,jdbcType=VARCHAR},
+      </if>
+      <if test="waterQualityAnalyzer != null" >
+        waterQualityAnalyzer = #{waterQualityAnalyzer,jdbcType=VARCHAR},
+      </if>
+      <if test="waterUpLevelAlarm != null" >
+        waterUpLevelAlarm = #{waterUpLevelAlarm,jdbcType=VARCHAR},
+      </if>
+      <if test="waterDownLevelAlarm != null" >
+        waterDownLevelAlarm = #{waterDownLevelAlarm,jdbcType=VARCHAR},
+      </if>
+      <if test="doorSwitch != null" >
+        doorSwitch = #{doorSwitch,jdbcType=VARCHAR},
+      </if>
+      <if test="powerDetect != null" >
+        powerDetect = #{powerDetect,jdbcType=VARCHAR},
+      </if>
+      <if test="faultAIN1 != null" >
+        faultAIN1 = #{faultAIN1,jdbcType=VARCHAR},
+      </if>
+      <if test="upperLimitAlarmAIN1 != null" >
+        upperLimitAlarmAIN1 = #{upperLimitAlarmAIN1,jdbcType=VARCHAR},
+      </if>
+      <if test="lowerLimitAlarmAIN1 != null" >
+        lowerLimitAlarmAIN1 = #{lowerLimitAlarmAIN1,jdbcType=VARCHAR},
+      </if>
+      <if test="waterLevelState != null" >
+        waterLevelState = #{waterLevelState,jdbcType=VARCHAR},
+      </if>
+      <if test="waterLevel != null" >
+        waterLevel = #{waterLevel,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xmmems.domain.site.SiteMonitoring" >
+    update site_monitoring
+    set siteName = #{siteName,jdbcType=VARCHAR},
+      ad = #{ad,jdbcType=VARCHAR},
+      deviceID = #{deviceID,jdbcType=INTEGER},
+      recordingTime = #{recordingTime,jdbcType=TIMESTAMP},
+      moniTime = #{moniTime,jdbcType=TIMESTAMP},
+      equipmentState = #{equipmentState,jdbcType=VARCHAR},
+      communicationStatus = #{communicationStatus,jdbcType=VARCHAR},
+      dataSource = #{dataSource,jdbcType=VARCHAR},
+      reservedAIN1 = #{reservedAIN1,jdbcType=VARCHAR},
+      accumulatedRainfall = #{accumulatedRainfall,jdbcType=VARCHAR},
+      rainfallIntensity = #{rainfallIntensity,jdbcType=VARCHAR},
+      five_minuteRainfall = #{five_minuteRainfall,jdbcType=VARCHAR},
+      rainfallDuring = #{rainfallDuring,jdbcType=VARCHAR},
+      dailyPrecipitation = #{dailyPrecipitation,jdbcType=VARCHAR},
+      ten_dayRainfall = #{ten_dayRainfall,jdbcType=VARCHAR},
+      monthlyRainfall = #{monthlyRainfall,jdbcType=VARCHAR},
+      valueCOD = #{valueCOD,jdbcType=VARCHAR},
+      zdz = #{zdz,jdbcType=VARCHAR},
+      valueTOC = #{valueTOC,jdbcType=VARCHAR},
+      probeTemperature = #{probeTemperature,jdbcType=VARCHAR},
+      atmosphericPressure = #{atmosphericPressure,jdbcType=VARCHAR},
+      batteryPercentage = #{batteryPercentage,jdbcType=VARCHAR},
+      externalVoltage = #{externalVoltage,jdbcType=VARCHAR},
+      pressure = #{pressure,jdbcType=VARCHAR},
+      depth = #{depth,jdbcType=VARCHAR},
+      rjy = #{rjy,jdbcType=VARCHAR},
+      oxygenPartialPressure = #{oxygenPartialPressure,jdbcType=VARCHAR},
+      zd = #{zd,jdbcType=VARCHAR},
+      temperature = #{temperature,jdbcType=VARCHAR},
+      ddl = #{ddl,jdbcType=VARCHAR},
+      salinity = #{salinity,jdbcType=VARCHAR},
+      totalDissolvedSolid = #{totalDissolvedSolid,jdbcType=VARCHAR},
+      resistivity = #{resistivity,jdbcType=VARCHAR},
+      waterDensity = #{waterDensity,jdbcType=VARCHAR},
+      ph = #{ph,jdbcType=VARCHAR},
+      potentialREDOX = #{potentialREDOX,jdbcType=VARCHAR},
+      rainGaugeFault = #{rainGaugeFault,jdbcType=VARCHAR},
+      rainClearAddress = #{rainClearAddress,jdbcType=VARCHAR},
+      communicationFailureCODanalyzer = #{communicationFailureCODanalyzer,jdbcType=VARCHAR},
+      waterQualityAnalyzer = #{waterQualityAnalyzer,jdbcType=VARCHAR},
+      waterUpLevelAlarm = #{waterUpLevelAlarm,jdbcType=VARCHAR},
+      waterDownLevelAlarm = #{waterDownLevelAlarm,jdbcType=VARCHAR},
+      doorSwitch = #{doorSwitch,jdbcType=VARCHAR},
+      powerDetect = #{powerDetect,jdbcType=VARCHAR},
+      faultAIN1 = #{faultAIN1,jdbcType=VARCHAR},
+      upperLimitAlarmAIN1 = #{upperLimitAlarmAIN1,jdbcType=VARCHAR},
+      lowerLimitAlarmAIN1 = #{lowerLimitAlarmAIN1,jdbcType=VARCHAR},
+      waterLevelState = #{waterLevelState,jdbcType=VARCHAR},
+      waterLevel = #{waterLevel,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xmmems.mapper.MonitoringFacilityMapper">
+  <resultMap id="BaseResultMap" type="com.xmmems.domain.MonitoringFacility">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="unitID" jdbcType="INTEGER" property="unitID" />
+    <result column="equipmentName" jdbcType="VARCHAR" property="equipmentName" />
+    <result column="equipmentModel" jdbcType="VARCHAR" property="equipmentModel" />
+    <result column="analysisWay" jdbcType="VARCHAR" property="analysisWay" />
+    <result column="testOption" jdbcType="VARCHAR" property="testOption" />
+    <result column="reagent" jdbcType="VARCHAR" property="reagent" />
+    <result column="detection" jdbcType="VARCHAR" property="detection" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, unitID, equipmentName, equipmentModel, analysisWay, testOption, reagent, detection
+  </sql>
+  <select id="selectByExample" parameterType="com.xmmems.domain.MonitoringFacilityExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from monitoring_facility
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from monitoring_facility
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from monitoring_facility
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.xmmems.domain.MonitoringFacility">
+    insert into monitoring_facility (id, unitID, equipmentName, 
+      equipmentModel, analysisWay, testOption, 
+      reagent, detection)
+    values (#{id,jdbcType=INTEGER}, #{unitID,jdbcType=INTEGER}, #{equipmentName,jdbcType=VARCHAR}, 
+      #{equipmentModel,jdbcType=VARCHAR}, #{analysisWay,jdbcType=VARCHAR}, #{testOption,jdbcType=VARCHAR}, 
+      #{reagent,jdbcType=VARCHAR}, #{detection,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.xmmems.domain.MonitoringFacility">
+    insert into monitoring_facility
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="unitID != null">
+        unitID,
+      </if>
+      <if test="equipmentName != null">
+        equipmentName,
+      </if>
+      <if test="equipmentModel != null">
+        equipmentModel,
+      </if>
+      <if test="analysisWay != null">
+        analysisWay,
+      </if>
+      <if test="testOption != null">
+        testOption,
+      </if>
+      <if test="reagent != null">
+        reagent,
+      </if>
+      <if test="detection != null">
+        detection,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="unitID != null">
+        #{unitID,jdbcType=INTEGER},
+      </if>
+      <if test="equipmentName != null">
+        #{equipmentName,jdbcType=VARCHAR},
+      </if>
+      <if test="equipmentModel != null">
+        #{equipmentModel,jdbcType=VARCHAR},
+      </if>
+      <if test="analysisWay != null">
+        #{analysisWay,jdbcType=VARCHAR},
+      </if>
+      <if test="testOption != null">
+        #{testOption,jdbcType=VARCHAR},
+      </if>
+      <if test="reagent != null">
+        #{reagent,jdbcType=VARCHAR},
+      </if>
+      <if test="detection != null">
+        #{detection,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xmmems.domain.MonitoringFacility">
+    update monitoring_facility
+    <set>
+      <if test="unitID != null">
+        unitID = #{unitID,jdbcType=INTEGER},
+      </if>
+      <if test="equipmentName != null">
+        equipmentName = #{equipmentName,jdbcType=VARCHAR},
+      </if>
+      <if test="equipmentModel != null">
+        equipmentModel = #{equipmentModel,jdbcType=VARCHAR},
+      </if>
+      <if test="analysisWay != null">
+        analysisWay = #{analysisWay,jdbcType=VARCHAR},
+      </if>
+      <if test="testOption != null">
+        testOption = #{testOption,jdbcType=VARCHAR},
+      </if>
+      <if test="reagent != null">
+        reagent = #{reagent,jdbcType=VARCHAR},
+      </if>
+      <if test="detection != null">
+        detection = #{detection,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xmmems.domain.MonitoringFacility">
+    update monitoring_facility
+    set unitID = #{unitID,jdbcType=INTEGER},
+      equipmentName = #{equipmentName,jdbcType=VARCHAR},
+      equipmentModel = #{equipmentModel,jdbcType=VARCHAR},
+      analysisWay = #{analysisWay,jdbcType=VARCHAR},
+      testOption = #{testOption,jdbcType=VARCHAR},
+      reagent = #{reagent,jdbcType=VARCHAR},
+      detection = #{detection,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+</mapper>

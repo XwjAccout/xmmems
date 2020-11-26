@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmmems.mapper.EnvHourDataAuditLogMapper" >
+  <resultMap id="BaseResultMap" type="com.xmmems.domain.env.EnvHourDataAuditLog" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="siteId" property="siteId" jdbcType="INTEGER" />
+    <result column="itemId" property="itemId" jdbcType="INTEGER" />
+    <result column="siteName" property="siteName" jdbcType="VARCHAR" />
+    <result column="genTime" property="genTime" jdbcType="TIMESTAMP" />
+    <result column="originValue" property="originValue" jdbcType="VARCHAR" />
+    <result column="modifyTime" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="modifyFlag" property="modifyFlag" jdbcType="VARCHAR" />
+    <result column="persion" property="persion" jdbcType="VARCHAR" />
+    <result column="modifyReason" property="modifyReason" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, siteId, itemId, siteName, genTime, originValue, modifyTime, modifyFlag, persion, 
+    modifyReason
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.xmmems.domain.env.EnvHourDataAuditLogExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from env_hour_data_audit_log
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from env_hour_data_audit_log
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from env_hour_data_audit_log
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.xmmems.domain.env.EnvHourDataAuditLog" >
+    insert into env_hour_data_audit_log (id, siteId, itemId, 
+      siteName, genTime, originValue, 
+      modifyTime, modifyFlag, persion, 
+      modifyReason)
+    values (#{id,jdbcType=INTEGER}, #{siteId,jdbcType=INTEGER}, #{itemId,jdbcType=INTEGER}, 
+      #{siteName,jdbcType=VARCHAR}, #{genTime,jdbcType=TIMESTAMP}, #{originValue,jdbcType=VARCHAR}, 
+      #{modifyTime,jdbcType=TIMESTAMP}, #{modifyFlag,jdbcType=VARCHAR}, #{persion,jdbcType=VARCHAR}, 
+      #{modifyReason,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.xmmems.domain.env.EnvHourDataAuditLog" >
+    insert into env_hour_data_audit_log
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="siteId != null" >
+        siteId,
+      </if>
+      <if test="itemId != null" >
+        itemId,
+      </if>
+      <if test="siteName != null" >
+        siteName,
+      </if>
+      <if test="genTime != null" >
+        genTime,
+      </if>
+      <if test="originValue != null" >
+        originValue,
+      </if>
+      <if test="modifyTime != null" >
+        modifyTime,
+      </if>
+      <if test="modifyFlag != null" >
+        modifyFlag,
+      </if>
+      <if test="persion != null" >
+        persion,
+      </if>
+      <if test="modifyReason != null" >
+        modifyReason,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="siteId != null" >
+        #{siteId,jdbcType=INTEGER},
+      </if>
+      <if test="itemId != null" >
+        #{itemId,jdbcType=INTEGER},
+      </if>
+      <if test="siteName != null" >
+        #{siteName,jdbcType=VARCHAR},
+      </if>
+      <if test="genTime != null" >
+        #{genTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="originValue != null" >
+        #{originValue,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyTime != null" >
+        #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyFlag != null" >
+        #{modifyFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="persion != null" >
+        #{persion,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyReason != null" >
+        #{modifyReason,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xmmems.domain.env.EnvHourDataAuditLog" >
+    update env_hour_data_audit_log
+    <set >
+      <if test="siteId != null" >
+        siteId = #{siteId,jdbcType=INTEGER},
+      </if>
+      <if test="itemId != null" >
+        itemId = #{itemId,jdbcType=INTEGER},
+      </if>
+      <if test="siteName != null" >
+        siteName = #{siteName,jdbcType=VARCHAR},
+      </if>
+      <if test="genTime != null" >
+        genTime = #{genTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="originValue != null" >
+        originValue = #{originValue,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyTime != null" >
+        modifyTime = #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyFlag != null" >
+        modifyFlag = #{modifyFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="persion != null" >
+        persion = #{persion,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyReason != null" >
+        modifyReason = #{modifyReason,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xmmems.domain.env.EnvHourDataAuditLog" >
+    update env_hour_data_audit_log
+    set siteId = #{siteId,jdbcType=INTEGER},
+      itemId = #{itemId,jdbcType=INTEGER},
+      siteName = #{siteName,jdbcType=VARCHAR},
+      genTime = #{genTime,jdbcType=TIMESTAMP},
+      originValue = #{originValue,jdbcType=VARCHAR},
+      modifyTime = #{modifyTime,jdbcType=TIMESTAMP},
+      modifyFlag = #{modifyFlag,jdbcType=VARCHAR},
+      persion = #{persion,jdbcType=VARCHAR},
+      modifyReason = #{modifyReason,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

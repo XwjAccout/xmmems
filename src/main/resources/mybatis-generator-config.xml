@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC
+        "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+<generatorConfiguration>
+    <!--导入属性配置-->
+    <properties resource="jdbc.properties"></properties>
+    <!--指定特定数据库的jdbc驱动jar包的位置-->
+    <classPathEntry location="${jdbc.path}"/>
+
+    <context id="context" targetRuntime="MyBatis3">
+        <!-- 是否去除自动生成的注释 true：是 ： false:否 -->
+        <commentGenerator>
+            <property name="suppressAllComments" value="true"/>
+            <property name="suppressDate" value="true"/>
+        </commentGenerator>
+
+        <!--数据库连接的信息：驱动类、连接地址、用户名、密码 -->
+        <jdbcConnection driverClass="${jdbc.driver}"
+                        connectionURL="${jdbc.url}"
+                        userId="${jdbc.username}"
+                        password="${jdbc.password}"/>
+        <!-- 默认false，把JDBC DECIMAL 和 NUMERIC 类型解析为 Integer，为 true时把JDBC DECIMAL 和
+            NUMERIC 类型解析为java.math.BigDecimal -->
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="false"/>
+        </javaTypeResolver>
+
+        <!--指定包名生成实体类 以及生成的地址 （可以自定义地址，如果路径不存在会自动创建） -->
+        <javaModelGenerator targetPackage="com.xmmems.domain"
+                            targetProject="C:\Users\SG\Desktop\xmmems\src\main\java">
+            <!-- enableSubPackages:是否让schema作为包的后缀 -->
+            <property name="enableSubPackages" value="false"/>
+            <!-- 从数据库返回的值被清理前后的空格 -->
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+
+        <!--Mapper映射文件生成所在的目录 为每一个数据库的表生成对应的mapper文件 -->
+        <sqlMapGenerator targetPackage="com.xmmems.mapper" targetProject="C:\Users\SG\Desktop\xmmems\src\main\resources">
+            <!-- enableSubPackages:是否让schema作为包的后缀 -->
+            <property name="enableSubPackages" value="false"/>
+        </sqlMapGenerator>
+
+        <!-- 客户端代码，生成易于使用的针对Model对象和XML配置文件 的代码
+                type="ANNOTATEDMAPPER",生成Java Model 和基于注解的Mapper对象
+                type="MIXEDMAPPER",生成基于注解的Java Model 和相应的Mapper对象
+                type="XMLMAPPER",生成SQLMap XML文件和独立的Mapper接口
+        -->
+        <javaClientGenerator targetPackage="com.xmmems.mapper"
+                             targetProject="C:\Users\SG\Desktop\xmmems\src\main\java" type="XMLMAPPER">
+            <!-- enableSubPackages:是否让schema作为包的后缀 -->
+            <property name="enableSubPackages" value="false"/>
+        </javaClientGenerator>
+
+
+        <!-- 指定数据库表 -->
+        <!--<table schema="xmmems" tableName="co_export" domainObjectName="Export" -->
+        <!--       enableCountByExample="false" enableDeleteByExample="false"-->
+        <!--       enableSelectByExample="false" enableUpdateByExample="false"   selectByExampleQueryId="false"/>-->
+        <!-- 要生成的表 tableName是数据库中的表名或视图名 domainObjectName是实体类名-->
+<!--        <table tableName="evaluation" domainObjectName="Evaluation" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="exceedStandard" domainObjectName="ExceedStandard" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="account" domainObjectName="Account" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="account_role" domainObjectName="AccountRole" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="account_site" domainObjectName="AccountSite" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="app_menu" domainObjectName="AppMenu" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="app_role_menu" domainObjectName="AppRoleMenu" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="app_version_record" domainObjectName="AppVersionRecord" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="base_analysisway" domainObjectName="BaseAnalysisway" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="base_area" domainObjectName="BaseArea" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="base_dictionary" domainObjectName="BaseDictionary" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="base_item" domainObjectName="BaseItem" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="base_river" domainObjectName="BaseRiver" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="base_section" domainObjectName="BaseSection" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="base_site" domainObjectName="BaseSite" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="base_siteitem" domainObjectName="BaseSiteitem" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_fluxcal_log" domainObjectName="CalFluxcalLog" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_fluxcal_result" domainObjectName="CalFluxcalResult" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_fluxcal_result_extre" domainObjectName="CalFluxcalResultExtre" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_manymeta_cluster_month_log" domainObjectName="CalManymetaClusterMonthLog" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_manymeta_cluster_month_log_kpi" domainObjectName="CalManymetaClusterMonthLogKpi" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_manymeta_cluster_month_result" domainObjectName="CalManymetaClusterMonthResult" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_manymeta_cluster_sites_log" domainObjectName="CalManymetaClusterSitesLog" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_manymeta_cluster_sites_log_kpi" domainObjectName="CalManymetaClusterSitesLogKpi" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_manymeta_cluster_sites_result" domainObjectName="CalManymetaClusterSitesResult" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_manymeta_factor_month_log" domainObjectName="CalManymetaFactorMonthLog" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_manymeta_factor_month_log_kpi" domainObjectName="CalManymetaFactorMonthLogKpi" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_manymeta_factor_month_result" domainObjectName="CalManymetaFactorMonthResult" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_manymeta_factor_sites_log" domainObjectName="CalManymetaFactorSitesLog" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_manymeta_factor_sites_log_kpi" domainObjectName="CalManymetaFactorSitesLogKpi" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_manymeta_factor_sites_result" domainObjectName="CalManymetaFactorSitesResult" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_manymeta_mainconst_month_log" domainObjectName="CalManymetaMainconstMonthLog" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_manymeta_mainconst_month_log_kpi" domainObjectName="CalManymetaMainconstMonthLogKpi" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_manymeta_mainconst_month_result" domainObjectName="CalManymetaMainconstMonthResult" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_manymeta_mainconst_sites_log" domainObjectName="CalManymetaMainconstSitesLog" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_manymeta_mainconst_sites_log_kpi" domainObjectName="CalManymetaMainconstSitesLogKpi" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_manymeta_mainconst_sites_result" domainObjectName="CalManymetaMainconstSitesResult" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_manymeta_relativity_month_log" domainObjectName="CalManymetaRelativityMonthLog" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_manymeta_relativity_month_log_kpi" domainObjectName="CalManymetaRelativityMonthLogKpi" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_manymeta_relativity_month_result" domainObjectName="CalManymetaRelativityMonthResult" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_manymeta_relativity_sites_log" domainObjectName="CalManymetaRelativitySitesLog" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_manymeta_relativity_sites_log_kpi" domainObjectName="CalManymetaRelativitySitesLogKpi" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_manymeta_relativity_sites_result" domainObjectName="CalManymetaRelativitySitesResult" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_timeseq_ar_log" domainObjectName="CalTimeseqArLog" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_timeseq_ar_log_kpi" domainObjectName="CalTimeseqArLogKpi" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_timeseq_ar_result" domainObjectName="CalTimeseqArResult" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_timeseq_arima_log" domainObjectName="CalTimeseqArimaLog" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_timeseq_arima_log_kpi" domainObjectName="CalTimeseqArimaLogKpi" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_timeseq_arima_result" domainObjectName="CalTimeseqArimaResult" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_timeseq_bp_log" domainObjectName="CalTimeseqBpLog" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_timeseq_bp_log_kpi" domainObjectName="CalTimeseqBpLogKpi" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_timeseq_bp_result" domainObjectName="CalTimeseqBpResult" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_timeseq_garch_log" domainObjectName="CalTimeseqGarchLog" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_timeseq_garch_log_kpi" domainObjectName="CalTimeseqGarchLogKpi" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_timeseq_garch_result" domainObjectName="CalTimeseqGarchResult" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_timeseq_log" domainObjectName="CalTimeseqLog" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_timeseq_lstm_log" domainObjectName="CalTimeseqLstmLog" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_timeseq_lstm_log_kpi" domainObjectName="CalTimeseqLstmLogKpi" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_timeseq_lstm_result" domainObjectName="CalTimeseqLstmResult" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_timeseq_result" domainObjectName="CalTimeseqResult" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_trend_mann_kendall_log" domainObjectName="CalTrendMannKendallLog" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_trend_mann_kendall_log_kpi" domainObjectName="CalTrendMannKendallLogKpi" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_trend_mann_kendall_result" domainObjectName="CalTrendMannKendallResult" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_trend_spearman_log" domainObjectName="CalTrendSpearmanLog" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_trend_spearman_log_kpi" domainObjectName="CalTrendSpearmanLogKpi" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="cal_trend_spearman_result" domainObjectName="CalTrendSpearmanResult" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="env_address_book" domainObjectName="EnvAddressBook" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="env_audit_data" domainObjectName="EnvAuditData" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="env_equipment_manager" domainObjectName="EnvEquipmentManager" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="env_hour_data" domainObjectName="EnvHourData" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="env_hour_data_audit_log" domainObjectName="EnvHourDataAuditLog" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="env_hour_data_luyan" domainObjectName="EnvHourDataLuyan" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="env_knowledge" domainObjectName="EnvKnowledge" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="env_kpi" domainObjectName="EnvKpi" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="env_kpi_type" domainObjectName="EnvKpiType" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="env_model_calculate" domainObjectName="EnvModelCalculate" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="env_quality_conf" domainObjectName="EnvQualityConf" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="env_realtime_data" domainObjectName="EnvRealtimeData" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="env_realtime_quality_level" domainObjectName="EnvRealtimeQualityLevel" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="env_site_info" domainObjectName="EnvSiteInfo" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="env_site_kpi" domainObjectName="EnvSiteKpi" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="env_sms_record" domainObjectName="EnvSmsRecord" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+<!--        <table tableName="env_warning_data_loss" domainObjectName="EnvWarningDataLoss" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="env_warning_group" domainObjectName="EnvWarningGroup" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+<!--        <table tableName="env_warning_msg" domainObjectName="EnvWarningMsg" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+<!--        <table tableName="env_warning_rule" domainObjectName="EnvWarningRule" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="env_warning_rule_sudden" domainObjectName="EnvWarningRuleSudden" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="file_manage" domainObjectName="FileManage" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="login_log" domainObjectName="LoginLog" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="menu" domainObjectName="Menu" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+<!--     <table tableName="monitoring_facility" domainObjectName="MonitoringFacility" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="operation_person" domainObjectName="OperationPerson" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="operation_unit" domainObjectName="OperationUnit" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="operation_vehicle" domainObjectName="OperationVehicle" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="otherpower" domainObjectName="Otherpower" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="permission" domainObjectName="Permission" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="role" domainObjectName="Role" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="role_menu" domainObjectName="RoleMenu" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="role_permission" domainObjectName="RolePermission" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="role_power" domainObjectName="RolePower" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="sensitive_words" domainObjectName="SensitiveWords" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="session" domainObjectName="Session" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="site_monitoring" domainObjectName="SiteMonitoring" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="temp_fluxcal" domainObjectName="TempFluxcal" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="temp_fluxcal_extre" domainObjectName="TempFluxcalExtre" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="temp_manaymeta_yz_01" domainObjectName="TempManaymetaYz01" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="temp_manaymeta_yz_02" domainObjectName="TempManaymetaYz02" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="temp_moni_data" domainObjectName="TempMoniData" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="temp_timeseq" domainObjectName="TempTimeseq" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+        <!--<table tableName="tmp_env_site_info" domainObjectName="TmpEnvSiteInfo" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+<!--        <table tableName="zero_check" domainObjectName="ZeroCheck" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true"> <property name="useActualColumnNames" value="true"/> </table>-->
+
+
+    </context>
+</generatorConfiguration>

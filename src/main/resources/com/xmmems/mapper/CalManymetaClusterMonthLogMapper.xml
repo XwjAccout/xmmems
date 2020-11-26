@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmmems.mapper.CalManymetaClusterMonthLogMapper" >
+  <resultMap id="BaseResultMap" type="com.xmmems.domain.cal.CalManymetaClusterMonthLog" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="siteName" property="siteName" jdbcType="VARCHAR" />
+    <result column="calTime" property="calTime" jdbcType="VARCHAR" />
+    <result column="kpiName" property="kpiName" jdbcType="VARCHAR" />
+    <result column="calCode" property="calCode" jdbcType="VARCHAR" />
+    <result column="startTime" property="startTime" jdbcType="TIMESTAMP" />
+    <result column="endTime" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="handleUser" property="handleUser" jdbcType="VARCHAR" />
+    <result column="filePath" property="filePath" jdbcType="VARCHAR" />
+    <result column="qnum" property="qnum" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, siteName, calTime, kpiName, calCode, startTime, endTime, handleUser, filePath, 
+    qnum
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.xmmems.domain.cal.CalManymetaClusterMonthLogExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from cal_manymeta_cluster_month_log
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from cal_manymeta_cluster_month_log
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from cal_manymeta_cluster_month_log
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.xmmems.domain.cal.CalManymetaClusterMonthLog" >
+    insert into cal_manymeta_cluster_month_log (id, siteName, calTime, 
+      kpiName, calCode, startTime, 
+      endTime, handleUser, filePath, 
+      qnum)
+    values (#{id,jdbcType=INTEGER}, #{siteName,jdbcType=VARCHAR}, #{calTime,jdbcType=VARCHAR}, 
+      #{kpiName,jdbcType=VARCHAR}, #{calCode,jdbcType=VARCHAR}, #{startTime,jdbcType=TIMESTAMP}, 
+      #{endTime,jdbcType=TIMESTAMP}, #{handleUser,jdbcType=VARCHAR}, #{filePath,jdbcType=VARCHAR}, 
+      #{qnum,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.xmmems.domain.cal.CalManymetaClusterMonthLog" >
+    insert into cal_manymeta_cluster_month_log
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="siteName != null" >
+        siteName,
+      </if>
+      <if test="calTime != null" >
+        calTime,
+      </if>
+      <if test="kpiName != null" >
+        kpiName,
+      </if>
+      <if test="calCode != null" >
+        calCode,
+      </if>
+      <if test="startTime != null" >
+        startTime,
+      </if>
+      <if test="endTime != null" >
+        endTime,
+      </if>
+      <if test="handleUser != null" >
+        handleUser,
+      </if>
+      <if test="filePath != null" >
+        filePath,
+      </if>
+      <if test="qnum != null" >
+        qnum,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="siteName != null" >
+        #{siteName,jdbcType=VARCHAR},
+      </if>
+      <if test="calTime != null" >
+        #{calTime,jdbcType=VARCHAR},
+      </if>
+      <if test="kpiName != null" >
+        #{kpiName,jdbcType=VARCHAR},
+      </if>
+      <if test="calCode != null" >
+        #{calCode,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null" >
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="handleUser != null" >
+        #{handleUser,jdbcType=VARCHAR},
+      </if>
+      <if test="filePath != null" >
+        #{filePath,jdbcType=VARCHAR},
+      </if>
+      <if test="qnum != null" >
+        #{qnum,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xmmems.domain.cal.CalManymetaClusterMonthLog" >
+    update cal_manymeta_cluster_month_log
+    <set >
+      <if test="siteName != null" >
+        siteName = #{siteName,jdbcType=VARCHAR},
+      </if>
+      <if test="calTime != null" >
+        calTime = #{calTime,jdbcType=VARCHAR},
+      </if>
+      <if test="kpiName != null" >
+        kpiName = #{kpiName,jdbcType=VARCHAR},
+      </if>
+      <if test="calCode != null" >
+        calCode = #{calCode,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null" >
+        startTime = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        endTime = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="handleUser != null" >
+        handleUser = #{handleUser,jdbcType=VARCHAR},
+      </if>
+      <if test="filePath != null" >
+        filePath = #{filePath,jdbcType=VARCHAR},
+      </if>
+      <if test="qnum != null" >
+        qnum = #{qnum,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xmmems.domain.cal.CalManymetaClusterMonthLog" >
+    update cal_manymeta_cluster_month_log
+    set siteName = #{siteName,jdbcType=VARCHAR},
+      calTime = #{calTime,jdbcType=VARCHAR},
+      kpiName = #{kpiName,jdbcType=VARCHAR},
+      calCode = #{calCode,jdbcType=VARCHAR},
+      startTime = #{startTime,jdbcType=TIMESTAMP},
+      endTime = #{endTime,jdbcType=TIMESTAMP},
+      handleUser = #{handleUser,jdbcType=VARCHAR},
+      filePath = #{filePath,jdbcType=VARCHAR},
+      qnum = #{qnum,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

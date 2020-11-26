@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmmems.mapper.TempFluxcalExtreMapper" >
+  <resultMap id="BaseResultMap" type="com.xmmems.domain.temp.TempFluxcalExtre" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="CHAR" />
+    <result column="realVal" property="realVal" jdbcType="VARCHAR" />
+    <result column="allowVal" property="allowVal" jdbcType="VARCHAR" />
+    <result column="subVal" property="subVal" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, type, realVal, allowVal, subVal
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.xmmems.domain.temp.TempFluxcalExtreExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from temp_fluxcal_extre
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from temp_fluxcal_extre
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from temp_fluxcal_extre
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.xmmems.domain.temp.TempFluxcalExtre" >
+    insert into temp_fluxcal_extre (id, type, realVal, 
+      allowVal, subVal)
+    values (#{id,jdbcType=INTEGER}, #{type,jdbcType=CHAR}, #{realVal,jdbcType=VARCHAR}, 
+      #{allowVal,jdbcType=VARCHAR}, #{subVal,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.xmmems.domain.temp.TempFluxcalExtre" >
+    insert into temp_fluxcal_extre
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="realVal != null" >
+        realVal,
+      </if>
+      <if test="allowVal != null" >
+        allowVal,
+      </if>
+      <if test="subVal != null" >
+        subVal,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=CHAR},
+      </if>
+      <if test="realVal != null" >
+        #{realVal,jdbcType=VARCHAR},
+      </if>
+      <if test="allowVal != null" >
+        #{allowVal,jdbcType=VARCHAR},
+      </if>
+      <if test="subVal != null" >
+        #{subVal,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xmmems.domain.temp.TempFluxcalExtre" >
+    update temp_fluxcal_extre
+    <set >
+      <if test="type != null" >
+        type = #{type,jdbcType=CHAR},
+      </if>
+      <if test="realVal != null" >
+        realVal = #{realVal,jdbcType=VARCHAR},
+      </if>
+      <if test="allowVal != null" >
+        allowVal = #{allowVal,jdbcType=VARCHAR},
+      </if>
+      <if test="subVal != null" >
+        subVal = #{subVal,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xmmems.domain.temp.TempFluxcalExtre" >
+    update temp_fluxcal_extre
+    set type = #{type,jdbcType=CHAR},
+      realVal = #{realVal,jdbcType=VARCHAR},
+      allowVal = #{allowVal,jdbcType=VARCHAR},
+      subVal = #{subVal,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

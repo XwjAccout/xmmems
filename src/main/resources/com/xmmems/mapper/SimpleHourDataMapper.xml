@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xmmems.mapper.SimpleHourDataMapper">
+
+    <select id="select50" resultType="java.util.Map">
+		SELECT `timeStr`, `value`, `troubleCode`
+		FROM `simhourdata`
+		WHERE `siteId` = #{siteId}
+			AND `itemId` = #{itemId}
+			AND `value` is not null
+		ORDER BY `time` DESC
+		LIMIT 8
+    </select>
+
+    <select id="selectPreValue" resultType="java.util.Map">
+		SELECT timeStr,`value`,preValue
+		FROM simhourdata
+		WHERE siteId = #{siteId}
+			AND itemId = #{itemId}
+			AND `time` >= #{start}
+			AND `time` &lt;= #{end}
+	</select>
+
+    <select id="selectCluster" resultType="com.xmmems.analyze.dto.ClusterHourDto">
+        SELECT `itemId`, `timeStr`, `itemName`, `value`, `troubleCode`
+        FROM `simhourdata`
+        WHERE siteId = #{siteId}
+        AND `time` >= #{start}
+        AND `time` &lt;= #{end}
+        AND `value` IS NOT NULL
+        AND `itemId` IN
+        <foreach collection="itemIds" separator="," open="(" close=")" item="itemId">
+            #{itemId}
+        </foreach>
+        ORDER BY `time` ASC
+    </select>
+
+    <select id="selectValues" resultType="java.lang.String">
+        SELECT `value`
+        FROM (
+        SELECT @rownumber := @rownumber + 1 AS line, `value`
+        FROM (
+        SELECT `value`
+        FROM simhourdata
+        WHERE siteId = #{siteId}
+        AND itemId = #{itemId}
+        AND `time` >= #{start}
+        AND `time` &lt;= #{end}
+        AND `value` IS NOT NULL
+        ORDER BY `time` ASC
+        ) a,
+        (
+        SELECT @rownumber := -1
+        ) b
+        ) temp
+
+        <if test="count >= space*100">
+            WHERE line % #{space} = 0
+        </if>
+    </select>
+
+    <select id="selectValuesCount" resultType="java.lang.Integer">
+		SELECT COUNT(0)
+		FROM simhourdata
+		WHERE siteId = #{siteId}
+			AND itemId = #{itemId}
+			AND `time` >= #{start}
+			AND `time` &lt;= #{end}
+			AND `value` IS NOT NULL
+		ORDER BY `time` ASC
+	</select>
+
+    <select id="selectPreValue1" resultType="java.util.Map">
+		SELECT timeStr,`value`,preValue1 as preValue
+		FROM simhourdata
+		WHERE siteId = #{siteId}
+			AND itemId = #{itemId}
+			AND `time` >= #{start}
+			AND `time` &lt;= #{end}
+	</select>
+
+    <select id="selectPreValue2" resultType="java.util.Map">
+		SELECT timeStr,`value`,preValue2  as preValue
+		FROM simhourdata
+		WHERE siteId = #{siteId}
+			AND itemId = #{itemId}
+			AND `time` >= #{start}
+			AND `time` &lt;= #{end}
+	</select>
+
+    <select id="selectPreValue3" resultType="java.util.Map">
+		SELECT timeStr,`value`,preValue3 as preValue
+		FROM simhourdata
+		WHERE siteId = #{siteId}
+			AND itemId = #{itemId}
+			AND `time` >= #{start}
+			AND `time` &lt;= #{end}
+	</select>
+
+    <select id="selectValue" resultType="java.util.Map">
+		SELECT timeStr,`value`
+			FROM simhourdata
+			WHERE siteId = #{siteId}
+				AND itemId = #{itemId}
+				AND `time` >= #{start}
+				AND `time` &lt; #{end}
+				AND `value` IS NOT NULL
+			ORDER BY `time` ASC
+	</select>
+    <select id="selectByItemName" resultType="java.util.Map">
+        <foreach collection="siteIds" item="siteId" open="(" close=")" separator=")union all(">
+            SELECT DATE_FORMAT(`time`,'%Y-%m-%d %T') as `time`,`value`, siteName, itemName,
+            cast(trend as char) as trend,
+            cast(valueUnchanged as char) as valueUnchanged
+            FROM simhourdata
+            WHERE siteId = #{siteId}
+            AND itemName = #{itemName}
+            ORDER BY `time` DESC
+            LIMIT 1
+        </foreach>
+    </select>
+    <select id="selectLastValueBySiteIdAndItemId" resultType="java.util.Map">
+        SELECT `value`,cast(valueUnchanged as char) as valueUnchanged
+			FROM simhourdata
+			WHERE siteId = #{siteId}
+				AND itemId = #{itemId}
+				and timeStr != #{timeStr}
+				AND `value` IS NOT NULL
+			ORDER BY `time` desc
+			limit 1
+    </select>
+    <select id="selectBySiteIdsLength" resultType="java.util.Map">
+		    SELECT  `timeStr`,`value`, siteName, itemName, siteId , trend, valueUnchanged ,itemId
+            FROM simhourdata WHERE `time` >= #{time} AND `value` IS NOT NULL
+            ORDER BY `time` DESC;
+	</select>
+	<select id="selectValidSiteIdAndItems" resultType="java.util.Map">
+            SELECT distinct bsi.siteId,bsi.itemId
+            FROM account_site asi JOIN base_siteitem bsi
+            ON asi.accountId = #{loginId} AND asi.siteId=bsi.siteId;
+	</select>
+
+
+</mapper>

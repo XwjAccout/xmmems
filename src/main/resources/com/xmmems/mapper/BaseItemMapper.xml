@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmmems.mapper.BaseItemMapper" >
+  <resultMap id="BaseResultMap" type="com.xmmems.domain.base.BaseItem" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="typeName" property="typeName" jdbcType="VARCHAR" />
+    <result column="typeId" property="typeId" jdbcType="INTEGER" />
+    <result column="shortName" property="shortName" jdbcType="VARCHAR" />
+    <result column="inteShortName" property="inteShortName" jdbcType="VARCHAR" />
+    <result column="validUpperLimit" property="validUpperLimit" jdbcType="VARCHAR" />
+    <result column="validLowerLimit" property="validLowerLimit" jdbcType="VARCHAR" />
+    <result column="outUpperLimit" property="outUpperLimit" jdbcType="VARCHAR" />
+    <result column="outLowerLimit" property="outLowerLimit" jdbcType="VARCHAR" />
+    <result column="unit" property="unit" jdbcType="VARCHAR" />
+    <result column="digits" property="digits" jdbcType="INTEGER" />
+    <result column="maxRange" property="maxRange" jdbcType="VARCHAR" />
+    <result column="minRange" property="minRange" jdbcType="VARCHAR" />
+    <result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="updateTime" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="rank" property="rank" jdbcType="INTEGER" />
+    <result column="isvalid" property="isvalid" jdbcType="CHAR" />
+    <result column="zeroSolution" property="zeroSolution" jdbcType="INTEGER" />
+    <result column="spanSolution" property="spanSolution" jdbcType="INTEGER" />
+    <result column="zeroSpan" property="zeroSpan" jdbcType="INTEGER" />
+    <result column="spanSpan" property="spanSpan" jdbcType="INTEGER" />
+    <result column="zeroAbsError" property="zeroAbsError" jdbcType="DOUBLE" />
+    <result column="zeroRelaError" property="zeroRelaError" jdbcType="DOUBLE" />
+    <result column="spanRelaError1" property="spanRelaError1" jdbcType="DOUBLE" />
+    <result column="spanRelaError2" property="spanRelaError2" jdbcType="DOUBLE" />
+    <result column="often" property="often" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, code, name, typeName, typeId, shortName, inteShortName, validUpperLimit, validLowerLimit, 
+    outUpperLimit, outLowerLimit, unit, digits, maxRange, minRange, createTime, updateTime, 
+    rank, isvalid, zeroSolution, spanSolution, zeroSpan, spanSpan, zeroAbsError, zeroRelaError, 
+    spanRelaError1, spanRelaError2, often
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.xmmems.domain.base.BaseItemExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from base_item
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from base_item
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from base_item
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.xmmems.domain.base.BaseItem" >
+    insert into base_item (id, code, name, 
+      typeName, typeId, shortName, 
+      inteShortName, validUpperLimit, validLowerLimit, 
+      outUpperLimit, outLowerLimit, unit, 
+      digits, maxRange, minRange, 
+      createTime, updateTime, rank, 
+      isvalid, zeroSolution, spanSolution, 
+      zeroSpan, spanSpan, zeroAbsError, 
+      zeroRelaError, spanRelaError1, spanRelaError2, 
+      often)
+    values (#{id,jdbcType=INTEGER}, #{code,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+      #{typeName,jdbcType=VARCHAR}, #{typeId,jdbcType=INTEGER}, #{shortName,jdbcType=VARCHAR}, 
+      #{inteShortName,jdbcType=VARCHAR}, #{validUpperLimit,jdbcType=VARCHAR}, #{validLowerLimit,jdbcType=VARCHAR}, 
+      #{outUpperLimit,jdbcType=VARCHAR}, #{outLowerLimit,jdbcType=VARCHAR}, #{unit,jdbcType=VARCHAR}, 
+      #{digits,jdbcType=INTEGER}, #{maxRange,jdbcType=VARCHAR}, #{minRange,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{rank,jdbcType=INTEGER}, 
+      #{isvalid,jdbcType=CHAR}, #{zeroSolution,jdbcType=INTEGER}, #{spanSolution,jdbcType=INTEGER}, 
+      #{zeroSpan,jdbcType=INTEGER}, #{spanSpan,jdbcType=INTEGER}, #{zeroAbsError,jdbcType=DOUBLE}, 
+      #{zeroRelaError,jdbcType=DOUBLE}, #{spanRelaError1,jdbcType=DOUBLE}, #{spanRelaError2,jdbcType=DOUBLE}, 
+      #{often,jdbcType=CHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.xmmems.domain.base.BaseItem" >
+    insert into base_item
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="code != null" >
+        code,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="typeName != null" >
+        typeName,
+      </if>
+      <if test="typeId != null" >
+        typeId,
+      </if>
+      <if test="shortName != null" >
+        shortName,
+      </if>
+      <if test="inteShortName != null" >
+        inteShortName,
+      </if>
+      <if test="validUpperLimit != null" >
+        validUpperLimit,
+      </if>
+      <if test="validLowerLimit != null" >
+        validLowerLimit,
+      </if>
+      <if test="outUpperLimit != null" >
+        outUpperLimit,
+      </if>
+      <if test="outLowerLimit != null" >
+        outLowerLimit,
+      </if>
+      <if test="unit != null" >
+        unit,
+      </if>
+      <if test="digits != null" >
+        digits,
+      </if>
+      <if test="maxRange != null" >
+        maxRange,
+      </if>
+      <if test="minRange != null" >
+        minRange,
+      </if>
+      <if test="createTime != null" >
+        createTime,
+      </if>
+      <if test="updateTime != null" >
+        updateTime,
+      </if>
+      <if test="rank != null" >
+        rank,
+      </if>
+      <if test="isvalid != null" >
+        isvalid,
+      </if>
+      <if test="zeroSolution != null" >
+        zeroSolution,
+      </if>
+      <if test="spanSolution != null" >
+        spanSolution,
+      </if>
+      <if test="zeroSpan != null" >
+        zeroSpan,
+      </if>
+      <if test="spanSpan != null" >
+        spanSpan,
+      </if>
+      <if test="zeroAbsError != null" >
+        zeroAbsError,
+      </if>
+      <if test="zeroRelaError != null" >
+        zeroRelaError,
+      </if>
+      <if test="spanRelaError1 != null" >
+        spanRelaError1,
+      </if>
+      <if test="spanRelaError2 != null" >
+        spanRelaError2,
+      </if>
+      <if test="often != null" >
+        often,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="code != null" >
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="typeName != null" >
+        #{typeName,jdbcType=VARCHAR},
+      </if>
+      <if test="typeId != null" >
+        #{typeId,jdbcType=INTEGER},
+      </if>
+      <if test="shortName != null" >
+        #{shortName,jdbcType=VARCHAR},
+      </if>
+      <if test="inteShortName != null" >
+        #{inteShortName,jdbcType=VARCHAR},
+      </if>
+      <if test="validUpperLimit != null" >
+        #{validUpperLimit,jdbcType=VARCHAR},
+      </if>
+      <if test="validLowerLimit != null" >
+        #{validLowerLimit,jdbcType=VARCHAR},
+      </if>
+      <if test="outUpperLimit != null" >
+        #{outUpperLimit,jdbcType=VARCHAR},
+      </if>
+      <if test="outLowerLimit != null" >
+        #{outLowerLimit,jdbcType=VARCHAR},
+      </if>
+      <if test="unit != null" >
+        #{unit,jdbcType=VARCHAR},
+      </if>
+      <if test="digits != null" >
+        #{digits,jdbcType=INTEGER},
+      </if>
+      <if test="maxRange != null" >
+        #{maxRange,jdbcType=VARCHAR},
+      </if>
+      <if test="minRange != null" >
+        #{minRange,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="rank != null" >
+        #{rank,jdbcType=INTEGER},
+      </if>
+      <if test="isvalid != null" >
+        #{isvalid,jdbcType=CHAR},
+      </if>
+      <if test="zeroSolution != null" >
+        #{zeroSolution,jdbcType=INTEGER},
+      </if>
+      <if test="spanSolution != null" >
+        #{spanSolution,jdbcType=INTEGER},
+      </if>
+      <if test="zeroSpan != null" >
+        #{zeroSpan,jdbcType=INTEGER},
+      </if>
+      <if test="spanSpan != null" >
+        #{spanSpan,jdbcType=INTEGER},
+      </if>
+      <if test="zeroAbsError != null" >
+        #{zeroAbsError,jdbcType=DOUBLE},
+      </if>
+      <if test="zeroRelaError != null" >
+        #{zeroRelaError,jdbcType=DOUBLE},
+      </if>
+      <if test="spanRelaError1 != null" >
+        #{spanRelaError1,jdbcType=DOUBLE},
+      </if>
+      <if test="spanRelaError2 != null" >
+        #{spanRelaError2,jdbcType=DOUBLE},
+      </if>
+      <if test="often != null" >
+        #{often,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xmmems.domain.base.BaseItem" >
+    update base_item
+    <set >
+      <if test="code != null" >
+        code = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="typeName != null" >
+        typeName = #{typeName,jdbcType=VARCHAR},
+      </if>
+      <if test="typeId != null" >
+        typeId = #{typeId,jdbcType=INTEGER},
+      </if>
+      <if test="shortName != null" >
+        shortName = #{shortName,jdbcType=VARCHAR},
+      </if>
+      <if test="inteShortName != null" >
+        inteShortName = #{inteShortName,jdbcType=VARCHAR},
+      </if>
+      <if test="validUpperLimit != null" >
+        validUpperLimit = #{validUpperLimit,jdbcType=VARCHAR},
+      </if>
+      <if test="validLowerLimit != null" >
+        validLowerLimit = #{validLowerLimit,jdbcType=VARCHAR},
+      </if>
+      <if test="outUpperLimit != null" >
+        outUpperLimit = #{outUpperLimit,jdbcType=VARCHAR},
+      </if>
+      <if test="outLowerLimit != null" >
+        outLowerLimit = #{outLowerLimit,jdbcType=VARCHAR},
+      </if>
+      <if test="unit != null" >
+        unit = #{unit,jdbcType=VARCHAR},
+      </if>
+      <if test="digits != null" >
+        digits = #{digits,jdbcType=INTEGER},
+      </if>
+      <if test="maxRange != null" >
+        maxRange = #{maxRange,jdbcType=VARCHAR},
+      </if>
+      <if test="minRange != null" >
+        minRange = #{minRange,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        createTime = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        updateTime = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="rank != null" >
+        rank = #{rank,jdbcType=INTEGER},
+      </if>
+      <if test="isvalid != null" >
+        isvalid = #{isvalid,jdbcType=CHAR},
+      </if>
+      <if test="zeroSolution != null" >
+        zeroSolution = #{zeroSolution,jdbcType=INTEGER},
+      </if>
+      <if test="spanSolution != null" >
+        spanSolution = #{spanSolution,jdbcType=INTEGER},
+      </if>
+      <if test="zeroSpan != null" >
+        zeroSpan = #{zeroSpan,jdbcType=INTEGER},
+      </if>
+      <if test="spanSpan != null" >
+        spanSpan = #{spanSpan,jdbcType=INTEGER},
+      </if>
+      <if test="zeroAbsError != null" >
+        zeroAbsError = #{zeroAbsError,jdbcType=DOUBLE},
+      </if>
+      <if test="zeroRelaError != null" >
+        zeroRelaError = #{zeroRelaError,jdbcType=DOUBLE},
+      </if>
+      <if test="spanRelaError1 != null" >
+        spanRelaError1 = #{spanRelaError1,jdbcType=DOUBLE},
+      </if>
+      <if test="spanRelaError2 != null" >
+        spanRelaError2 = #{spanRelaError2,jdbcType=DOUBLE},
+      </if>
+      <if test="often != null" >
+        often = #{often,jdbcType=CHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xmmems.domain.base.BaseItem" >
+    update base_item
+    set code = #{code,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      typeName = #{typeName,jdbcType=VARCHAR},
+      typeId = #{typeId,jdbcType=INTEGER},
+      shortName = #{shortName,jdbcType=VARCHAR},
+      inteShortName = #{inteShortName,jdbcType=VARCHAR},
+      validUpperLimit = #{validUpperLimit,jdbcType=VARCHAR},
+      validLowerLimit = #{validLowerLimit,jdbcType=VARCHAR},
+      outUpperLimit = #{outUpperLimit,jdbcType=VARCHAR},
+      outLowerLimit = #{outLowerLimit,jdbcType=VARCHAR},
+      unit = #{unit,jdbcType=VARCHAR},
+      digits = #{digits,jdbcType=INTEGER},
+      maxRange = #{maxRange,jdbcType=VARCHAR},
+      minRange = #{minRange,jdbcType=VARCHAR},
+      createTime = #{createTime,jdbcType=TIMESTAMP},
+      updateTime = #{updateTime,jdbcType=TIMESTAMP},
+      rank = #{rank,jdbcType=INTEGER},
+      isvalid = #{isvalid,jdbcType=CHAR},
+      zeroSolution = #{zeroSolution,jdbcType=INTEGER},
+      spanSolution = #{spanSolution,jdbcType=INTEGER},
+      zeroSpan = #{zeroSpan,jdbcType=INTEGER},
+      spanSpan = #{spanSpan,jdbcType=INTEGER},
+      zeroAbsError = #{zeroAbsError,jdbcType=DOUBLE},
+      zeroRelaError = #{zeroRelaError,jdbcType=DOUBLE},
+      spanRelaError1 = #{spanRelaError1,jdbcType=DOUBLE},
+      spanRelaError2 = #{spanRelaError2,jdbcType=DOUBLE},
+      often = #{often,jdbcType=CHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

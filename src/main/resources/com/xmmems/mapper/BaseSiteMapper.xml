@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmmems.mapper.BaseSiteMapper" >
+  <resultMap id="BaseResultMap" type="com.xmmems.domain.base.BaseSite" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="siteName" property="siteName" jdbcType="VARCHAR" />
+    <result column="operCompany" property="operCompany" jdbcType="VARCHAR" />
+    <result column="basinCode" property="basinCode" jdbcType="VARCHAR" />
+    <result column="basinName" property="basinName" jdbcType="VARCHAR" />
+    <result column="riverCode" property="riverCode" jdbcType="VARCHAR" />
+    <result column="riverName" property="riverName" jdbcType="VARCHAR" />
+    <result column="sectionCode" property="sectionCode" jdbcType="VARCHAR" />
+    <result column="sectionName" property="sectionName" jdbcType="VARCHAR" />
+    <result column="provinceCode" property="provinceCode" jdbcType="VARCHAR" />
+    <result column="provinceName" property="provinceName" jdbcType="VARCHAR" />
+    <result column="cityCode" property="cityCode" jdbcType="VARCHAR" />
+    <result column="cityName" property="cityName" jdbcType="VARCHAR" />
+    <result column="countyCode" property="countyCode" jdbcType="VARCHAR" />
+    <result column="countyName" property="countyName" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="CHAR" />
+    <result column="siteType" property="siteType" jdbcType="CHAR" />
+    <result column="longitude" property="longitude" jdbcType="VARCHAR" />
+    <result column="latitude" property="latitude" jdbcType="VARCHAR" />
+    <result column="contactPerson" property="contactPerson" jdbcType="VARCHAR" />
+    <result column="contactTels" property="contactTels" jdbcType="VARCHAR" />
+    <result column="createStationDate" property="createStationDate" jdbcType="TIMESTAMP" />
+    <result column="levelStandard" property="levelStandard" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="isvalid" property="isvalid" jdbcType="CHAR" />
+    <result column="waterQualityLevel" property="waterQualityLevel" jdbcType="VARCHAR" />
+    <result column="sort" property="sort" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, siteName, operCompany, basinCode, basinName, riverCode, riverName, sectionCode, 
+    sectionName, provinceCode, provinceName, cityCode, cityName, countyCode, countyName, 
+    status, siteType, longitude, latitude, contactPerson, contactTels, createStationDate, 
+    levelStandard, remark, isvalid, waterQualityLevel, sort,MN
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.xmmems.domain.base.BaseSiteExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from base_site
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from base_site
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from base_site
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.xmmems.domain.base.BaseSite" >
+    insert into base_site (id, siteName, operCompany, 
+      basinCode, basinName, riverCode, 
+      riverName, sectionCode, sectionName, 
+      provinceCode, provinceName, cityCode, 
+      cityName, countyCode, countyName, 
+      status, siteType, longitude, 
+      latitude, contactPerson, contactTels, 
+      createStationDate, levelStandard, remark, 
+      isvalid, waterQualityLevel, sort
+      )
+    values (#{id,jdbcType=INTEGER}, #{siteName,jdbcType=VARCHAR}, #{operCompany,jdbcType=VARCHAR}, 
+      #{basinCode,jdbcType=VARCHAR}, #{basinName,jdbcType=VARCHAR}, #{riverCode,jdbcType=VARCHAR}, 
+      #{riverName,jdbcType=VARCHAR}, #{sectionCode,jdbcType=VARCHAR}, #{sectionName,jdbcType=VARCHAR}, 
+      #{provinceCode,jdbcType=VARCHAR}, #{provinceName,jdbcType=VARCHAR}, #{cityCode,jdbcType=VARCHAR}, 
+      #{cityName,jdbcType=VARCHAR}, #{countyCode,jdbcType=VARCHAR}, #{countyName,jdbcType=VARCHAR}, 
+      #{status,jdbcType=CHAR}, #{siteType,jdbcType=CHAR}, #{longitude,jdbcType=VARCHAR}, 
+      #{latitude,jdbcType=VARCHAR}, #{contactPerson,jdbcType=VARCHAR}, #{contactTels,jdbcType=VARCHAR}, 
+      #{createStationDate,jdbcType=TIMESTAMP}, #{levelStandard,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
+      #{isvalid,jdbcType=CHAR}, #{waterQualityLevel,jdbcType=VARCHAR}, #{sort,jdbcType=DECIMAL}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.xmmems.domain.base.BaseSite" >
+    insert into base_site
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="siteName != null" >
+        siteName,
+      </if>
+      <if test="operCompany != null" >
+        operCompany,
+      </if>
+      <if test="basinCode != null" >
+        basinCode,
+      </if>
+      <if test="basinName != null" >
+        basinName,
+      </if>
+      <if test="riverCode != null" >
+        riverCode,
+      </if>
+      <if test="riverName != null" >
+        riverName,
+      </if>
+      <if test="sectionCode != null" >
+        sectionCode,
+      </if>
+      <if test="sectionName != null" >
+        sectionName,
+      </if>
+      <if test="provinceCode != null" >
+        provinceCode,
+      </if>
+      <if test="provinceName != null" >
+        provinceName,
+      </if>
+      <if test="cityCode != null" >
+        cityCode,
+      </if>
+      <if test="cityName != null" >
+        cityName,
+      </if>
+      <if test="countyCode != null" >
+        countyCode,
+      </if>
+      <if test="countyName != null" >
+        countyName,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="siteType != null" >
+        siteType,
+      </if>
+      <if test="longitude != null" >
+        longitude,
+      </if>
+      <if test="latitude != null" >
+        latitude,
+      </if>
+      <if test="contactPerson != null" >
+        contactPerson,
+      </if>
+      <if test="contactTels != null" >
+        contactTels,
+      </if>
+      <if test="createStationDate != null" >
+        createStationDate,
+      </if>
+      <if test="levelStandard != null" >
+        levelStandard,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="isvalid != null" >
+        isvalid,
+      </if>
+      <if test="waterQualityLevel != null" >
+        waterQualityLevel,
+      </if>
+      <if test="sort != null" >
+        sort,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="siteName != null" >
+        #{siteName,jdbcType=VARCHAR},
+      </if>
+      <if test="operCompany != null" >
+        #{operCompany,jdbcType=VARCHAR},
+      </if>
+      <if test="basinCode != null" >
+        #{basinCode,jdbcType=VARCHAR},
+      </if>
+      <if test="basinName != null" >
+        #{basinName,jdbcType=VARCHAR},
+      </if>
+      <if test="riverCode != null" >
+        #{riverCode,jdbcType=VARCHAR},
+      </if>
+      <if test="riverName != null" >
+        #{riverName,jdbcType=VARCHAR},
+      </if>
+      <if test="sectionCode != null" >
+        #{sectionCode,jdbcType=VARCHAR},
+      </if>
+      <if test="sectionName != null" >
+        #{sectionName,jdbcType=VARCHAR},
+      </if>
+      <if test="provinceCode != null" >
+        #{provinceCode,jdbcType=VARCHAR},
+      </if>
+      <if test="provinceName != null" >
+        #{provinceName,jdbcType=VARCHAR},
+      </if>
+      <if test="cityCode != null" >
+        #{cityCode,jdbcType=VARCHAR},
+      </if>
+      <if test="cityName != null" >
+        #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="countyCode != null" >
+        #{countyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="countyName != null" >
+        #{countyName,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=CHAR},
+      </if>
+      <if test="siteType != null" >
+        #{siteType,jdbcType=CHAR},
+      </if>
+      <if test="longitude != null" >
+        #{longitude,jdbcType=VARCHAR},
+      </if>
+      <if test="latitude != null" >
+        #{latitude,jdbcType=VARCHAR},
+      </if>
+      <if test="contactPerson != null" >
+        #{contactPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="contactTels != null" >
+        #{contactTels,jdbcType=VARCHAR},
+      </if>
+      <if test="createStationDate != null" >
+        #{createStationDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="levelStandard != null" >
+        #{levelStandard,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="isvalid != null" >
+        #{isvalid,jdbcType=CHAR},
+      </if>
+      <if test="waterQualityLevel != null" >
+        #{waterQualityLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="sort != null" >
+        #{sort,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xmmems.domain.base.BaseSite" >
+    update base_site
+    <set >
+      <if test="siteName != null" >
+        siteName = #{siteName,jdbcType=VARCHAR},
+      </if>
+      <if test="operCompany != null" >
+        operCompany = #{operCompany,jdbcType=VARCHAR},
+      </if>
+      <if test="basinCode != null" >
+        basinCode = #{basinCode,jdbcType=VARCHAR},
+      </if>
+      <if test="basinName != null" >
+        basinName = #{basinName,jdbcType=VARCHAR},
+      </if>
+      <if test="riverCode != null" >
+        riverCode = #{riverCode,jdbcType=VARCHAR},
+      </if>
+      <if test="riverName != null" >
+        riverName = #{riverName,jdbcType=VARCHAR},
+      </if>
+      <if test="sectionCode != null" >
+        sectionCode = #{sectionCode,jdbcType=VARCHAR},
+      </if>
+      <if test="sectionName != null" >
+        sectionName = #{sectionName,jdbcType=VARCHAR},
+      </if>
+      <if test="provinceCode != null" >
+        provinceCode = #{provinceCode,jdbcType=VARCHAR},
+      </if>
+      <if test="provinceName != null" >
+        provinceName = #{provinceName,jdbcType=VARCHAR},
+      </if>
+      <if test="cityCode != null" >
+        cityCode = #{cityCode,jdbcType=VARCHAR},
+      </if>
+      <if test="cityName != null" >
+        cityName = #{cityName,jdbcType=VARCHAR},
+      </if>
+      <if test="countyCode != null" >
+        countyCode = #{countyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="countyName != null" >
+        countyName = #{countyName,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=CHAR},
+      </if>
+      <if test="siteType != null" >
+        siteType = #{siteType,jdbcType=CHAR},
+      </if>
+      <if test="longitude != null" >
+        longitude = #{longitude,jdbcType=VARCHAR},
+      </if>
+      <if test="latitude != null" >
+        latitude = #{latitude,jdbcType=VARCHAR},
+      </if>
+      <if test="contactPerson != null" >
+        contactPerson = #{contactPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="contactTels != null" >
+        contactTels = #{contactTels,jdbcType=VARCHAR},
+      </if>
+      <if test="createStationDate != null" >
+        createStationDate = #{createStationDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="levelStandard != null" >
+        levelStandard = #{levelStandard,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="isvalid != null" >
+        isvalid = #{isvalid,jdbcType=CHAR},
+      </if>
+      <if test="waterQualityLevel != null" >
+        waterQualityLevel = #{waterQualityLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="sort != null" >
+        sort = #{sort,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xmmems.domain.base.BaseSite" >
+    update base_site
+    set siteName = #{siteName,jdbcType=VARCHAR},
+      operCompany = #{operCompany,jdbcType=VARCHAR},
+      basinCode = #{basinCode,jdbcType=VARCHAR},
+      basinName = #{basinName,jdbcType=VARCHAR},
+      riverCode = #{riverCode,jdbcType=VARCHAR},
+      riverName = #{riverName,jdbcType=VARCHAR},
+      sectionCode = #{sectionCode,jdbcType=VARCHAR},
+      sectionName = #{sectionName,jdbcType=VARCHAR},
+      provinceCode = #{provinceCode,jdbcType=VARCHAR},
+      provinceName = #{provinceName,jdbcType=VARCHAR},
+      cityCode = #{cityCode,jdbcType=VARCHAR},
+      cityName = #{cityName,jdbcType=VARCHAR},
+      countyCode = #{countyCode,jdbcType=VARCHAR},
+      countyName = #{countyName,jdbcType=VARCHAR},
+      status = #{status,jdbcType=CHAR},
+      siteType = #{siteType,jdbcType=CHAR},
+      longitude = #{longitude,jdbcType=VARCHAR},
+      latitude = #{latitude,jdbcType=VARCHAR},
+      contactPerson = #{contactPerson,jdbcType=VARCHAR},
+      contactTels = #{contactTels,jdbcType=VARCHAR},
+      createStationDate = #{createStationDate,jdbcType=TIMESTAMP},
+      levelStandard = #{levelStandard,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      isvalid = #{isvalid,jdbcType=CHAR},
+      waterQualityLevel = #{waterQualityLevel,jdbcType=VARCHAR},
+      sort = #{sort,jdbcType=DECIMAL}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

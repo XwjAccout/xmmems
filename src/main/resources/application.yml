@@ -1,0 +1,105 @@
+server:
+  port: 6689
+
+spring:
+  profiles:
+    active: platform
+  application:
+    name: xmmems
+  servlet:
+    multipart:
+      max-file-size: 5MB # 限制一次上次文件的总大小
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://59.39.56.6:3306/sdmems?useSSL=false&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
+    username: root
+    password: sg12345
+
+mybatis:
+  type-aliases-package: com.xmmems.domain
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: com.xmmems.mapper/*.xml
+
+logging:
+  level:
+    com.xmmems: info
+    com.xmmems.mapper.SimpleHourDataMapper: info
+
+mapper:
+  wrap-keyword: "`{0}`"
+
+#自定义数据
+xmmems:
+  cors:  #跨域
+    allowedOrigins:
+      - http://runapi.showdoc.cc
+    #        - http://www.jujia.com1
+    allowedCredentials: true
+    allowedHeaders:
+      - "*"
+    allowedMethods:
+      - GET
+      - POST
+      - DELETE
+      - PUT
+      - OPTIONS
+      - HEAD
+    maxAge: 360000
+    filterPath: "/**"
+
+#认证加密数据
+ly:
+  jwt:
+    pubKeyPath: D:\ly_guangzhou120\rsa\rsa_key.pub # 公钥地址
+    priKeyPath: D:\ly_guangzhou120\rsa\rsa_key # 私钥地址
+    user:
+      expire: 1000000 # 过期时间,单位分钟 30
+      refreshTime: 15
+      cookieName: token # cookie名称
+      cookieDomain: xmmems.com # cookie的域
+  filter:  #提供过滤白名单
+    allowPaths:
+      - /login
+      - /log
+      - /upload
+      - /poi
+      - /pdf
+      #- /exceed
+      - /favicon.ico
+      - /water/save
+
+network: "0 31 21 * * ?"
+
+poipath:
+  excel: D:\poi\excel\
+  pdf: D:\poi\pdf\
+
+
+report:
+  #零点核查误差比较值（无%）
+  zeroCheck:
+    - 氨氮=0.1
+    - 高锰酸盐指数=0.5
+    - 总氮=0.1
+    - 总磷=0.01
+  #零点漂移误差比较值（有%但是省略）
+  zeroDrift:
+    - 氨氮=5
+    - 高锰酸盐指数=5
+    - 总氮=5
+    - 总磷=5
+  #跨度核查误差比较值（有%但是省略）
+  spanCheck:
+    - 氨氮=15
+    - 高锰酸盐指数=15
+    - 总氮=15
+    - 总磷=15
+  #跨度漂移误差比较值（有%但是省略）
+  spanDrift:
+    - 氨氮=5
+    - 高锰酸盐指数=5
+    - 总氮=10
+    - 总磷=10
+
+

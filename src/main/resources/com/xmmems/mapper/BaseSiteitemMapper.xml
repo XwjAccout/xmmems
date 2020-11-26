@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmmems.mapper.BaseSiteitemMapper">
+    <resultMap id="BaseResultMap" type="com.xmmems.domain.base.BaseSiteitem">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="siteId" property="siteId" jdbcType="INTEGER"/>
+        <result column="itemId" property="itemId" jdbcType="INTEGER"/>
+        <result column="siteName" property="siteName" jdbcType="VARCHAR"/>
+        <result column="itemName" property="itemName" jdbcType="VARCHAR"/>
+        <result column="createTime" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="updateTime" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="sort" property="sort" jdbcType="DECIMAL"/>
+        <result column="isValid" property="isValid" jdbcType="CHAR"/>
+        <result column="minValue" property="minValue" jdbcType="VARCHAR"/>
+        <result column="maxValue" property="maxValue" jdbcType="VARCHAR"/>
+        <result column="isAutoTag" property="isAutoTag" jdbcType="CHAR"/>
+        <result column="number" property="number" jdbcType="INTEGER"/>
+        <result column="limitNum" property="limitNum" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+    id, siteId, itemId, siteName, itemName, createTime, updateTime, sort, isValid, minValue, 
+    'maxValue', isAutoTag, number, limitNum
+  </sql>
+    <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.xmmems.domain.base.BaseSiteitemExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from base_siteitem
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from base_siteitem
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from base_siteitem
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <insert id="insert" parameterType="com.xmmems.domain.base.BaseSiteitem">
+    insert into base_siteitem (id, siteId, itemId, 
+      siteName, itemName, createTime, 
+      updateTime, sort, isValid, 
+      minValue, maxValue, isAutoTag, 
+      number, limitNum)
+    values (#{id,jdbcType=INTEGER}, #{siteId,jdbcType=INTEGER}, #{itemId,jdbcType=INTEGER}, 
+      #{siteName,jdbcType=VARCHAR}, #{itemName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{sort,jdbcType=DECIMAL}, #{isValid,jdbcType=CHAR}, 
+      #{minValue,jdbcType=VARCHAR}, #{maxValue,jdbcType=VARCHAR}, #{isAutoTag,jdbcType=CHAR}, 
+      #{number,jdbcType=INTEGER}, #{limitNum,jdbcType=VARCHAR})
+  </insert>
+    <insert id="insertSelective" parameterType="com.xmmems.domain.base.BaseSiteitem">
+        insert into base_siteitem
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="siteId != null">
+                siteId,
+            </if>
+            <if test="itemId != null">
+                itemId,
+            </if>
+            <if test="siteName != null">
+                siteName,
+            </if>
+            <if test="itemName != null">
+                itemName,
+            </if>
+            <if test="createTime != null">
+                createTime,
+            </if>
+            <if test="updateTime != null">
+                updateTime,
+            </if>
+            <if test="sort != null">
+                sort,
+            </if>
+            <if test="isValid != null">
+                isValid,
+            </if>
+            <if test="minValue != null">
+                minValue,
+            </if>
+            <if test="maxValue != null">
+                maxValue,
+            </if>
+            <if test="isAutoTag != null">
+                isAutoTag,
+            </if>
+            <if test="number != null">
+                number,
+            </if>
+            <if test="limitNum != null">
+                limitNum,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="siteId != null">
+                #{siteId,jdbcType=INTEGER},
+            </if>
+            <if test="itemId != null">
+                #{itemId,jdbcType=INTEGER},
+            </if>
+            <if test="siteName != null">
+                #{siteName,jdbcType=VARCHAR},
+            </if>
+            <if test="itemName != null">
+                #{itemName,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="sort != null">
+                #{sort,jdbcType=DECIMAL},
+            </if>
+            <if test="isValid != null">
+                #{isValid,jdbcType=CHAR},
+            </if>
+            <if test="minValue != null">
+                #{minValue,jdbcType=VARCHAR},
+            </if>
+            <if test="maxValue != null">
+                #{maxValue,jdbcType=VARCHAR},
+            </if>
+            <if test="isAutoTag != null">
+                #{isAutoTag,jdbcType=CHAR},
+            </if>
+            <if test="number != null">
+                #{number,jdbcType=INTEGER},
+            </if>
+            <if test="limitNum != null">
+                #{limitNum,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.xmmems.domain.base.BaseSiteitem">
+        update base_siteitem
+        <set>
+            <if test="siteId != null">
+                siteId = #{siteId,jdbcType=INTEGER},
+            </if>
+            <if test="itemId != null">
+                itemId = #{itemId,jdbcType=INTEGER},
+            </if>
+            <if test="siteName != null">
+                siteName = #{siteName,jdbcType=VARCHAR},
+            </if>
+            <if test="itemName != null">
+                itemName = #{itemName,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                createTime = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                updateTime = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="sort != null">
+                sort = #{sort,jdbcType=DECIMAL},
+            </if>
+            <if test="isValid != null">
+                isValid = #{isValid,jdbcType=CHAR},
+            </if>
+            <if test="minValue != null">
+                minValue = #{minValue,jdbcType=VARCHAR},
+            </if>
+            <if test="maxValue != null">
+                maxValue = #{maxValue,jdbcType=VARCHAR},
+            </if>
+            <if test="isAutoTag != null">
+                isAutoTag = #{isAutoTag,jdbcType=CHAR},
+            </if>
+            <if test="number != null">
+                number = #{number,jdbcType=INTEGER},
+            </if>
+            <if test="limitNum != null">
+                limitNum = #{limitNum,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.xmmems.domain.base.BaseSiteitem">
+    update base_siteitem
+    set siteId = #{siteId,jdbcType=INTEGER},
+      itemId = #{itemId,jdbcType=INTEGER},
+      siteName = #{siteName,jdbcType=VARCHAR},
+      itemName = #{itemName,jdbcType=VARCHAR},
+      createTime = #{createTime,jdbcType=TIMESTAMP},
+      updateTime = #{updateTime,jdbcType=TIMESTAMP},
+      sort = #{sort,jdbcType=DECIMAL},
+      isValid = #{isValid,jdbcType=CHAR},
+      minValue = #{minValue,jdbcType=VARCHAR},
+      maxValue = #{maxValue,jdbcType=VARCHAR},
+      isAutoTag = #{isAutoTag,jdbcType=CHAR},
+      number = #{number,jdbcType=INTEGER},
+      limitNum = #{limitNum,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+    <update id="updateDetectionLimit">
+        update base_siteitem set limitNum = #{limit} where siteId  = #{siteId} and itemId = #{itemId}
+    </update>
+
+    <update id="updateSort">
+        update base_siteitem set sort = #{sort} where siteId  = #{siteId} and itemId = #{itemId}
+    </update>
+
+    <update id="updateNumber">
+        update base_siteitem set number = #{number} where siteId  = #{siteId} and itemId = #{itemId}
+    </update>
+
+    <select id="getSiteItemAll" resultType="java.util.Map">
+        SELECT DISTINCT itemName FROM base_siteitem t WHERE t.isValid='1' AND t.siteId IN
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="getValidSiteIdItemId" resultType="java.util.Map">
+      SELECT  si.siteId,si.itemId,si.number FROM base_siteitem si ,base_item i,base_site s WHERE si.siteId = s.id AND si.itemId = i.id
+    </select>
+
+    <insert id="insertBaseSiteItem">
+        insert into base_siteitem (siteId, itemId, siteName, itemName, createTime,sort, isValid,isAutoTag,`number`)
+        values (#{siteId},#{itemId},#{siteName},#{itemName},now(),(select rank from base_item where id =#{itemId}),'1','0',24);
+    </insert>
+
+    <select id="selectByAccountId" resultType="java.util.Map">
+        SELECT DISTINCT bs.itemId,bs.itemName FROM base_siteitem bs ,account_site asi WHERE bs.siteId=asi.siteId AND asi.accountId=#{loginId}
+    </select>
+</mapper>

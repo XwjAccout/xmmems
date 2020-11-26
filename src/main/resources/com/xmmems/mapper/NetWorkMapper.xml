@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmmems.mapper.NetWorkMapper" >
+  <resultMap id="BaseResultMap" type="com.xmmems.domain.NetWork" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="siteId" property="siteId" jdbcType="VARCHAR" />
+    <result column="siteName" property="siteName" jdbcType="VARCHAR" />
+    <result column="mn" property="mn" jdbcType="VARCHAR" />
+    <result column="date" property="date" jdbcType="DATE" />
+    <result column="onLine" property="onLine" jdbcType="INTEGER" />
+    <result column="offLine" property="offLine" jdbcType="INTEGER" />
+    <result column="offLineCount" property="offLineCount" jdbcType="INTEGER" />
+    <result column="flow" property="flow" jdbcType="INTEGER" />
+    <result column="loginTime" property="loginTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, siteId, siteName, mn, date, onLine, offLine, offLineCount, flow, loginTime
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.xmmems.domain.NetWorkExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from network
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from network
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from network
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.xmmems.domain.NetWork" >
+    insert into network (id, siteId, siteName, 
+      mn, date, onLine, offLine, 
+      offLineCount, flow, loginTime
+      )
+    values (#{id,jdbcType=INTEGER}, #{siteId,jdbcType=VARCHAR}, #{siteName,jdbcType=VARCHAR}, 
+      #{mn,jdbcType=VARCHAR}, #{date,jdbcType=DATE}, #{onLine,jdbcType=INTEGER}, #{offLine,jdbcType=INTEGER}, 
+      #{offLineCount,jdbcType=INTEGER}, #{flow,jdbcType=INTEGER}, #{loginTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.xmmems.domain.NetWork" >
+    insert into network
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="siteId != null" >
+        siteId,
+      </if>
+      <if test="siteName != null" >
+        siteName,
+      </if>
+      <if test="mn != null" >
+        mn,
+      </if>
+      <if test="date != null" >
+        date,
+      </if>
+      <if test="onLine != null" >
+        onLine,
+      </if>
+      <if test="offLine != null" >
+        offLine,
+      </if>
+      <if test="offLineCount != null" >
+        offLineCount,
+      </if>
+      <if test="flow != null" >
+        flow,
+      </if>
+      <if test="loginTime != null" >
+        loginTime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="siteId != null" >
+        #{siteId,jdbcType=VARCHAR},
+      </if>
+      <if test="siteName != null" >
+        #{siteName,jdbcType=VARCHAR},
+      </if>
+      <if test="mn != null" >
+        #{mn,jdbcType=VARCHAR},
+      </if>
+      <if test="date != null" >
+        #{date,jdbcType=DATE},
+      </if>
+      <if test="onLine != null" >
+        #{onLine,jdbcType=INTEGER},
+      </if>
+      <if test="offLine != null" >
+        #{offLine,jdbcType=INTEGER},
+      </if>
+      <if test="offLineCount != null" >
+        #{offLineCount,jdbcType=INTEGER},
+      </if>
+      <if test="flow != null" >
+        #{flow,jdbcType=INTEGER},
+      </if>
+      <if test="loginTime != null" >
+        #{loginTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xmmems.domain.NetWork" >
+    update network
+    <set >
+      <if test="siteId != null" >
+        siteId = #{siteId,jdbcType=VARCHAR},
+      </if>
+      <if test="siteName != null" >
+        siteName = #{siteName,jdbcType=VARCHAR},
+      </if>
+      <if test="mn != null" >
+        mn = #{mn,jdbcType=VARCHAR},
+      </if>
+      <if test="date != null" >
+        date = #{date,jdbcType=DATE},
+      </if>
+      <if test="onLine != null" >
+        onLine = #{onLine,jdbcType=INTEGER},
+      </if>
+      <if test="offLine != null" >
+        offLine = #{offLine,jdbcType=INTEGER},
+      </if>
+      <if test="offLineCount != null" >
+        offLineCount = #{offLineCount,jdbcType=INTEGER},
+      </if>
+      <if test="flow != null" >
+        flow = #{flow,jdbcType=INTEGER},
+      </if>
+      <if test="loginTime != null" >
+        loginTime = #{loginTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xmmems.domain.NetWork" >
+    update network
+    set siteId = #{siteId,jdbcType=VARCHAR},
+      siteName = #{siteName,jdbcType=VARCHAR},
+      mn = #{mn,jdbcType=VARCHAR},
+      date = #{date,jdbcType=DATE},
+      onLine = #{onLine,jdbcType=INTEGER},
+      offLine = #{offLine,jdbcType=INTEGER},
+      offLineCount = #{offLineCount,jdbcType=INTEGER},
+      flow = #{flow,jdbcType=INTEGER},
+      loginTime = #{loginTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

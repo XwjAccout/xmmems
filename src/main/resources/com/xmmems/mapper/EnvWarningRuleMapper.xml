@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmmems.mapper.EnvWarningRuleMapper" >
+  <resultMap id="BaseResultMap" type="com.xmmems.domain.env.EnvWarningRule" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="siteId" property="siteId" jdbcType="INTEGER" />
+    <result column="siteName" property="siteName" jdbcType="VARCHAR" />
+    <result column="itemId" property="itemId" jdbcType="INTEGER" />
+    <result column="itemName" property="itemName" jdbcType="VARCHAR" />
+    <result column="typeId" property="typeId" jdbcType="INTEGER" />
+    <result column="typeName" property="typeName" jdbcType="VARCHAR" />
+    <result column="rangeTypeId" property="rangeTypeId" jdbcType="INTEGER" />
+    <result column="rangeTypeName" property="rangeTypeName" jdbcType="VARCHAR" />
+    <result column="rangeMin" property="rangeMin" jdbcType="VARCHAR" />
+    <result column="rangeMax" property="rangeMax" jdbcType="VARCHAR" />
+    <result column="repeatNum" property="repeatNum" jdbcType="INTEGER" />
+    <result column="isUsed" property="isUsed" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, siteId, siteName, itemId, itemName, typeId, typeName, rangeTypeId, rangeTypeName, 
+    rangeMin, rangeMax, repeatNum, isUsed
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.xmmems.domain.env.EnvWarningRuleExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from env_warning_rule
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from env_warning_rule
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from env_warning_rule
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.xmmems.domain.env.EnvWarningRule" >
+    insert into env_warning_rule (id, siteId, siteName, 
+      itemId, itemName, typeId, 
+      typeName, rangeTypeId, rangeTypeName, 
+      rangeMin, rangeMax, repeatNum, 
+      isUsed)
+    values (#{id,jdbcType=INTEGER}, #{siteId,jdbcType=INTEGER}, #{siteName,jdbcType=VARCHAR}, 
+      #{itemId,jdbcType=INTEGER}, #{itemName,jdbcType=VARCHAR}, #{typeId,jdbcType=INTEGER}, 
+      #{typeName,jdbcType=VARCHAR}, #{rangeTypeId,jdbcType=INTEGER}, #{rangeTypeName,jdbcType=VARCHAR}, 
+      #{rangeMin,jdbcType=VARCHAR}, #{rangeMax,jdbcType=VARCHAR}, #{repeatNum,jdbcType=INTEGER}, 
+      #{isUsed,jdbcType=CHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.xmmems.domain.env.EnvWarningRule" >
+    insert into env_warning_rule
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="siteId != null" >
+        siteId,
+      </if>
+      <if test="siteName != null" >
+        siteName,
+      </if>
+      <if test="itemId != null" >
+        itemId,
+      </if>
+      <if test="itemName != null" >
+        itemName,
+      </if>
+      <if test="typeId != null" >
+        typeId,
+      </if>
+      <if test="typeName != null" >
+        typeName,
+      </if>
+      <if test="rangeTypeId != null" >
+        rangeTypeId,
+      </if>
+      <if test="rangeTypeName != null" >
+        rangeTypeName,
+      </if>
+      <if test="rangeMin != null" >
+        rangeMin,
+      </if>
+      <if test="rangeMax != null" >
+        rangeMax,
+      </if>
+      <if test="repeatNum != null" >
+        repeatNum,
+      </if>
+      <if test="isUsed != null" >
+        isUsed,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="siteId != null" >
+        #{siteId,jdbcType=INTEGER},
+      </if>
+      <if test="siteName != null" >
+        #{siteName,jdbcType=VARCHAR},
+      </if>
+      <if test="itemId != null" >
+        #{itemId,jdbcType=INTEGER},
+      </if>
+      <if test="itemName != null" >
+        #{itemName,jdbcType=VARCHAR},
+      </if>
+      <if test="typeId != null" >
+        #{typeId,jdbcType=INTEGER},
+      </if>
+      <if test="typeName != null" >
+        #{typeName,jdbcType=VARCHAR},
+      </if>
+      <if test="rangeTypeId != null" >
+        #{rangeTypeId,jdbcType=INTEGER},
+      </if>
+      <if test="rangeTypeName != null" >
+        #{rangeTypeName,jdbcType=VARCHAR},
+      </if>
+      <if test="rangeMin != null" >
+        #{rangeMin,jdbcType=VARCHAR},
+      </if>
+      <if test="rangeMax != null" >
+        #{rangeMax,jdbcType=VARCHAR},
+      </if>
+      <if test="repeatNum != null" >
+        #{repeatNum,jdbcType=INTEGER},
+      </if>
+      <if test="isUsed != null" >
+        #{isUsed,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.xmmems.domain.env.EnvWarningRule" >
+    update env_warning_rule
+    <set >
+      <if test="siteId != null" >
+        siteId = #{siteId,jdbcType=INTEGER},
+      </if>
+      <if test="siteName != null" >
+        siteName = #{siteName,jdbcType=VARCHAR},
+      </if>
+      <if test="itemId != null" >
+        itemId = #{itemId,jdbcType=INTEGER},
+      </if>
+      <if test="itemName != null" >
+        itemName = #{itemName,jdbcType=VARCHAR},
+      </if>
+      <if test="typeId != null" >
+        typeId = #{typeId,jdbcType=INTEGER},
+      </if>
+      <if test="typeName != null" >
+        typeName = #{typeName,jdbcType=VARCHAR},
+      </if>
+      <if test="rangeTypeId != null" >
+        rangeTypeId = #{rangeTypeId,jdbcType=INTEGER},
+      </if>
+      <if test="rangeTypeName != null" >
+        rangeTypeName = #{rangeTypeName,jdbcType=VARCHAR},
+      </if>
+      <if test="rangeMin != null" >
+        rangeMin = #{rangeMin,jdbcType=VARCHAR},
+      </if>
+      <if test="rangeMax != null" >
+        rangeMax = #{rangeMax,jdbcType=VARCHAR},
+      </if>
+      <if test="repeatNum != null" >
+        repeatNum = #{repeatNum,jdbcType=INTEGER},
+      </if>
+      <if test="isUsed != null" >
+        isUsed = #{isUsed,jdbcType=CHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.xmmems.domain.env.EnvWarningRule" >
+    update env_warning_rule
+    set siteId = #{siteId,jdbcType=INTEGER},
+      siteName = #{siteName,jdbcType=VARCHAR},
+      itemId = #{itemId,jdbcType=INTEGER},
+      itemName = #{itemName,jdbcType=VARCHAR},
+      typeId = #{typeId,jdbcType=INTEGER},
+      typeName = #{typeName,jdbcType=VARCHAR},
+      rangeTypeId = #{rangeTypeId,jdbcType=INTEGER},
+      rangeTypeName = #{rangeTypeName,jdbcType=VARCHAR},
+      rangeMin = #{rangeMin,jdbcType=VARCHAR},
+      rangeMax = #{rangeMax,jdbcType=VARCHAR},
+      repeatNum = #{repeatNum,jdbcType=INTEGER},
+      isUsed = #{isUsed,jdbcType=CHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
