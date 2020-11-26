@@ -2,11 +2,8 @@ package com.xmmems.service;
 
 import com.xmmems.common.exception.XMException;
 import com.xmmems.common.utils.DateFormat;
-import com.xmmems.common.utils.FileLog;
 import com.xmmems.domain.NetWork;
 import com.xmmems.domain.NetWorkExample;
-import com.xmmems.domain.base.BaseSite;
-import com.xmmems.mapper.BaseSiteMapper;
 import com.xmmems.mapper.NetWorkMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +26,6 @@ public class NetWorkService {
     @Autowired
     private NetWorkMapper netWorkMapper;
 
-    @Autowired
-    private BaseSiteMapper baseSiteMapper;
-
-    @Autowired
-    private CommonService commonService;
-
     public List<NetWork> findNetWorks(String siteName, String start, String end,String siteId) {
         NetWorkExample example = new NetWorkExample();
         NetWorkExample.Criteria criteria = example.createCriteria();
@@ -54,47 +45,6 @@ public class NetWorkService {
 
     }
 
-    /**
-     * 更新联网情况为断网状态
-     */
-    private void offLine(NetWork netWork) {
-        FileLog.error("断网状态");
-        if (netWork.getFlow() == 1) {
-            netWork.setOffLineCount(netWork.getOffLineCount() + 1);
-            netWork.setFlow(0);
-            BaseSite record = new BaseSite();
-            String siteId = netWork.getSiteId();
-            record.setId(Integer.valueOf(siteId));
-            record.setStatus("0");
-            baseSiteMapper.updateByPrimaryKeySelective(record);
-        }
-        netWork.setOffLine(netWork.getOffLine() + 1);
-        int i = netWorkMapper.updateByPrimaryKeySelective(netWork);
-        if (i < 1) {
-            FileLog.info("断网数据更新失败");
-        }
-    }
-
-    /**
-     * 更新联网情况为联网状态
-     */
-    private void onLine(NetWork netWork) {
-        //FileLog.info("onLine");
-        if (netWork.getFlow() == 0) {
-            netWork.setLoginTime(new Date());
-            netWork.setFlow(1);
-            BaseSite record = new BaseSite();
-            String siteId = netWork.getSiteId();
-            record.setId(Integer.valueOf(siteId));
-            record.setStatus("1");
-            baseSiteMapper.updateByPrimaryKeySelective(record);
-        }
-        netWork.setOnLine(netWork.getOnLine() + 1);
-        int i = netWorkMapper.updateByPrimaryKeySelective(netWork);
-        if (i < 1) {
-            FileLog.info(netWork.getSiteName() + "联网数据更新失败");
-        }
-    }
 
     public Map<String, Integer> findNetWorksNumber() {
         Map<String, Integer> map = new HashMap<>();
