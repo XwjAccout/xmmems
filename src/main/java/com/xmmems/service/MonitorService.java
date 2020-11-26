@@ -62,12 +62,7 @@ public class MonitorService {
     private NetWorkService netWorkService;
 
     public List<BaseSiteitemDTO> getColumns(Integer siteId) {
-        List<BaseSiteitemDTO> items = baseSiteitemMapper.getColumns(siteId);
-
-        if (items.size() == 0) {
-            throw new XMException(ExceptionEnum.MONITORREPORT_NOT_FOUND);
-        }
-        return items;
+        return commonService.getBaseSiteItemBySiteId(siteId);
     }
 
     public List<BaseSiteitemDTO> getColumnsAll() {
@@ -777,7 +772,8 @@ public class MonitorService {
         return monthData(siteId, start, end);
     }
 
-    public List<Map<String, String>> seasons(Integer siteId, Integer seasons, Integer year, List<Integer> statistics, Boolean limit) {
+    //isDayAvg true 返回日均值 false 返回月均值
+    public List<Map<String, String>> seasons(Integer siteId, Integer seasons, Integer year, List<Integer> statistics, Boolean limit, Boolean isDayAvg) {
         String startTime = year + "-";
         String endTime = year + "-";
         switch (seasons) {
@@ -801,7 +797,11 @@ public class MonitorService {
                 throw new XMException(500, "季节选择出错，只可以选择1,2,3,4");
         }
 
-        return year(siteId, startTime, endTime, statistics, limit);
+        if (isDayAvg) {
+            return month(siteId, startTime, endTime, statistics, limit);
+        } else {
+            return year(siteId, startTime, endTime, statistics, limit);
+        }
     }
 
     public List<Map<String, String>> waterAnalysis() {

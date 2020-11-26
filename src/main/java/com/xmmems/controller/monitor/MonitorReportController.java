@@ -79,8 +79,9 @@ public class MonitorReportController {
                                                              @RequestParam(value = "year") Integer year,
                                                              @RequestParam(value = "seasons") Integer seasons,
                                                              @RequestParam(value = "statistics", required = false) List<Integer> statistics,
+                                                             @RequestParam(value = "isDayAvg", defaultValue = "false") Boolean isDayAvg,
                                                              @RequestParam(value = "limit", defaultValue = "true") Boolean limit) {
-        return ResponseEntity.ok(monitorService.seasons(siteId, seasons, year, statistics, limit));
+        return ResponseEntity.ok(monitorService.seasons(siteId, seasons, year, statistics, limit, isDayAvg));
     }
 
     //月报表查询功能,其实就是获取某个月的日均值报表
