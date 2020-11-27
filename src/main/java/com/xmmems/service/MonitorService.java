@@ -640,7 +640,7 @@ public class MonitorService {
             trend(null, null);
             return TREND_MAP.get(trend);
         } else {
-            if (System.currentTimeMillis() - TREND_TIME > 20 * 60000) {
+            if (System.currentTimeMillis() - TREND_TIME > 5 * 60000) {
                 TREND_TIME = System.currentTimeMillis();
             } else {
                 String mm = new SimpleDateFormat("mm").format(System.currentTimeMillis());
