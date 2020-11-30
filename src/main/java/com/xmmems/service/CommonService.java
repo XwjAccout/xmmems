@@ -115,9 +115,8 @@ public class CommonService {
     }
 
 
-
     private void initBaseSiteItemMap(Integer siteId) {
-        if (System.currentTimeMillis() - BASE_SITE_ITEM_MAP_Effective_Time > 60000) {
+        if (!BASE_SITE_ITEM_MAP.containsKey(siteId) || (System.currentTimeMillis() - BASE_SITE_ITEM_MAP_Effective_Time > 60000)) {
             List<BaseSiteitemDTO> items = baseSiteitemMapper.getColumns(siteId);
             BASE_SITE_ITEM_MAP.put(siteId, items);
             BASE_SITE_ITEM_MAP_Effective_Time = System.currentTimeMillis();
@@ -129,4 +128,7 @@ public class CommonService {
         return BASE_SITE_ITEM_MAP.get(siteId);
     }
 
+    public Object getgg() {
+        return BASE_SITE_ITEM_MAP;
+    }
 }

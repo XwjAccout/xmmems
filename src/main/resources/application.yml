@@ -23,8 +23,8 @@ mybatis:
 
 logging:
   level:
-    com.xmmems: info
-    com.xmmems.mapper.SimpleHourDataMapper: info
+    com.xmmems: debug
+    com.xmmems.mapper.SimpleHourDataMapper: debug
 
 mapper:
   wrap-keyword: "`{0}`"

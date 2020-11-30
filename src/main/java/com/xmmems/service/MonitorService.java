@@ -15,11 +15,7 @@ import com.xmmems.domain.env.EnvRealtimeData;
 import com.xmmems.dto.BaseSiteDTO;
 import com.xmmems.dto.BaseSiteitemDTO;
 import com.xmmems.dto.PageResult;
-import com.xmmems.mapper.SimpleHourDataMapper;
-import com.xmmems.mapper.BaseSiteMapper;
-import com.xmmems.mapper.BaseSiteitemMapper;
-import com.xmmems.mapper.EnvHourDataMapper;
-import com.xmmems.mapper.EnvRealtimeDataMapper;
+import com.xmmems.mapper.*;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -338,18 +334,30 @@ public class MonitorService {
                     }
                 });
 
-                Future<List<String>> collectFuture = PoolExecutor.submit(new Callable<List<String>>() {
-                    @Override
-                    public List<String> call() throws Exception {
-                        List<BaseSiteitemDTO> columns = getColumns(Integer.valueOf(siteId));
-                        return columns.stream().map(BaseSiteitemDTO::getItemName).collect(Collectors.toList());
-                    }
-                });
+                //Future<List<String>> collectFuture = PoolExecutor.submit(new Callable<List<String>>() {
+                //    @Override
+                //    public List<String> call() throws Exception {
+                //        System.out.println("查询列名");
+                //        List<BaseSiteitemDTO> columns = getColumns(Integer.valueOf(siteId));
+                //        Object getgg = commonService.getgg();
+                //        if (columns == null) {
+                //            return null;
+                //        }
+                //        return columns.stream().map(BaseSiteitemDTO::getItemName).collect(Collectors.toList());
+                //    }
+                //});
                 Map<String, String> limitMap = null;
                 List<String> collect = null;
                 try {
                     limitMap = limitMapFuture.get();
-                    collect = collectFuture.get();
+                    System.out.println("查询列名");
+                    List<BaseSiteitemDTO> columns = getColumns(Integer.valueOf(siteId));
+                    Object getgg = commonService.getgg();
+                    if (columns == null) {
+                        return null;
+                    }
+                    collect=  columns.stream().map(BaseSiteitemDTO::getItemName).collect(Collectors.toList());
+                    //collect = collectFuture.get();
                 } catch (Exception e) {
                     String err = "使用多线程出错com.xmmems.service.MonitorService.getRealTimeData";
                     FileLog.error(err);
