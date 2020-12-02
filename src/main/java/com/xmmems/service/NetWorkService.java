@@ -1,5 +1,6 @@
 package com.xmmems.service;
 
+import com.xmmems.common.auth.domain.UserHolder;
 import com.xmmems.common.exception.XMException;
 import com.xmmems.common.utils.DateFormat;
 import com.xmmems.domain.NetWork;
@@ -27,21 +28,21 @@ public class NetWorkService {
     private NetWorkMapper netWorkMapper;
 
     public List<NetWork> findNetWorks(String siteName, String start, String end,String siteId) {
-        NetWorkExample example = new NetWorkExample();
-        NetWorkExample.Criteria criteria = example.createCriteria();
-        if (StringUtils.isNotBlank(siteName)) {
-            criteria.andSiteNameEqualTo(siteName);
-        }
-        if (StringUtils.isNotBlank(siteId)) {
-            criteria.andSiteIdEqualTo(siteId);
-        }
-        try {
-            criteria.andDateGreaterThanOrEqualTo(DateFormat.parseSome(start));
-            criteria.andDateLessThanOrEqualTo(DateFormat.parseSome(end));
-        } catch (Exception e) {
-            throw new XMException(500, "日期解析异常");
-        }
-        return netWorkMapper.selectByExample(example);
+//        NetWorkExample example = new NetWorkExample();
+//        NetWorkExample.Criteria criteria = example.createCriteria();
+//        if (StringUtils.isNotBlank(siteName)) {
+//            criteria.andSiteNameEqualTo(siteName);
+//        }
+//        if (StringUtils.isNotBlank(siteId)) {
+//            criteria.andSiteIdEqualTo(siteId);
+//        }
+//        try {
+//            criteria.andDateGreaterThanOrEqualTo(DateFormat.parseSome(start));
+//            criteria.andDateLessThanOrEqualTo(DateFormat.parseSome(end));
+//        } catch (Exception e) {
+//            throw new XMException(500, "日期解析异常");
+//        }
+        return netWorkMapper.selectByExampleByAccountId(UserHolder.loginId(),start);
 
     }
 

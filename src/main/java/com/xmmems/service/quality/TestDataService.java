@@ -464,16 +464,16 @@ public class TestDataService {
         if (itemName != null) {
             String qualified = null;
             String title = null;
-            if ("高锰酸盐指数".equals(itemName) && Math.abs(absolute) <=1 ) {
+            if ("高锰酸盐指数".equals(itemName) &&    Math.abs(absolute) <=1) {
                 qualified = "合格";
                 title = "合格范围：≤±1";
             } else if ("总磷".equals(itemName) && Math.abs(absolute) <= 0.025) {
                 qualified = "合格";
                 title = "合格范围：≤±0.025";
-            } else if ("氨氮".equals(itemName) && Math.abs(absolute) <= 0.05) {
+            } else if ("氨氮".equals(itemName) &&  Math.abs(absolute) <= 0.05) {
                 qualified = "合格";
                 title = "合格范围：≤±0.05";
-            } else if ("总氮".equals(itemName) && Math.abs(absolute) <= 0.2) {
+            } else if ("总氮".equals(itemName) &&  Math.abs(absolute) <= 0.2) {
                 qualified = "合格";
                 title = "合格范围：≤±0.2";
             } else {
@@ -500,25 +500,25 @@ public class TestDataService {
             } else if ("总磷".equals(itemName) && Math.abs(relative) <= 5) {
                 qualified = "合格";
                 title = "合格范围：≤±5%";
-            } else if ("总氮".equals(itemName) && Math.abs(relative) <= 5) {
+            } else if ("总氮".equals(itemName) && Math.abs(relative) <= 5 ) {
                 qualified = "合格";
                 title = "合格范围：≤±5%";
             } else if ("氨氮".equals(itemName) && Math.abs(relative) <= 5) {
                 qualified = "合格";
                 title = "合格范围：≤±5%";
-            } else if ("溶解氧".equals(itemName) && Math.abs(relative) <= 0.3) {
+            } else if ("溶解氧".equals(itemName) && Math.abs(relative) <= 0.3 ) {
                 qualified = "合格";
                 title = "合格范围：≤±0.3%";
-            } else if ("电导率".equals(itemName) && Math.abs(relative) <= 1) {
+            } else if ("电导率".equals(itemName) && Math.abs(relative) <= 1 ) {
                 qualified = "合格";
                 title = "合格范围：≤±1%";
-            } else if ("浊度".equals(itemName) && Math.abs(relative) <= 3) {
+            } else if ("浊度".equals(itemName) && Math.abs(relative) <= 3 ) {
                 qualified = "合格";
                 title = "合格范围：≤±3%";
-            } else if ("总有机碳".equals(itemName) && Math.abs(relative) <= 5) {
+            } else if ("总有机碳".equals(itemName) && Math.abs(relative) <= 5 ) {
                 qualified = "合格";
                 title = "合格范围：≤±5%";
-            } else if ("生化需氧量".equals(itemName) && Math.abs(relative) <= 5) {
+            } else if ("生化需氧量".equals(itemName) && Math.abs(relative) <= 5 ) {
                 qualified = "合格";
                 title = "合格范围：≤±5%";
             } else {
@@ -535,7 +535,7 @@ public class TestDataService {
 
         String qualified = null;
         String title = null;
-        if (Math.abs(absolute) <= 10 || Math.abs(relativeStr) <= 10) {
+        if (Math.abs(absolute) <= 10 || Math.abs(relativeStr) >= 10) {
             qualified = "合格";
             title = "合格范围：≤±10%";
         } else {

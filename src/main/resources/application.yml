@@ -65,7 +65,7 @@ ly:
       - /upload
       - /poi
       - /pdf
-      #- /exceed
+#      - /statis/findNetWorksNumber
       - /favicon.ico
       - /water/save
 

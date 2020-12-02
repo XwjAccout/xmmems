@@ -23,4 +23,7 @@ public interface NetWorkMapper {
 
     @Select("SELECT * FROM network WHERE siteId = #{siteId} ORDER BY `date` DESC LIMIT 1")
     NetWork selectLastOneBySiteId(String siteId);
+
+    @Select("select * from account_site as a,network as s where a.siteId=s.siteId and a.accountId=#{accountId} and date =#{date} GROUP BY s.siteId")
+    List<NetWork> selectByExampleByAccountId(Integer accountId ,String date);
 }
