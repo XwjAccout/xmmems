@@ -43,6 +43,7 @@ public class PdfController {
                        @RequestParam(value = "isAutoPageSize", defaultValue = "true") Boolean isAutoPageSize,
                        @RequestParam(value = "statistics", required = false) List<Integer> statistics,
                        @RequestParam(value = "limit", defaultValue = "true") Boolean limit,
+                       @RequestParam(value = "isDayAvg", defaultValue = "false") Boolean isDayAvg,
                        HttpServletResponse response){
 
         try {
@@ -95,7 +96,7 @@ public class PdfController {
                     break;
                 case 5:
                     typeName = "季报表";
-                    datas = monitorService.seasons(siteId, Integer.parseInt(endTime), Integer.parseInt(startTime), statistics, limit);
+                    datas = monitorService.seasons(siteId, Integer.parseInt(endTime), Integer.parseInt(startTime), statistics, limit,isDayAvg);
                     break;
                 case 6:
                     typeName = "日报表";

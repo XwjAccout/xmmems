@@ -25,6 +25,7 @@ public class DateFormat {
     public static final SimpleDateFormat yyyy_MM_dd = new SimpleDateFormat("yyyy-MM-dd");
     public static final SimpleDateFormat yyyy_MM = new SimpleDateFormat("yyyy-MM");
     public static final SimpleDateFormat yyyy = new SimpleDateFormat("yyyy");
+    public static final SimpleDateFormat MM = new SimpleDateFormat("MM");
     public static final SimpleDateFormat HH_mm_ss = new SimpleDateFormat("HH:mm:ss");
     public static final SimpleDateFormat HH_mm = new SimpleDateFormat("HH:mm");
     public static final SimpleDateFormat HH = new SimpleDateFormat("HH");

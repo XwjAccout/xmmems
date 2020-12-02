@@ -131,8 +131,9 @@ public class MonitorChartController {
     @GetMapping("/realSeasons")
     public ResponseEntity<List<Map<String, String>>> seasons(@RequestParam("siteId") Integer siteId,
                                                              @RequestParam("year") Integer year,
+                                                             @RequestParam(value = "isDayAvg", defaultValue = "false") Boolean isDayAvg,
                                                              @RequestParam("seasons") Integer seasons) {
-        List<Map<String, String>> list = monitorService.seasons(siteId, seasons, year, null, false);
+        List<Map<String, String>> list = monitorService.seasons(siteId, seasons, year, null, false, isDayAvg);
         if ("平均值".equals(list.get(list.size() - 1).get("moniterTime"))) {
             list.remove(list.size() - 1);
         }
@@ -167,6 +168,7 @@ public class MonitorChartController {
     /**
      * 单参数对比
      * type 1 日  2 周   3 月  4 年
+     *
      * @return
      */
     @GetMapping("/singleComparison")
