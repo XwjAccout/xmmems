@@ -25,11 +25,13 @@ import java.util.List;
 import java.util.Map;
 
 @SpringBootApplication
+//@org.mybatis.spring.annotation.MapperScan(basePackages = "com.xmmems.mapper")
 @MapperScan(basePackages = "com.xmmems.mapper")
 @EnableConfigurationProperties({JwtProperties.class})
 @EnableScheduling
 @EnableAsync
 public class XmmemsApplication extends SpringBootServletInitializer {
+    Log log = LogFactory.getLog(this.getClass());
     @Autowired
     private SimpleHourDataMapper simpleHourDataMapper;
 

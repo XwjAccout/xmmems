@@ -28,6 +28,8 @@ public class NetWorkService {
     private NetWorkMapper netWorkMapper;
 
     public List<NetWork> findNetWorks(String siteName, String start, String end,String siteId) {
+        System.out.println(start);
+        System.out.println(end);
 //        NetWorkExample example = new NetWorkExample();
 //        NetWorkExample.Criteria criteria = example.createCriteria();
 //        if (StringUtils.isNotBlank(siteName)) {

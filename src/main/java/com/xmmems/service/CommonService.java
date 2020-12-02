@@ -5,10 +5,8 @@ import com.xmmems.domain.base.BaseItemExample;
 import com.xmmems.domain.base.BaseSite;
 import com.xmmems.domain.env.EnvQualityConf;
 import com.xmmems.domain.env.EnvQualityConfExample;
-import com.xmmems.dto.BaseSiteitemDTO;
 import com.xmmems.mapper.BaseItemMapper;
 import com.xmmems.mapper.BaseSiteMapper;
-import com.xmmems.mapper.BaseSiteitemMapper;
 import com.xmmems.mapper.EnvQualityConfMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,8 +31,6 @@ public class CommonService {
     private EnvQualityConfMapper envQualityConfMapper;
     @Autowired
     private BaseItemMapper baseItemMapper;
-    @Autowired
-    private BaseSiteitemMapper baseSiteitemMapper;
 
     private static List<BaseSite> BASE_SITE_LIST = new ArrayList<>();
     private static Map<String, BaseSite> ALL_SITE_MAP = new HashMap<>();
@@ -47,10 +43,7 @@ public class CommonService {
     private static Map<String, BaseItem> BASE_ITEM_MAP = new HashMap<>();
     private static long BASE_ITEM_MAP_Effective_Time = 0;
 
-    private static Map<Integer, List<BaseSiteitemDTO>> BASE_SITE_ITEM_MAP = new HashMap<>();
-    private static long BASE_SITE_ITEM_MAP_Effective_Time = 0;
-
-    private void initSite() {
+    public void initSite() {
         //初始化有效的站点集合(超过10秒才会更新)
         if (System.currentTimeMillis() - BASE_SITE_LIST_Effective_Time > 15000) {
 
@@ -63,7 +56,7 @@ public class CommonService {
         }
     }
 
-    private void initEnvQualityConf() {
+    public void initEnvQualityConf() {
         //初始化所有的质量类别集合(超过10秒才会更新)
         if (System.currentTimeMillis() - ENV_QUALITY_CONF_LIST_Effective_Time > 20000) {
 
@@ -72,7 +65,7 @@ public class CommonService {
         }
     }
 
-    private void initBaseItem() {
+    public void initBaseItem() {
         //初始化键值对集合，key值为itemName or itemId ，value 值为BaseItem(超过10秒才会更新)
         if (System.currentTimeMillis() - BASE_ITEM_MAP_Effective_Time > 30000) {
 
@@ -91,7 +84,6 @@ public class CommonService {
         initSite();
         return BASE_SITE_LIST;
     }
-
     //获取站点map集合
     public Map<String, BaseSite> getAllSiteMap() {
         initSite();
@@ -114,21 +106,4 @@ public class CommonService {
         return BASE_ITEM_LIST;
     }
 
-
-    private void initBaseSiteItemMap(Integer siteId) {
-        if (!BASE_SITE_ITEM_MAP.containsKey(siteId) || (System.currentTimeMillis() - BASE_SITE_ITEM_MAP_Effective_Time > 60000)) {
-            List<BaseSiteitemDTO> items = baseSiteitemMapper.getColumns(siteId);
-            BASE_SITE_ITEM_MAP.put(siteId, items);
-            BASE_SITE_ITEM_MAP_Effective_Time = System.currentTimeMillis();
-        }
-    }
-
-    public List<BaseSiteitemDTO> getBaseSiteItemBySiteId(Integer siteId) {
-        initBaseSiteItemMap(siteId);
-        return BASE_SITE_ITEM_MAP.get(siteId);
-    }
-
-    public Object getgg() {
-        return BASE_SITE_ITEM_MAP;
-    }
 }

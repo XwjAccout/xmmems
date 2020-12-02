@@ -15,7 +15,11 @@ import com.xmmems.domain.env.EnvRealtimeData;
 import com.xmmems.dto.BaseSiteDTO;
 import com.xmmems.dto.BaseSiteitemDTO;
 import com.xmmems.dto.PageResult;
-import com.xmmems.mapper.*;
+import com.xmmems.mapper.SimpleHourDataMapper;
+import com.xmmems.mapper.BaseSiteMapper;
+import com.xmmems.mapper.BaseSiteitemMapper;
+import com.xmmems.mapper.EnvHourDataMapper;
+import com.xmmems.mapper.EnvRealtimeDataMapper;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -58,7 +62,12 @@ public class MonitorService {
     private NetWorkService netWorkService;
 
     public List<BaseSiteitemDTO> getColumns(Integer siteId) {
-        return commonService.getBaseSiteItemBySiteId(siteId);
+        List<BaseSiteitemDTO> items = baseSiteitemMapper.getColumns(siteId);
+
+        if (items.size() == 0) {
+            throw new XMException(ExceptionEnum.MONITORREPORT_NOT_FOUND);
+        }
+        return items;
     }
 
     public List<BaseSiteitemDTO> getColumnsAll() {
@@ -334,30 +343,18 @@ public class MonitorService {
                     }
                 });
 
-                //Future<List<String>> collectFuture = PoolExecutor.submit(new Callable<List<String>>() {
-                //    @Override
-                //    public List<String> call() throws Exception {
-                //        System.out.println("查询列名");
-                //        List<BaseSiteitemDTO> columns = getColumns(Integer.valueOf(siteId));
-                //        Object getgg = commonService.getgg();
-                //        if (columns == null) {
-                //            return null;
-                //        }
-                //        return columns.stream().map(BaseSiteitemDTO::getItemName).collect(Collectors.toList());
-                //    }
-                //});
+                Future<List<String>> collectFuture = PoolExecutor.submit(new Callable<List<String>>() {
+                    @Override
+                    public List<String> call() throws Exception {
+                        List<BaseSiteitemDTO> columns = getColumns(Integer.valueOf(siteId));
+                        return columns.stream().map(BaseSiteitemDTO::getItemName).collect(Collectors.toList());
+                    }
+                });
                 Map<String, String> limitMap = null;
                 List<String> collect = null;
                 try {
                     limitMap = limitMapFuture.get();
-                    System.out.println("查询列名");
-                    List<BaseSiteitemDTO> columns = getColumns(Integer.valueOf(siteId));
-                    Object getgg = commonService.getgg();
-                    if (columns == null) {
-                        return null;
-                    }
-                    collect=  columns.stream().map(BaseSiteitemDTO::getItemName).collect(Collectors.toList());
-                    //collect = collectFuture.get();
+                    collect = collectFuture.get();
                 } catch (Exception e) {
                     String err = "使用多线程出错com.xmmems.service.MonitorService.getRealTimeData";
                     FileLog.error(err);
@@ -648,7 +645,7 @@ public class MonitorService {
             trend(null, null);
             return TREND_MAP.get(trend);
         } else {
-            if (System.currentTimeMillis() - TREND_TIME > 5 * 60000) {
+            if (System.currentTimeMillis() - TREND_TIME > 20 * 60000) {
                 TREND_TIME = System.currentTimeMillis();
             } else {
                 String mm = new SimpleDateFormat("mm").format(System.currentTimeMillis());
@@ -780,8 +777,7 @@ public class MonitorService {
         return monthData(siteId, start, end);
     }
 
-    //isDayAvg true 返回日均值 false 返回月均值
-    public List<Map<String, String>> seasons(Integer siteId, Integer seasons, Integer year, List<Integer> statistics, Boolean limit, Boolean isDayAvg) {
+    public List<Map<String, String>> seasons(Integer siteId, Integer seasons, Integer year, List<Integer> statistics, Boolean limit) {
         String startTime = year + "-";
         String endTime = year + "-";
         switch (seasons) {
@@ -805,11 +801,7 @@ public class MonitorService {
                 throw new XMException(500, "季节选择出错，只可以选择1,2,3,4");
         }
 
-        if (isDayAvg) {
-            return month(siteId, startTime, endTime, statistics, limit);
-        } else {
-            return year(siteId, startTime, endTime, statistics, limit);
-        }
+        return year(siteId, startTime, endTime, statistics, limit);
     }
 
     public List<Map<String, String>> waterAnalysis() {

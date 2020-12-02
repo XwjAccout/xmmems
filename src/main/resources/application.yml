@@ -23,8 +23,8 @@ mybatis:
 
 logging:
   level:
-    com.xmmems: debug
-    com.xmmems.mapper.SimpleHourDataMapper: debug
+    com.xmmems: info
+    com.xmmems.mapper.SimpleHourDataMapper: info
 
 mapper:
   wrap-keyword: "`{0}`"
@@ -34,7 +34,7 @@ xmmems:
   cors:  #跨域
     allowedOrigins:
       - http://runapi.showdoc.cc
-    #        - http://www.jujia.com1
+    #        - http://www.jujia.com
     allowedCredentials: true
     allowedHeaders:
       - "*"
@@ -65,7 +65,7 @@ ly:
       - /upload
       - /poi
       - /pdf
-#      - /statis/findNetWorksNumber
+      #- /exceed
       - /favicon.ico
       - /water/save
 
