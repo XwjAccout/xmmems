@@ -10,6 +10,15 @@ spring:
     multipart:
       max-file-size: 5MB # 限制一次上次文件的总大小
   datasource:
+    hikari:
+      readOnly: false
+      connectionTimeout: 60000
+      idleTimeout: 60000
+      validationTimeout: 3000
+      maxLifetime: 60000
+      loginTimeout: 5
+      maximumPoolSize: 60
+      minimumIdle: 10
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://59.39.56.6:3306/sdmems?useSSL=false&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
     username: root

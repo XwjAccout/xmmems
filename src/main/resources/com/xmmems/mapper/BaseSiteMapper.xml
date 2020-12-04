@@ -394,4 +394,11 @@
       sort = #{sort,jdbcType=DECIMAL}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="selectByExampleBysiteId"  resultMap="BaseResultMap" parameterType="com.xmmems.domain.base.BaseSiteExample">
+    select * from base_site as s,account_site as a where s.id=a.siteId and a.accountId=#{accountId}
+    <if test="siteName != null" >
+      and s.siteName like CONCAT('%',#{siteName},'%')
+    </if>
+  </select>
 </mapper>
