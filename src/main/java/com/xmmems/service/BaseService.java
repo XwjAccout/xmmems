@@ -58,7 +58,7 @@ public class BaseService {
             if (StringUtils.isNotBlank(siteName)) {
                 criteria.andSiteNameLike(CustomUtils.likeValue(siteName));
             }
-            List<BaseSite> baseSites = baseSiteMapper.selectByExample(example);
+            List<BaseSite> baseSites = baseSiteMapper.selectByExampleByAccountId(UserHolder.loginId());
 
             //得到pageHelper的分页对象
             PageInfo<BaseSite> pageInfo = new PageInfo<>(baseSites);

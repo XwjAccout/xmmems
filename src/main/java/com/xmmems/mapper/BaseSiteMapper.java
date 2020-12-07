@@ -22,6 +22,8 @@ public interface BaseSiteMapper {
     int updateByPrimaryKeySelective(BaseSite record);
 
     int updateByPrimaryKey(BaseSite record);
+    @Select("select * from account_site a , base_site b where a.`siteId` = b.`id` and a.accountId=#{accountId} and isvalid='1'")
+    List<BaseSite> selectByExampleByAccountId(Integer accountId);
 
     @Select("select * from account_site asite,base_site bsite where asite.accountId = #{accountId} and bsite.id = asite.siteId and bsite.isvalid = 1 order by bsite.sort")
     List<BaseSiteDTO> getSites(Integer accountId);
