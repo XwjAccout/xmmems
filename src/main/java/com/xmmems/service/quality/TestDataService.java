@@ -365,11 +365,11 @@ public class TestDataService {
                 BigDecimal percentDecimal = new BigDecimal(percent.replace("-", ""));//取得绝对值
 
                 if (percentDecimal.compareTo(new BigDecimal(compare)) > 0) {
-                    temp.put("nowResult", nowResultDecimal.setScale(2, BigDecimal.ROUND_HALF_EVEN).toPlainString() + "$$");
+                    temp.put("nowResult", scale(itemName,nowResultDecimal) + "$$");
                     temp.put("percent", percent + "$$");
                     temp.put("qualified", "不合格$$");
                 } else {
-                    temp.put("nowResult", nowResultDecimal.setScale(2, BigDecimal.ROUND_HALF_EVEN).toPlainString());
+                    temp.put("nowResult", scale(itemName,nowResultDecimal));
                     temp.put("percent", percent);
                     temp.put("qualified", "合格");
                 }
@@ -577,10 +577,9 @@ public class TestDataService {
 
                 BigDecimal nowResultDecimal = new BigDecimal(nowResult);
                 BigDecimal solutionDecimal = new BigDecimal(solution);
-                //零点核查绝对误差 ：测试结果-标液浓度（取绝对值）
-                String percent = nowResultDecimal.subtract(solutionDecimal).toPlainString().replace("-", "");
-
                 String itemName = contentItem.get("itemName");
+                //零点核查绝对误差 ：测试结果-标液浓度（取绝对值）
+                String percent = scale(itemName,nowResultDecimal.subtract(solutionDecimal));
 
                 Map<String, String> temp = new HashMap<>();
                 temp.put("genTime", contentItem.get("genTime"));
@@ -594,11 +593,11 @@ public class TestDataService {
                 BigDecimal percentDecimal = new BigDecimal(percent.replace("-", ""));//取得绝对值
 
                 if (percentDecimal.compareTo(new BigDecimal(compare)) > 0) {
-                    temp.put("nowResult", nowResultDecimal.setScale(2, BigDecimal.ROUND_HALF_EVEN).toPlainString() + "$$");
+                    temp.put("nowResult", scale(itemName,nowResultDecimal) + "$$");
                     temp.put("percent", percent + "$$");
                     temp.put("qualified", "不合格$$");
                 } else {
-                    temp.put("nowResult", nowResultDecimal.setScale(2, BigDecimal.ROUND_HALF_EVEN).toPlainString());
+                    temp.put("nowResult", scale(itemName,nowResultDecimal));
                     temp.put("percent", percent);
                     temp.put("qualified", "合格");
                 }
@@ -682,5 +681,18 @@ public class TestDataService {
 
     public List<Map<String, Object>> site() {
         return zeroCheckMapper.site();
+    }
+
+    private static String scale(String itemName, BigDecimal bd) {
+        switch (itemName) {
+            case "总磷":
+                return bd.setScale(3, BigDecimal.ROUND_HALF_EVEN).stripTrailingZeros().toPlainString();
+            case "高锰酸盐指数":
+            case "总氮":
+            case "氨氮":
+                return bd.setScale(2, BigDecimal.ROUND_HALF_EVEN).stripTrailingZeros().toPlainString();
+            default:
+                return bd.setScale(2, BigDecimal.ROUND_HALF_EVEN).stripTrailingZeros().toPlainString();
+        }
     }
 }
