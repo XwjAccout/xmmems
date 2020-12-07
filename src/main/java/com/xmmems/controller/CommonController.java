@@ -3,6 +3,7 @@ package com.xmmems.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.xmmems.common.auth.domain.UserHolder;
 import com.xmmems.common.utils.DateFormat;
+import com.xmmems.common.utils.FileLog;
 import com.xmmems.common.utils.JsonUtils;
 import com.xmmems.domain.ExceedStandard;
 import com.xmmems.dto.BaseSiteDTO;
@@ -44,12 +45,17 @@ public class CommonController {
 
         List<Map<String, Object>> result = new ArrayList<>();
         List<Map<String, Object>> realTimeData = monitorService.getRealTimeData();
+        FileLog.info("com.xmmems.controller.CommonController   48行"+JsonUtils.toString(realTimeData));
+        for (Map<String, Object> realTimeDatum : realTimeData) {
+            FileLog.info("com.xmmems.controller.CommonController   50行"+JsonUtils.toString(realTimeDatum));
+        }
         realTimeData.forEach(temp -> {
             String level = temp.get("level") + "";
             if (!level.contains("-")) {
                 Map<String, Object> map = new HashMap<>();
                 map.put("siteName", temp.get("siteName"));
                 map.put("level", level);
+                FileLog.info("com.xmmems.controller.CommonController  map.put(\"level\", level);  55行"+level);
                 int siteId = Integer.parseInt(temp.get("siteId")+"");
                 map.put("siteId", siteId);
                 for (BaseSiteDTO site : sites) {
@@ -72,6 +78,7 @@ public class CommonController {
 
         Map<String, Object> comMap = new HashMap<>();
         comMap.put("waterquality", waterquality);
+
         comMap.put("ditu", result);
         return ResponseEntity.ok(comMap);
 

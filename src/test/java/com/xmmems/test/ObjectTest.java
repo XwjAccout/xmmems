@@ -1,3 +1,4 @@
+/*
 package com.xmmems.test;
 
 import java.math.BigDecimal;
@@ -156,3 +157,4 @@ public class ObjectTest {
     }
 
 }
+*/
