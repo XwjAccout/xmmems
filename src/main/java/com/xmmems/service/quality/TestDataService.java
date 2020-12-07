@@ -53,21 +53,21 @@ public class TestDataService {
 
     //查询零点核查数据1
     public List<Map<String, Object>> zeroData(String start, String end, Integer siteId) {
-        List<ZeroCheck> list = zeroCheckMapper.selectZeroData(start, end, siteId,1);
-        Map<String,ZeroSpan> zeroSpanMap = new LinkedHashMap<>();
-        Map<String,List<ZeroCheck>>zeroSpanMap1 = new LinkedHashMap<>();
+        List<ZeroCheck> list = zeroCheckMapper.selectZeroData(start, end, siteId, 1);
+        Map<String, ZeroSpan> zeroSpanMap = new LinkedHashMap<>();
+        Map<String, List<ZeroCheck>> zeroSpanMap1 = new LinkedHashMap<>();
         for (ZeroCheck zeroCheck : list) {
             List<ZeroCheck> zeroChecks = zeroSpanMap1.computeIfAbsent(zeroCheck.getItemName(), k -> new ArrayList<>());
             zeroChecks.add(zeroCheck);
         }
-        String last="0";
+        String last = "0";
         //按照时间分组,存入zeroSpans
         for (List<ZeroCheck> zeroCheck : zeroSpanMap1.values()) {
-            for (int count=0; count<zeroCheck.size();count++) {
+            for (int count = 0; count < zeroCheck.size(); count++) {
                 ZeroCheck temp = zeroCheck.get(count);
                 String key = DateFormat.format(DateFormat.yyyy_MM_dd_HH, temp.getGenTime());
                 ZeroSpan zeroSpan = zeroSpanMap.get(key);
-                if (zeroSpan==null) {
+                if (zeroSpan == null) {
                     zeroSpan = new ZeroSpan();
                     zeroSpan.setSiteId(temp.getSiteId());
                     zeroSpan.setSiteName(temp.getSiteName());
@@ -76,61 +76,61 @@ public class TestDataService {
                     zeroSpanMap.put(key, zeroSpan);
                 }
                 Specific specific = new Specific();
-                if(zeroCheck.size()==count+1){
-                    last=   zeroSpanMap1.get(temp.getItemName()).get(count).getCheck();
-                }else{
-                    last=   zeroSpanMap1.get(temp.getItemName()).get(count+1).getCheck();
+                if (zeroCheck.size() == count + 1) {
+                    last = zeroSpanMap1.get(temp.getItemName()).get(count).getCheck();
+                } else {
+                    last = zeroSpanMap1.get(temp.getItemName()).get(count + 1).getCheck();
                 }
                 specific.setLastResult(last);
-                double absoluteStr =0;
-                double relativeStr =0;
+                double absoluteStr = 0;
+                double relativeStr = 0;
                 if (!temp.getCheck().equals("0.0")) {
                     //计算绝对误差  绝对误差=测试结果-标液浓度(取绝对值）
-                     absoluteStr = Double.parseDouble(temp.getCheck()) - Double.parseDouble(temp.getConcentration());
+                    absoluteStr = Double.parseDouble(temp.getCheck()) - Double.parseDouble(temp.getConcentration());
                     //计算相对误差  相对误差=（测试结果-前一次测量结果）*100/跨度值
-                     relativeStr = (Double.parseDouble(temp.getCheck()) - Double.parseDouble(specific.getLastResult()))*100 / Double.parseDouble(temp.getSpanvalues());
+                    relativeStr = (Double.parseDouble(temp.getCheck()) - Double.parseDouble(specific.getLastResult())) * 100 / Double.parseDouble(temp.getSpanvalues());
                 }
-                String relative =null;
-                String absolute =null;
+                String relative = null;
+                String absolute = null;
                 switch (temp.getItemName()) {
                     case "高锰酸盐指数":
                         relative = setScale(relativeStr, 2);
                         absolute = setScale(absoluteStr, 2);
-                        specific.setLastResult(setScale(last,2));
-                        specific.setNowResult(setScale(temp.getCheck(),2));
+                        specific.setLastResult(setScale(last, 2));
+                        specific.setNowResult(setScale(temp.getCheck(), 2));
                         break;
                     case "总磷":
                         relative = setScale(relativeStr, 3);
                         absolute = setScale(absoluteStr, 3);
-                        specific.setLastResult(setScale(last,3));
-                        specific.setNowResult(setScale(temp.getCheck(),3));
+                        specific.setLastResult(setScale(last, 3));
+                        specific.setNowResult(setScale(temp.getCheck(), 3));
                         break;
                     case "总氮":
                         relative = setScale(relativeStr, 2);
                         absolute = setScale(absoluteStr, 2);
-                        specific.setLastResult(setScale(last,2));
-                        specific.setNowResult(setScale(temp.getCheck(),2));
+                        specific.setLastResult(setScale(last, 2));
+                        specific.setNowResult(setScale(temp.getCheck(), 2));
                         break;
                     default:
                         relative = setScale(relativeStr, 2);
                         absolute = setScale(absoluteStr, 2);
-                        specific.setLastResult(setScale(last,2));
-                        specific.setNowResult(setScale(temp.getCheck(),2));
+                        specific.setLastResult(setScale(last, 2));
+                        specific.setNowResult(setScale(temp.getCheck(), 2));
                         break;
                 }
 
                 specific.setAbsoluteError(absolute);
-                specific.setRelativeError(relative+ "%");
+                specific.setRelativeError(relative + "%");
                 //是否合格
-                Map<String, String> map1=isQualified1(temp.getItemName(), absoluteStr);
-                for(String key1 : map1.keySet()){
+                Map<String, String> map1 = isQualified1(temp.getItemName(), absoluteStr);
+                for (String key1 : map1.keySet()) {
                     specific.setQualified1(key1);
                     String value = map1.get(key1);
                     specific.setTitle1(value);
                 }
                 //是否合格
-                Map<String, String> map2=isQualified2(temp.getItemName(), relativeStr);
-                for(String key2 : map2.keySet()){
+                Map<String, String> map2 = isQualified2(temp.getItemName(), relativeStr);
+                for (String key2 : map2.keySet()) {
                     specific.setQualified2(key2);
                     String value = map2.get(key2);
                     specific.setTitle2(value);
@@ -147,7 +147,7 @@ public class TestDataService {
         }
         Collection<ZeroSpan> values = zeroSpanMap.values();
         List<ZeroCheckHandled> zeroCheckHandleds = new ArrayList<>();
-        values.forEach(value->{
+        values.forEach(value -> {
             zeroCheckHandleds.add(BeanHelper.copyProperties(value, ZeroCheckHandled.class));
         });
         return getMaps(zeroCheckHandleds);
@@ -156,27 +156,28 @@ public class TestDataService {
     private static String setScale(double absoluteStr, int i) {
         return new BigDecimal(absoluteStr).setScale(i, BigDecimal.ROUND_HALF_EVEN).stripTrailingZeros().toPlainString();
     }
+
     private static String setScale(String absoluteStr, int i) {
         return new BigDecimal(absoluteStr).setScale(i, BigDecimal.ROUND_HALF_EVEN).stripTrailingZeros().toPlainString();
     }
 
     //查询跨度核查数据
     public List<Map<String, Object>> spanData(String start, String end, Integer siteId) {
-        List<ZeroCheck> list = zeroCheckMapper.selectZeroData(start, end, siteId,2);
-        Map<String,ZeroSpan> zeroSpanMap = new LinkedHashMap<>();
-        Map<String,List<ZeroCheck>>zeroSpanMap1 = new LinkedHashMap<>();
+        List<ZeroCheck> list = zeroCheckMapper.selectZeroData(start, end, siteId, 2);
+        Map<String, ZeroSpan> zeroSpanMap = new LinkedHashMap<>();
+        Map<String, List<ZeroCheck>> zeroSpanMap1 = new LinkedHashMap<>();
         for (ZeroCheck zeroCheck : list) {
             List<ZeroCheck> zeroChecks = zeroSpanMap1.computeIfAbsent(zeroCheck.getItemName(), k -> new ArrayList<>());
             zeroChecks.add(zeroCheck);
         }
-        String last="0.0";
+        String last = "0.0";
         //按照时间分组,存入zeroSpans
         for (List<ZeroCheck> zeroCheck : zeroSpanMap1.values()) {
-            for (int count=0; count<zeroCheck.size();count++) {
+            for (int count = 0; count < zeroCheck.size(); count++) {
                 ZeroCheck temp = zeroCheck.get(count);
                 String key = DateFormat.format(DateFormat.yyyy_MM_dd_HH, temp.getGenTime());
                 ZeroSpan zeroSpan = zeroSpanMap.get(key);
-                if (zeroSpan==null) {
+                if (zeroSpan == null) {
                     zeroSpan = new ZeroSpan();
                     zeroSpan.setSiteId(temp.getSiteId());
                     zeroSpan.setSiteName(temp.getSiteName());
@@ -184,48 +185,48 @@ public class TestDataService {
                     zeroSpan.setReceiveId(temp.getType());
                     zeroSpanMap.put(key, zeroSpan);
                 }
-                 Specific specific = new Specific();
-                    if(zeroCheck.size()==count+1){
-                        last=   zeroSpanMap1.get(temp.getItemName()).get(count).getCheck();
-                    }else{
-                        last=   zeroSpanMap1.get(temp.getItemName()).get(count+1).getCheck();
-                    }
+                Specific specific = new Specific();
+                if (zeroCheck.size() == count + 1) {
+                    last = zeroSpanMap1.get(temp.getItemName()).get(count).getCheck();
+                } else {
+                    last = zeroSpanMap1.get(temp.getItemName()).get(count + 1).getCheck();
+                }
 
                 specific.setLastResult(last);
-                double absoluteStr =0.0;
-                double relativeStr =0.0;
+                double absoluteStr = 0.0;
+                double relativeStr = 0.0;
                 if (!temp.getCheck().equals("0.0")) {
                     //计算相对误差  （测试结果-标液浓度）/标液浓度
-                    absoluteStr =(Double.parseDouble(temp.getCheck()) - Double.parseDouble(temp.getConcentration()))*100/Double.parseDouble(temp.getConcentration());
+                    absoluteStr = (Double.parseDouble(temp.getCheck()) - Double.parseDouble(temp.getConcentration())) * 100 / Double.parseDouble(temp.getConcentration());
                     //计算相对误差  相对误差=（测试结果-前一次测量结果）/跨度值
-                    relativeStr = (Double.parseDouble(temp.getCheck()) - Double.parseDouble(specific.getLastResult())) * 100/ Double.parseDouble(temp.getSpanvalues()) ;
+                    relativeStr = (Double.parseDouble(temp.getCheck()) - Double.parseDouble(specific.getLastResult())) * 100 / Double.parseDouble(temp.getSpanvalues());
                 }
-                String relative =null;
-                String absolute =null;
+                String relative = null;
+                String absolute = null;
                 switch (temp.getItemName()) {
                     case "高锰酸盐指数":
                         relative = setScale(relativeStr, 2);
                         absolute = setScale(absoluteStr, 2);
-                        specific.setLastResult(setScale(last,2));
-                        specific.setNowResult(setScale(temp.getCheck(),2));
+                        specific.setLastResult(setScale(last, 2));
+                        specific.setNowResult(setScale(temp.getCheck(), 2));
                         break;
                     case "总磷":
                         relative = setScale(relativeStr, 3);
                         absolute = setScale(absoluteStr, 3);
-                        specific.setLastResult(setScale(last,3));
-                        specific.setNowResult(setScale(temp.getCheck(),3));
+                        specific.setLastResult(setScale(last, 3));
+                        specific.setNowResult(setScale(temp.getCheck(), 3));
                         break;
                     case "总氮":
                         relative = setScale(relativeStr, 2);
                         absolute = setScale(absoluteStr, 2);
-                        specific.setLastResult(setScale(last,2));
-                        specific.setNowResult(setScale(temp.getCheck(),2));
+                        specific.setLastResult(setScale(last, 2));
+                        specific.setNowResult(setScale(temp.getCheck(), 2));
                         break;
                     default:
                         relative = setScale(relativeStr, 2);
                         absolute = setScale(absoluteStr, 2);
-                        specific.setLastResult(setScale(last,2));
-                        specific.setNowResult(setScale(temp.getCheck(),2));
+                        specific.setLastResult(setScale(last, 2));
+                        specific.setNowResult(setScale(temp.getCheck(), 2));
                         break;
                 }
 
@@ -233,15 +234,15 @@ public class TestDataService {
                 specific.setAbsoluteError(absolute);
                 specific.setRelativeError(relative);
                 //是否合格
-                Map<String, String> map1=isQualifiedscope(relativeStr, absoluteStr);
-                for(String key1 : map1.keySet()){
+                Map<String, String> map1 = isQualifiedscope(relativeStr, absoluteStr);
+                for (String key1 : map1.keySet()) {
                     specific.setQualified1(key1);
                     String value = map1.get(key1);
                     specific.setTitle1(value);
                 }
                 //是否合格
-                Map<String, String> map2=isQualifiedscope(relativeStr, absoluteStr);
-                for(String key2 : map2.keySet()){
+                Map<String, String> map2 = isQualifiedscope(relativeStr, absoluteStr);
+                for (String key2 : map2.keySet()) {
                     specific.setQualified2(key2);
                     String value = map2.get(key2);
                     specific.setTitle2(value);
@@ -258,7 +259,7 @@ public class TestDataService {
         Collection<ZeroSpan> values = zeroSpanMap.values();
 
         List<ZeroCheckHandled> zeroCheckHandleds = new ArrayList<>();
-        values.forEach(value->{
+        values.forEach(value -> {
             zeroCheckHandleds.add(BeanHelper.copyProperties(value, ZeroCheckHandled.class));
         });
 
@@ -464,7 +465,7 @@ public class TestDataService {
         if (itemName != null) {
             String qualified = null;
             String title = null;
-            if ("高锰酸盐指数".equals(itemName) && Math.abs(absolute) <=1 ) {
+            if ("高锰酸盐指数".equals(itemName) && Math.abs(absolute) <= 1) {
                 qualified = "合格";
                 title = "合格范围：≤±1";
             } else if ("总磷".equals(itemName) && Math.abs(absolute) <= 0.025) {

@@ -3,7 +3,6 @@ package com.xmmems.mapper;
 import com.xmmems.domain.base.BaseSite;
 import com.xmmems.domain.base.BaseSiteExample;
 import com.xmmems.dto.BaseSiteDTO;
-import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -35,7 +34,5 @@ public interface BaseSiteMapper {
 
     @Select("select distinct z.siteId,z.siteName from zero_check z,account_site a where z.`siteId` = a.`siteId` and a.`accountId` = #{accountId} ")
     List<Map<String, Object>> getSiteIdAndNameExcludeZeroCheck(Integer accountId);
-
-    List<BaseSite> selectByExampleBysiteId(@Param("accountId") Integer accountId, @Param("siteName")String siteName);
 
 }

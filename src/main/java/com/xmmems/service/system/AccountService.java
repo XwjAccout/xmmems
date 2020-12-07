@@ -219,7 +219,7 @@ public class AccountService {
     }
 
     public int selectState(Integer id) {
-        Account account = accountMapper.selectByPrimaryKey(id);
+        Account account = accountMapper.selectById(id);
         if(account!=null) return account.getStatus();
         return -1;
     }

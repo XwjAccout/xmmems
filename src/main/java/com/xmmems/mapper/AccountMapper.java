@@ -37,4 +37,7 @@ public interface AccountMapper {
     int deleteAccountIdAndSiteId(@Param("accountId") Integer accountId,@Param("siteId") Integer siteId);
     @Update("update account set  password =#{password} , userName=#{userName} where id=#{id} ")
     int updatePassword(@Param("password") String password,@Param("userName") String userName, @Param("id") Integer id);
+
+    @Select("SELECT * FROM `account` WHERE id = #{id}")
+    Account selectById(Integer id);
 }

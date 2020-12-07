@@ -31,8 +31,9 @@ public class NetWorkController {
     @GetMapping("/findNetWorks")
     @SystemControllerLog(descrption = "联网情况统计", actionType = "4")
     public ResponseEntity<List<NetWork>> findNetWorks(
-            @RequestParam(value = "siteName", required = false) String siteName, @RequestParam(value = "start") String start, @RequestParam(value = "end") String end) {
-        List<NetWork> list = netWorkService.findNetWorks(siteName, start, end, null);
+            @RequestParam(value = "siteName", required = false) String siteName, @RequestParam(value = "siteId", required = false) String siteId,
+            @RequestParam(value = "start") String start, @RequestParam(value = "end") String end) {
+        List<NetWork> list = netWorkService.findNetWorks(siteName, start, end, siteId);
         return ResponseEntity.ok(list);
     }
 
