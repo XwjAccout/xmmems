@@ -50,15 +50,15 @@ public class BaseService {
         try {
             //封装分页信息
             PageHelper.startPage(page, limit);
-            //封装查询条件
-            BaseSiteExample example = new BaseSiteExample();
-            example.setOrderByClause("id desc");
-            BaseSiteExample.Criteria criteria = example.createCriteria();
-            criteria.andIsvalidEqualTo("1");
-            if (StringUtils.isNotBlank(siteName)) {
-                criteria.andSiteNameLike(CustomUtils.likeValue(siteName));
-            }
-            List<BaseSite> baseSites = baseSiteMapper.selectByExampleByAccountId(UserHolder.loginId());
+//            //封装查询条件
+//            BaseSiteExample example = new BaseSiteExample();
+//            example.setOrderByClause("id desc");
+//            BaseSiteExample.Criteria criteria = example.createCriteria();
+//            criteria.andIsvalidEqualTo("1");
+//            if (StringUtils.isNotBlank(siteName)) {
+//                criteria.andSiteNameLike(CustomUtils.likeValue(siteName));
+//            }
+            List<BaseSite> baseSites = baseSiteMapper.selectByExampleByAccountId(UserHolder.loginId(),siteName);
 
             //得到pageHelper的分页对象
             PageInfo<BaseSite> pageInfo = new PageInfo<>(baseSites);
