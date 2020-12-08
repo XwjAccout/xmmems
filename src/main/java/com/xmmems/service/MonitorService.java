@@ -304,66 +304,20 @@ public class MonitorService {
     /**
      * 实时监测数据
      */
-
-    private static final Map<Integer, List<Map<String, Object>>> real = new HashMap<>();
-    private static long real_time = 0;
-
     public List<Map<String, Object>> getRealTimeData() {
-        Integer accountId = UserHolder.loginId();
-        if (System.currentTimeMillis() - real_time > 60000) {
-            real_time = System.currentTimeMillis();
-        } else {
-            return real.get(accountId);
-        }
-
-        List<Map<String, Object>> list = envRealtimeDataMapper.getRealTimeData(accountId);
-        real.put(accountId, list);
+        List<Map<String, Object>> list = envRealtimeDataMapper.getRealTimeData(UserHolder.loginId());
 
         if (list.size() > 0) {
             for (Map<String, Object> site : list) {
                 String siteId = site.get("siteId") + "";
-                Future<Map<String, String>> limitMapFuture = PoolExecutor.submit(new Callable<Map<String, String>>() {
-                    @Override
-                    public Map<String, String> call() throws Exception {
-                        List<Map<String, String>> limit = baseSiteitemMapper.getDetectionLimit(Integer.valueOf(siteId));
-                        Map<String, String> limitMap = new HashMap<>();
-                        if (limit.size() > 0) {
-                            limit.forEach(temp -> limitMap.put(temp.get("itemId"), temp.get("limitNum")));
-                        }
-                        return limitMap;
-                    }
-                });
-
-                //Future<List<String>> collectFuture = PoolExecutor.submit(new Callable<List<String>>() {
-                //    @Override
-                //    public List<String> call() throws Exception {
-                //        System.out.println("查询列名");
-                //        List<BaseSiteitemDTO> columns = getColumns(Integer.valueOf(siteId));
-                //        Object getgg = commonService.getgg();
-                //        if (columns == null) {
-                //            return null;
-                //        }
-                //        return columns.stream().map(BaseSiteitemDTO::getItemName).collect(Collectors.toList());
-                //    }
-                //});
-                Map<String, String> limitMap = null;
-                List<String> collect = null;
-                try {
-                    limitMap = limitMapFuture.get();
-                    System.out.println("查询列名");
-                    List<BaseSiteitemDTO> columns = getColumns(Integer.valueOf(siteId));
-                    //Object getgg = commonService.getgg();
-                    if (columns == null) {
-                        return null;
-                    }
-                    collect=  columns.stream().map(BaseSiteitemDTO::getItemName).collect(Collectors.toList());
-                    //collect = collectFuture.get();
-                } catch (Exception e) {
-                    String err = "使用多线程出错com.xmmems.service.MonitorService.getRealTimeData";
-                    FileLog.error(err);
-                    e.printStackTrace();
-                    throw new XMException(500, err);
+                List<Map<String, String>> limit = baseSiteitemMapper.getDetectionLimit(Integer.valueOf(siteId));
+                Map<String, String> limitMap = new HashMap<>();
+                if (limit.size() > 0) {
+                    limit.forEach(temp -> limitMap.put(temp.get("itemId"), temp.get("limitNum")));
                 }
+
+                List<BaseSiteitemDTO> columns = getColumns(Integer.valueOf(siteId));
+                List<String> collect = columns.stream().map(BaseSiteitemDTO::getItemName).collect(Collectors.toList());
 
                 List<Map<String, String>> monitorItemList = JsonUtils.nativeRead(site.get("content").toString(), new TypeReference<List<Map<String, String>>>() {
                 });
@@ -387,7 +341,6 @@ public class MonitorService {
 
                     }
                 }
-
                 //总类别水质
                 String level = itemWaterQualityCategory(Integer.parseInt(site.get("siteId") + ""), subCategoryMap);
                 site.put("level", level);
