@@ -3,6 +3,7 @@ package com.xmmems.mapper;
 import com.xmmems.domain.base.BaseSite;
 import com.xmmems.domain.base.BaseSiteExample;
 import com.xmmems.dto.BaseSiteDTO;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -22,8 +23,8 @@ public interface BaseSiteMapper {
     int updateByPrimaryKeySelective(BaseSite record);
 
     int updateByPrimaryKey(BaseSite record);
-    @Select("select * from account_site a , base_site b where a.`siteId` = b.`id` and a.accountId=#{accountId} and isvalid='1'")
-    List<BaseSite> selectByExampleByAccountId(Integer accountId);
+
+    List<BaseSite> selectByExampleByAccountId( Integer accountId, String siteName);
 
     @Select("select * from account_site asite,base_site bsite where asite.accountId = #{accountId} and bsite.id = asite.siteId and bsite.isvalid = 1 order by bsite.sort")
     List<BaseSiteDTO> getSites(Integer accountId);
