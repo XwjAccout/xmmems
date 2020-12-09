@@ -204,12 +204,12 @@
     </select>
 
     <select id="selectZeroData" resultType="com.xmmems.domain.ZeroCheck">
-      SELECT
-    *
-      FROM
-      `zero_check`
-      WHERE `type` = #{type} AND siteId = #{siteId} AND genTime >= #{start} AND genTime &lt;= #{end} ORDER BY genTime DESC
-    </select>
+  SELECT
+*
+  FROM
+  `zero_check`
+  WHERE `type` = #{type} AND siteId = #{siteId} AND itemName !='总氮' AND genTime >= #{start} AND genTime &lt;= #{end} ORDER BY genTime DESC
+</select>
 
     <select id="selectStandardVerification" resultType="java.util.Map">
       SELECT DISTINCT DATE_FORMAT(genTime,'%Y-%m-%d %T') genTime, `concentration`, `spanvalues`, `checkdata`, `itemId`,itemName

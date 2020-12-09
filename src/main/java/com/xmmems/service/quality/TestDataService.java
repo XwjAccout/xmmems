@@ -111,6 +111,24 @@ public class TestDataService {
                         specific.setLastResult(setScale(last, 2));
                         specific.setNowResult(setScale(temp.getCheck(), 2));
                         break;
+                    case "氨氮":
+                        relative = setScale(relativeStr, 3);
+                        absolute = setScale(absoluteStr, 3);
+                        specific.setLastResult(setScale(last, 3));
+                        specific.setNowResult(setScale(temp.getCheck(), 3));
+                        break;
+                    case "氰化物":
+                        relative = setScale(relativeStr, 3);
+                        absolute = setScale(absoluteStr, 3);
+                        specific.setLastResult(setScale(last, 3));
+                        specific.setNowResult(setScale(temp.getCheck(), 3));
+                        break;
+                    case "挥发酚":
+                        relative = setScale(relativeStr, 3);
+                        absolute = setScale(absoluteStr, 3);
+                        specific.setLastResult(setScale(last, 3));
+                        specific.setNowResult(setScale(temp.getCheck(), 3));
+                        break;
                     default:
                         relative = setScale(relativeStr, 2);
                         absolute = setScale(absoluteStr, 2);
@@ -121,14 +139,14 @@ public class TestDataService {
 
                 specific.setAbsoluteError(absolute);
                 specific.setRelativeError(relative + "%");
-                //是否合格
+                //是否合格绝对
                 Map<String, String> map1 = isQualified1(temp.getItemName(), absoluteStr);
                 for (String key1 : map1.keySet()) {
                     specific.setQualified1(key1);
                     String value = map1.get(key1);
                     specific.setTitle1(value);
                 }
-                //是否合格
+                //是否合格相对
                 Map<String, String> map2 = isQualified2(temp.getItemName(), relativeStr);
                 for (String key2 : map2.keySet()) {
                     specific.setQualified2(key2);
@@ -221,6 +239,24 @@ public class TestDataService {
                         absolute = setScale(absoluteStr, 2);
                         specific.setLastResult(setScale(last, 2));
                         specific.setNowResult(setScale(temp.getCheck(), 2));
+                        break;
+                    case "氨氮":
+                        relative = setScale(relativeStr, 3);
+                        absolute = setScale(absoluteStr, 3);
+                        specific.setLastResult(setScale(last, 3));
+                        specific.setNowResult(setScale(temp.getCheck(), 3));
+                        break;
+                    case "氰化物":
+                        relative = setScale(relativeStr, 3);
+                        absolute = setScale(absoluteStr, 3);
+                        specific.setLastResult(setScale(last, 3));
+                        specific.setNowResult(setScale(temp.getCheck(), 3));
+                        break;
+                    case "挥发酚":
+                        relative = setScale(relativeStr, 3);
+                        absolute = setScale(absoluteStr, 3);
+                        specific.setLastResult(setScale(last, 3));
+                        specific.setNowResult(setScale(temp.getCheck(), 3));
                         break;
                     default:
                         relative = setScale(relativeStr, 2);
@@ -460,7 +496,7 @@ public class TestDataService {
         return m10;
     }
 
-    //绝对合格判断
+    //绝对合格判断(零点核查)
     private static Map<String, String> isQualified1(String itemName, double absolute) {
         if (itemName != null) {
             String qualified = null;
@@ -468,18 +504,36 @@ public class TestDataService {
             if ("高锰酸盐指数".equals(itemName) && Math.abs(absolute) <= 1) {
                 qualified = "合格";
                 title = "合格范围：≤±1";
-            } else if ("总磷".equals(itemName) && Math.abs(absolute) <= 0.025) {
+            } else if ("总磷".equals(itemName) && Math.abs(absolute) <= 0.02) {
                 qualified = "合格";
-                title = "合格范围：≤±0.025";
-            } else if ("氨氮".equals(itemName) && Math.abs(absolute) <= 0.05) {
-                qualified = "合格";
-                title = "合格范围：≤±0.05";
-            } else if ("总氮".equals(itemName) && Math.abs(absolute) <= 0.2) {
+                title = "合格范围：≤±0.02";
+            } else if ("氨氮".equals(itemName) && Math.abs(absolute) <= 0.2) {
                 qualified = "合格";
                 title = "合格范围：≤±0.2";
-            } else {
+            } else if ("总氮".equals(itemName) && Math.abs(absolute) <= 0.3) {
+                qualified = "合格";
+                title = "合格范围：≤±0.3";
+            }else if ("挥发酚".equals(itemName) && Math.abs(absolute) <= 0.006 ) {
+                qualified = "合格";
+                title = "合格范围：≤±0.006";
+            } else if ("氰化物".equals(itemName) && Math.abs(absolute) <= 0.015) {
+                qualified = "合格";
+                title = "合格范围：≤±0.015";
+            }  else {
                 qualified = "不合格";
-                title = "合格范围：≤±0.1";
+                if("高锰酸盐指数".equals(itemName)){
+                    title = "合格范围：≤±1";
+                }else if("总磷".equals(itemName)){
+                    title = "合格范围：≤±0.02";
+                }else if("氨氮".equals(itemName)){
+                    title = "合格范围：≤±0.2";
+                }else if("总氮".equals(itemName)){
+                    title = "合格范围：≤±0.3";
+                }else if("挥发酚".equals(itemName)){
+                    title = "合格范围：≤±0.001";
+                }else if("氰化物".equals(itemName)){
+                    title = "合格范围：≤±0.002";
+                }
             }
             Map<String, String> map = new HashMap<>();
             map.put(qualified, title);
@@ -488,16 +542,16 @@ public class TestDataService {
         return null;
     }
 
-    //相对合格判断
+    //相对合格判断（零点漂移）
     private static Map<String, String> isQualified2(String itemName, double relative) {
         if (itemName == null) {
             return null;
         } else {
             String qualified = null;
             String title = null;
-            if ("高锰酸盐指数".equals(itemName) && Math.abs(relative) <= 5) {
+            if ("高锰酸盐指数".equals(itemName) && Math.abs(relative) <= 10) {
                 qualified = "合格";
-                title = "合格范围：≤±5%";
+                title = "合格范围：≤±10%";
             } else if ("总磷".equals(itemName) && Math.abs(relative) <= 5) {
                 qualified = "合格";
                 title = "合格范围：≤±5%";
@@ -507,24 +561,36 @@ public class TestDataService {
             } else if ("氨氮".equals(itemName) && Math.abs(relative) <= 5) {
                 qualified = "合格";
                 title = "合格范围：≤±5%";
-            } else if ("溶解氧".equals(itemName) && Math.abs(relative) <= 0.3) {
-                qualified = "合格";
-                title = "合格范围：≤±0.3%";
-            } else if ("电导率".equals(itemName) && Math.abs(relative) <= 1) {
-                qualified = "合格";
-                title = "合格范围：≤±1%";
-            } else if ("浊度".equals(itemName) && Math.abs(relative) <= 3) {
-                qualified = "合格";
-                title = "合格范围：≤±3%";
-            } else if ("总有机碳".equals(itemName) && Math.abs(relative) <= 5) {
+            } else if ("溶解氧".equals(itemName) && Math.abs(relative) <= 5) {
                 qualified = "合格";
                 title = "合格范围：≤±5%";
-            } else if ("生化需氧量".equals(itemName) && Math.abs(relative) <= 5) {
+            } else if ("电导率".equals(itemName) && Math.abs(relative) <= 5) {
+                qualified = "合格";
+                title = "合格范围：≤±5%";
+            } else if ("浊度".equals(itemName) && Math.abs(relative) <= 5) {
+                qualified = "合格";
+                title = "合格范围：≤±5%";
+            } else if ("挥发酚".equals(itemName) && Math.abs(relative) <= 5) {
+                qualified = "合格";
+                title = "合格范围：≤±5%";
+            } else if ("氰化物".equals(itemName) && Math.abs(relative) <= 5) {
                 qualified = "合格";
                 title = "合格范围：≤±5%";
             } else {
                 qualified = "不合格";
-                title = "合格范围：≤±1%";
+                if("高锰酸盐指数".equals(itemName)){
+                    title = "合格范围：≤±10%";
+                }else if("总磷".equals(itemName)){
+                    title = "合格范围：≤±5%";
+                }else if("氨氮".equals(itemName)){
+                    title = "合格范围：≤±5%";
+                }else if("总氮".equals(itemName)){
+                    title = "合格范围：≤±5%";
+                }else if("挥发酚".equals(itemName)){
+                    title = "合格范围：≤±5%";
+                }else if("氰化物".equals(itemName)){
+                    title = "合格范围：≤±5%";
+                }
             }
             Map<String, String> map = new HashMap<>();
             map.put(qualified, title);
