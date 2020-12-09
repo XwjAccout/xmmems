@@ -1590,9 +1590,6 @@ public class MonitorService {
                                                 List<Map<String, String>> MonthData, List<Map<String, String>> yearData, Map<String, String> limit) {
         List<Map<String, String>> contentLists = JsonUtils.nativeRead(map.get("content").toString(), new TypeReference<List<Map<String, String>>>() {
         });
-        if (returnData.size() == 24) {
-            System.out.println();
-        }
         Map<String, String> tempMap = new HashMap<>();
         String moniterTime = map.get("moniterTime").toString();
         tempMap.put("moniterTime", moniterTime);
@@ -1612,8 +1609,8 @@ public class MonitorService {
                     if (StringUtils.isNotBlank(troubleCode) && !"N".equals(troubleCode) && !" N".equals(troubleCode)) {
                         value = scale + "$$" + troubleCode;
 
-                    } else if (b != null && Double.parseDouble(value) <= Double.parseDouble(b) && ReportThreadLocal.getLimit()) {
-                        value = "$$≤" + b;
+                    } else if (b != null && Double.parseDouble(value) < Double.parseDouble(b) && ReportThreadLocal.getLimit()) {
+                        value = "$$<" + b;
 
                     }
                     if (value.contains("$$")) {
