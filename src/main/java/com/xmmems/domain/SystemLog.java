@@ -105,4 +105,20 @@ public class SystemLog {
     public void setExceptiondetail(String exceptiondetail) {
         this.exceptiondetail = exceptiondetail == null ? null : exceptiondetail.trim();
     }
+
+    @Override
+    public String toString() {
+        return "SystemLog{" +
+                "id=" + id +
+                ", requestip='" + requestip + '\'' +
+                ", type='" + type + '\'' +
+                ", userid='" + userid + '\'' +
+                ", description='" + description + '\'' +
+                ", actiondate=" + actiondate +
+                ", exceptioncode='" + exceptioncode + '\'' +
+                ", actionmethod='" + actionmethod + '\'' +
+                ", params='" + params + '\'' +
+                ", exceptiondetail='" + exceptiondetail + '\'' +
+                '}';
+    }
 }

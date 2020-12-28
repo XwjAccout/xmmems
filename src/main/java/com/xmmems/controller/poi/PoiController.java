@@ -627,7 +627,7 @@ public class PoiController {
             cell.setCellValue(itemNames.get(i1) + (units.get(i1) == null ? "" : ("(" + units.get(i1) + ")")));
             // cell.setCellStyle(this.title(workbook));
         }
-        PageResult<Map<String, Object>> pageResult = monitorService.getHistoryData(limit, page, siteId, startTime, endTime, "ASC");
+        PageResult<Map<String, Object>> pageResult = monitorService.getHistoryData(limit, page, siteId, startTime, endTime, "ASC",false);
         List<Map<String, Object>> mapList = pageResult.getRows();
 
 

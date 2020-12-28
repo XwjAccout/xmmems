@@ -62,7 +62,7 @@ public class MonitorHistoryController {
             @RequestParam(value = "endTime") String endTime
     ) {
         log.info("分页查询历史数据");
-        PageResult<Map<String, Object>> list = monitorService.getHistoryData(limit, page, siteId, startTime, endTime, "ASC");
+        PageResult<Map<String, Object>> list = monitorService.getHistoryData(limit, page, siteId, startTime, endTime, "ASC",true);
         return ResponseEntity.ok(list);
     }
 

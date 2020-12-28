@@ -45,7 +45,7 @@ public class ApproveService {
 
     public PageResult<Map<String, Object>> getHistoryDataHandled(Integer limit, Integer page, Integer siteId, String startTime, String endTime) {
         //查询历史分页数据
-        PageResult<Map<String, Object>> pageResult = monitorService.getHistoryData(limit, page, siteId, startTime, endTime,"DESC");
+        PageResult<Map<String, Object>> pageResult = monitorService.getHistoryData(limit, page, siteId, startTime, endTime,"DESC",false);
 
         List<Map<String, Object>> siteList = pageResult.getRows();
 
@@ -68,11 +68,12 @@ public class ApproveService {
             /*if (ProConstant.existModifyItem(monitorItem.get("itemName"))) {
                 monitorItem.put("itemName", ProConstant.getModifyValueByKey(monitorItem.get("itemName")));
             }*/
-            String value = rds.formatValue(monitorItem.get("itemName"), monitorItem.get("value"));
+            String v = monitorItem.get("value");
+            String value = rds.formatValue(monitorItem.get("itemName"), v);
             if (!StringUtils.isBlank(monitorItem.get("troubleCode")) && !"N".equals(monitorItem.get("troubleCode"))&& !" N".equals(monitorItem.get("troubleCode"))) {
                 value = value + "$$" + monitorItem.get("troubleCode");
             }
-            record.put(monitorItem.get("itemName"), value);
+            record.put(monitorItem.get("itemName"), value+"^"+v);
         }
 
         record.remove("content");

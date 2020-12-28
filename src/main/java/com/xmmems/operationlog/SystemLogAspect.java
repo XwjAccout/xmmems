@@ -83,14 +83,6 @@ public class SystemLogAspect {
     public Object controllerLog(ProceedingJoinPoint joinPoint){
         Object proceed = null;
         SystemLog systemLog = initSystemLog(joinPoint);
-
-        //放行拦截
-        try {
-            proceed = joinPoint.proceed();
-        } catch (Throwable throwable) {
-            throw new XMException(500, throwable.getMessage());
-        }
-
         //成功的两步操作
         //设置操作信息
         systemLog.setType("1");
@@ -100,6 +92,16 @@ public class SystemLogAspect {
         //获取请求参数
         String returnStr = getParams(joinPoint);
         systemLog.setParams(returnStr);
+
+
+        //放行拦截
+        try {
+            proceed = joinPoint.proceed();
+
+        } catch (Throwable throwable) {
+            System.out.println(systemLog.toString());
+            throw new XMException(500, throwable.getMessage());
+        }
 
         systemLogService.save(systemLog);
 

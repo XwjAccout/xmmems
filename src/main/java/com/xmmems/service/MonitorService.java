@@ -386,7 +386,7 @@ public class MonitorService {
     /**
      * 查询历史数据
      */
-    public PageResult<Map<String, Object>> getHistoryData(Integer limit, Integer page, Integer siteId, String startTime, String endTime, String order) {
+    public PageResult<Map<String, Object>> getHistoryData(Integer limit, Integer page, Integer siteId, String startTime, String endTime, String order, Boolean original) {
 
         //封装分页信息
         PageHelper.startPage(page, limit);
@@ -401,11 +401,13 @@ public class MonitorService {
         for (Map<String, Object> record : records) {
             List<Map<String, String>> monitorItemList = JsonUtils.nativeRead(record.get("content").toString(), new TypeReference<List<Map<String, String>>>() {
             });
-
+            //record.remove("content"); //不可去除，数据审批需要用
             for (Map<String, String> monitorItem : monitorItemList) {
 
-                String value = rds.formatValue(monitorItem.get("itemName"), monitorItem.get("value"));
-                record.put(monitorItem.get("itemName"), value);
+                String v = monitorItem.get("value");
+                String value = rds.formatValue(monitorItem.get("itemName"), v);
+                if (original) record.put(monitorItem.get("itemName"), value + "^" + v);
+                else record.put(monitorItem.get("itemName"), value);
             }
             record.put("genTime", sdf.format(record.get("genTime")));
         }
@@ -1336,7 +1338,7 @@ public class MonitorService {
         //有效值个数
         double num = 0;
         for (String value : values) {
-            if (!value.contains("$$") || value.contains("≤")) {
+            if (!value.contains("$$") || value.contains("＜")) {
                 num++;
             }
         }
@@ -1610,7 +1612,7 @@ public class MonitorService {
                         value = scale + "$$" + troubleCode;
 
                     } else if (b != null && Double.parseDouble(value) < Double.parseDouble(b) && ReportThreadLocal.getLimit()) {
-                        value = "$$<" + b;
+                        value = "$$＜" + b;
 
                     }
                     if (value.contains("$$")) {
