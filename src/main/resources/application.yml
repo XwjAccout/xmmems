@@ -22,9 +22,9 @@ spring:
       read-only: false
       login-timeout: 5
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/sdmems?useSSL=false&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
+    url: jdbc:mysql://59.39.56.6:3306/sdmems?useSSL=false&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
     username: root
-    password: 123456
+    password: sg12345
 
 
 mybatis:
@@ -36,7 +36,6 @@ mybatis:
 logging:
   level:
     com.xmmems: debug
-    com.xmmems.mapper.SimpleHourDataMapper: debug
 
 mapper:
   wrap-keyword: "`{0}`"

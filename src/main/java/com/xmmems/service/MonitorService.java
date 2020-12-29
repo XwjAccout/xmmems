@@ -29,6 +29,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
@@ -1418,7 +1419,7 @@ public class MonitorService {
     }
 
     //获取标准水质
-    private Integer getSlevel(String key) {
+    public Integer getSlevel(String key) {
         Map<String, BaseSite> allSiteMap = commonService.getAllSiteMap();
         BaseSite site = allSiteMap.get(key);
         if (site == null) {
@@ -1468,10 +1469,10 @@ public class MonitorService {
     }
 
     public String itemSubCategory(String itemName, String avg, Integer siteId) {
-        Integer standard = getSlevel(siteId + "");
 
         EnvQualityConf envQualityConf = waterQualityCategory(itemName, avg);
         if (envQualityConf != null) {
+            Integer standard = getSlevel(siteId + "");
             String level = envQualityConf.getLevel();
             if (levelName2LevelCode(level) > standard) {
                 return level + "$$";
@@ -1482,9 +1483,9 @@ public class MonitorService {
         return "";
     }
 
-    private EnvQualityConf waterQualityCategory(@NonNull String itemName, @NonNull String avg) {
+    public EnvQualityConf waterQualityCategory(@NonNull String itemName, @NonNull String avg) {
 
-        List<EnvQualityConf> envQualityConfs = new ArrayList<>();
+       /* List<EnvQualityConf> envQualityConfs = new ArrayList<>();
         //方法2 查询全部 一次性查询，在根据项目名进行处理
         for (EnvQualityConf envQualityConf : commonService.getEnvQualityConfList()) {
             String kpiName = envQualityConf.getKpiName();
@@ -1498,6 +1499,18 @@ public class MonitorService {
             for (EnvQualityConf envQualityConf : envQualityConfs) {
                 if (Double.parseDouble(envQualityConf.getMinVal()) <= Double.parseDouble(avg) && Double.parseDouble(envQualityConf.getMaxVal()) >= Double.parseDouble(avg)) {
                     return envQualityConf;
+                }
+            }
+        }*/
+
+        //方法3 查到一个质量类别直接进行比较，比方法为减少循环次数
+        if (avg != null && !"".equals(avg)) {
+            for (EnvQualityConf envQualityConf : commonService.getEnvQualityConfList()) {
+                String kpiName = envQualityConf.getKpiName();
+                if (itemName.equals(kpiName) ) {
+                    if (Double.parseDouble(envQualityConf.getMinVal()) <= Double.parseDouble(avg) && Double.parseDouble(envQualityConf.getMaxVal()) >= Double.parseDouble(avg)) {
+                        return envQualityConf;
+                    }
                 }
             }
         }
@@ -1645,5 +1658,116 @@ public class MonitorService {
             }
         }
         return list;
+    }
+
+    //一个月的水质统计
+    public Map<String, Object> monthQuality(Integer siteId, Integer year, Integer month) {
+        Map<String, Object> map = new LinkedHashMap<>();//返回对象
+        //返回子集1---水质分类
+        List<String> types = new ArrayList<>();
+        //返回子集2---日期
+        List<String> dates = new ArrayList<String>();
+        //返回子集3---数据
+        List<Map<String, String>> datas = new ArrayList<>();
+        //将三个子集添加进去返回对象中
+        map.put("types", types);
+        map.put("dates", dates);
+        map.put("datas", datas);
+        //数据处理主过程
+        List<Map<String, String>> monthList = realMonth(siteId, year, month, null, false);
+        //去掉平均值一项数据
+        monthList.remove(monthList.size() - 1);
+        //标准水质
+        Integer standard = getSlevel(siteId + "");
+        //质量类别转换为键值对形式
+        Map<String, List<EnvQualityConf>> eqMap = new HashMap<>();
+        for (EnvQualityConf envQualityConf : commonService.getEnvQualityConfList()) {
+            String kpiName = envQualityConf.getKpiName();
+            eqMap.computeIfAbsent(kpiName, k -> new ArrayList<>()).add(envQualityConf);
+        }
+
+        List<Future<Boolean>> tt = new ArrayList<>();
+        for (Map<String, String> dayList : monthList) {
+            Future<Boolean> submit = PoolExecutor.submit(new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws Exception {
+                    //等级统计
+                    Map<String, String> tempMap = new LinkedHashMap<>();
+                    tempMap.put("D", "0");
+                    tempMap.put("N", "0");
+                    tempMap.put("UN", "0");
+
+                    for (Map.Entry<String, String> entry : dayList.entrySet()) {
+
+                        String key = entry.getKey();
+                        String value = entry.getValue();
+
+                        if ("moniterTime".equals(key)) {
+                            //value是日期
+                            dates.add(value);
+                            tempMap.put("time", value);
+                        } else {
+                            //key是监测指标名称，value是值，level是等级，这里只查询
+                            String level = "";
+                            if (value != null && !"".equals(value)) {
+                                List<EnvQualityConf> envQualityConfs = eqMap.get(key);
+                                if (envQualityConfs != null) {
+
+                                    for (EnvQualityConf temp : envQualityConfs) {
+                                        if (Double.parseDouble(temp.getMinVal()) <= Double.parseDouble(value) && Double.parseDouble(temp.getMaxVal()) >= Double.parseDouble(value)) {
+                                            level = temp.getLevel();
+                                            if (WaterLevelTransformUtil.levelStringToLevelInt(level) > standard) {
+                                                level = level + "$$";
+                                            }
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (level.contains("$")) {
+                                tempMap.put("UN", Integer.parseInt(tempMap.get("UN")) + 1 + "");
+                            } else if (level.equals("")) {
+                                tempMap.put("D", Integer.parseInt(tempMap.get("D")) + 1 + "");
+                            } else {
+                                tempMap.put("N", Integer.parseInt(tempMap.get("N")) + 1 + "");
+                            }
+                        }
+                    }
+
+
+                    datas.add(tempMap);
+                    return true;
+                }
+            });
+            tt.add(submit);
+        }
+
+        types.add("不统计项");
+        types.add("标准");
+        types.add("未达标");
+        System.out.println();
+        for (Future<Boolean> future : tt) {
+            try {
+                Boolean aBoolean = future.get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+        datas.sort((o1, o2) -> {
+            String time1 = o1.get("time");
+            String time2 = o2.get("time");
+            long t1 = DateFormat.parseSome(time1).getTime();
+            long t2 = DateFormat.parseSome(time2).getTime();
+
+            return (int) (t1 - t2);
+        });
+        dates.sort((o1, o2) -> {
+            long t1 = DateFormat.parseSome(o1).getTime();
+            long t2 = DateFormat.parseSome(o2).getTime();
+
+            return (int) (t1 - t2);
+        });
+        return map;
     }
 }
