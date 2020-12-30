@@ -22,9 +22,21 @@ public class NewFunctionController {
     @Autowired
     private MonitorService monitorService;
 
+    /**
+     * 月水质达标分类饼图
+     * @param siteId
+     * @param year
+     * @param month
+     * @return
+     */
     @GetMapping("/month/quality")
     public ResponseEntity<Map> monthQuality(@RequestParam("siteId") Integer siteId, @RequestParam("year") Integer year, @RequestParam("month") Integer month){
         return ResponseEntity.ok(monitorService.monthQuality(siteId, year, month));
+    }
+
+    @GetMapping("/month/onLine")
+    public ResponseEntity<Map> monthOnline(@RequestParam("siteId") Integer siteId, @RequestParam("year") Integer year, @RequestParam("month") Integer month){
+        return ResponseEntity.ok(monitorService.monthOnline(siteId, year, month));
     }
 
 }

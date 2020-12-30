@@ -56,4 +56,9 @@ public class NetWorkService {
         });
         return map;
     }
+
+    public List<NetWork> findNetWorksBySiteId(String start, String end, Integer siteId) {
+
+        return netWorkMapper.findNetWorksBySiteId(start, end, siteId);
+    }
 }

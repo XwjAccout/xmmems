@@ -1507,7 +1507,7 @@ public class MonitorService {
         if (avg != null && !"".equals(avg)) {
             for (EnvQualityConf envQualityConf : commonService.getEnvQualityConfList()) {
                 String kpiName = envQualityConf.getKpiName();
-                if (itemName.equals(kpiName) ) {
+                if (itemName.equals(kpiName)) {
                     if (Double.parseDouble(envQualityConf.getMinVal()) <= Double.parseDouble(avg) && Double.parseDouble(envQualityConf.getMaxVal()) >= Double.parseDouble(avg)) {
                         return envQualityConf;
                     }
@@ -1662,17 +1662,13 @@ public class MonitorService {
 
     //一个月的水质统计
     public Map<String, Object> monthQuality(Integer siteId, Integer year, Integer month) {
-        Map<String, Object> map = new LinkedHashMap<>();//返回对象
         //返回子集1---水质分类
         List<String> types = new ArrayList<>();
         //返回子集2---日期
-        List<String> dates = new ArrayList<String>();
+        //List<String> dates = new ArrayList<String>();
         //返回子集3---数据
         List<Map<String, String>> datas = new ArrayList<>();
-        //将三个子集添加进去返回对象中
-        map.put("types", types);
-        map.put("dates", dates);
-        map.put("datas", datas);
+
         //数据处理主过程
         List<Map<String, String>> monthList = realMonth(siteId, year, month, null, false);
         //去掉平均值一项数据
@@ -1704,7 +1700,7 @@ public class MonitorService {
 
                         if ("moniterTime".equals(key)) {
                             //value是日期
-                            dates.add(value);
+                            //dates.add(value);
                             tempMap.put("time", value);
                         } else {
                             //key是监测指标名称，value是值，level是等级，这里只查询
@@ -1742,14 +1738,19 @@ public class MonitorService {
             });
             tt.add(submit);
         }
+        Map<String, Object> map = new LinkedHashMap<>();//返回对象
+        //将三个子集添加进去返回对象中
+        map.put("types", types);
+        //map.put("dates", dates);
+        map.put("datas", datas);
 
         types.add("不统计项");
         types.add("标准");
         types.add("未达标");
-        System.out.println();
+        //等待多线程执行完毕
         for (Future<Boolean> future : tt) {
             try {
-                Boolean aBoolean = future.get();
+                future.get();
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
@@ -1762,12 +1763,94 @@ public class MonitorService {
 
             return (int) (t1 - t2);
         });
-        dates.sort((o1, o2) -> {
+       /* dates.sort((o1, o2) -> {
             long t1 = DateFormat.parseSome(o1).getTime();
             long t2 = DateFormat.parseSome(o2).getTime();
 
             return (int) (t1 - t2);
+        });*/
+        return map;
+    }
+
+    public Map<String, Object> monthOnline(Integer siteId, Integer year, Integer month) {
+        //返回子集1---水质分类
+        List<String> types = new ArrayList<>();
+        //返回子集2---日期
+        //List<String> dates = new ArrayList<String>();
+        //返回子集3---数据
+        List<Map<String, String>> datas = new ArrayList<>();
+
+        //将月份转换为开始时间与结束时间
+        StringBuilder endSb = getStringBuilder(year, month);
+        String end = endSb.toString();
+        String start = endSb.replace(8, 10, "01").toString();
+
+        //查询数据
+        List<NetWork> netWorks = netWorkService.findNetWorksBySiteId(start, end, siteId);
+
+        List<Future<Boolean>> tt = new ArrayList<>();
+        //分日处理数据
+        for (NetWork netWork : netWorks) {
+            Future<Boolean> submit = PoolExecutor.submit(new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws Exception {
+                    Integer onLine = netWork.getOnLine();
+                    //一天24小时 乘以 60 分钟每小时 = 1440分钟
+                    if (onLine >= 1435) {
+                        //大于1435就算是整天在线了
+                        onLine = 1440;
+                    } else if (onLine <= 5) {
+                        onLine = 0;
+                    }
+                    //其他状态都是离线状态，用一天总分钟数减去在线时间
+                    int offLine = 1440 - onLine;
+                    String date = DateFormat.formatSome(netWork.getDate());
+                    //dates.add(date);
+
+                    Map<String,String> tempMap = new LinkedHashMap<>();
+                    tempMap.put("on", onLine+"");
+                    tempMap.put("off", offLine+"");
+                    tempMap.put("time", date);
+                    datas.add(tempMap);
+
+                    return true;
+                }
+            });
+            tt.add(submit);
+        }
+
+        Map<String, Object> map = new LinkedHashMap<>();//返回对象
+        //将三个子集添加进去返回对象中
+        map.put("types", types);
+        //map.put("dates", dates);
+        map.put("datas", datas);
+
+        types.add("在线");
+        types.add("离线");
+        //等待多线程执行完毕
+        for (Future<Boolean> future : tt) {
+            try {
+                future.get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+        datas.sort((o1, o2) -> {
+            String time1 = o1.get("time");
+            String time2 = o2.get("time");
+            long t1 = DateFormat.parseSome(time1).getTime();
+            long t2 = DateFormat.parseSome(time2).getTime();
+
+            return (int) (t1 - t2);
         });
+        /*dates.sort((o1, o2) -> {
+            long t1 = DateFormat.parseSome(o1).getTime();
+            long t2 = DateFormat.parseSome(o2).getTime();
+
+            return (int) (t1 - t2);
+        });*/
+        //datas.forEach(d->d.remove("time"));
+        //System.out.println(map);
         return map;
     }
 }

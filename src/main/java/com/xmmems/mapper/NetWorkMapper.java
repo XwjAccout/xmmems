@@ -27,4 +27,7 @@ public interface NetWorkMapper {
 
     @Select("SELECT s.* FROM account_site AS a,network AS s WHERE a.siteId=s.siteId AND a.accountId= #{accountId} AND `date` >= #{start} AND `date` <= #{end}")
     List<NetWork> selectByExampleByAccountId(@Param("accountId") Integer accountId, @Param("start") String start, @Param("end") String end);
+
+    @Select("SELECT * FROM network  WHERE siteId = #{siteId} and `date` >= #{start} AND `date` <= #{end}")
+    List<NetWork> findNetWorksBySiteId(@Param("start") String start,@Param("end") String end,@Param("siteId") Integer siteId);
 }
