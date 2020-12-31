@@ -35,7 +35,7 @@ mybatis:
 
 logging:
   level:
-    com.xmmems: debug
+    com.xmmems: info
 
 mapper:
   wrap-keyword: "`{0}`"

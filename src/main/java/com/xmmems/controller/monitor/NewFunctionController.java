@@ -24,19 +24,40 @@ public class NewFunctionController {
 
     /**
      * 月水质达标分类饼图
+     *
      * @param siteId
      * @param year
      * @param month
      * @return
      */
     @GetMapping("/month/quality")
-    public ResponseEntity<Map> monthQuality(@RequestParam("siteId") Integer siteId, @RequestParam("year") Integer year, @RequestParam("month") Integer month){
-        return ResponseEntity.ok(monitorService.monthQuality(siteId, year, month));
+    public ResponseEntity<Map> monthQuality(@RequestParam("siteId") Integer siteId, @RequestParam("year") Integer year, @RequestParam("month") Integer month, @RequestParam(value = "isPercent", defaultValue = "false") Boolean isPercent) {
+        return ResponseEntity.ok(monitorService.monthQuality(siteId, year, month, isPercent));
     }
 
+    /**
+     * 月数据有效个数统计
+     *
+     * @param siteId
+     * @param year
+     * @param month
+     * @return
+     */
+    @GetMapping("/month/efficiency")
+    public ResponseEntity<Map> monthEfficiency(@RequestParam("siteId") Integer siteId, @RequestParam("year") Integer year, @RequestParam("month") Integer month, @RequestParam(value = "isPercent", defaultValue = "false") Boolean isPercent) {
+        return ResponseEntity.ok(monitorService.monthEfficiency(siteId, year, month, isPercent));
+    }
+
+    /**
+     * 月联网情况统计
+     *
+     * @param siteId
+     * @param year
+     * @param month
+     * @return
+     */
     @GetMapping("/month/onLine")
-    public ResponseEntity<Map> monthOnline(@RequestParam("siteId") Integer siteId, @RequestParam("year") Integer year, @RequestParam("month") Integer month){
-        return ResponseEntity.ok(monitorService.monthOnline(siteId, year, month));
+    public ResponseEntity<Map> monthOnline(@RequestParam("siteId") Integer siteId, @RequestParam("year") Integer year, @RequestParam("month") Integer month, @RequestParam(value = "isPercent", defaultValue = "false") Boolean isPercent) {
+        return ResponseEntity.ok(monitorService.monthOnline(siteId, year, month, isPercent));
     }
-
 }

@@ -1084,13 +1084,7 @@ public class MonitorService {
         if (listMap.size() > 0) {
 
             //获取所有检出限
-            Map<String, String> limitMap = new HashMap<>();
-            if (ReportThreadLocal.getLimit()) {
-                List<Map<String, String>> limit = baseSiteitemMapper.getDetectionLimit(siteId);
-                if (limit.size() > 0) {
-                    limit.forEach(temp -> limitMap.put(temp.get("itemId"), temp.get("limitNum")));
-                }
-            }
+            Map<String, String> limitMap = getLimitMap(siteId);
             for (Map<String, Object> map : listMap) {
                 handleOneHourDataIntoReturnData(returnData, map, itemNameAndNumbersMap, MonthData, yearData, limitMap);
             }
@@ -1098,6 +1092,19 @@ public class MonitorService {
             boolean isAvg = MonthData != null;
             handleOtherIntoReturnData(returnData, itemNameAndValuesList, siteId, dayNum, itemNameAndNumbersMap, isAvg, statistics, "dd", itemNameAndValuesList, eH, sH);
         }
+    }
+
+    //获取所有检出限
+    private Map<String, String> getLimitMap(Integer siteId) {
+        if (ReportThreadLocal.getLimit()) {
+            Map<String, String> limitMap = new HashMap<>();
+            List<Map<String, String>> limit = baseSiteitemMapper.getDetectionLimit(siteId);
+            if (limit.size() > 0) {
+                limit.forEach(temp -> limitMap.put(temp.get("itemId"), temp.get("limitNum")));
+            }
+            return limitMap;
+        }
+        return null;
     }
 
     /**
@@ -1275,7 +1282,6 @@ public class MonitorService {
         }
 
         if (!isAvg) {
-
 
             //水质类别
             String waterQualityCategory = itemWaterQualityCategory(siteId, subCategoryMap);
@@ -1594,9 +1600,9 @@ public class MonitorService {
      */
     public static String scale(@NonNull Object value, @NonNull Integer digit) {
         try {
-            return new BigDecimal(value + "").setScale(digit, BigDecimal.ROUND_HALF_EVEN).toPlainString();
+            return new BigDecimal(value + "").setScale(digit, BigDecimal.ROUND_HALF_EVEN).stripTrailingZeros().toPlainString();
         } catch (NumberFormatException e) {
-            System.out.println("数据解析异常1474--->" + value);
+            System.out.println("数据解析异常1605--->" + value);
             return "";
         }
     }
@@ -1616,17 +1622,18 @@ public class MonitorService {
                 String value = contentItem.get("value").replace(",", "").trim();
                 String itemId = contentItem.get("itemId");
 
-                //检出限
-                String b = limit.get(itemId.replace(".0", ""));
 
                 if (value.length() > 0) {
                     String scale = rds.scale(itemName, value);
                     if (StringUtils.isNotBlank(troubleCode) && !"N".equals(troubleCode) && !" N".equals(troubleCode)) {
                         value = scale + "$$" + troubleCode;
 
-                    } else if (b != null && Double.parseDouble(value) < Double.parseDouble(b) && ReportThreadLocal.getLimit()) {
-                        value = "$$＜" + b;
-
+                    } else if (ReportThreadLocal.getLimit()) {
+                        //检出限
+                        String b = limit.get(itemId.replace(".0", ""));
+                        if (b != null && Double.parseDouble(value) < Double.parseDouble(b)) {
+                            value = "$$＜" + b;
+                        }
                     }
                     if (value.contains("$$")) {
 
@@ -1661,7 +1668,7 @@ public class MonitorService {
     }
 
     //一个月的水质统计
-    public Map<String, Object> monthQuality(Integer siteId, Integer year, Integer month) {
+    public Map<String, Object> monthQuality(Integer siteId, Integer year, Integer month, Boolean isPercent) {
         //返回子集1---水质分类
         List<String> types = new ArrayList<>();
         //返回子集2---日期
@@ -1731,6 +1738,18 @@ public class MonitorService {
                         }
                     }
 
+                    if (isPercent) {
+                        int id = Integer.parseInt(tempMap.get("D"));
+                        int in = Integer.parseInt(tempMap.get("N"));
+                        int iun = Integer.parseInt(tempMap.get("UN"));
+                        double sum = in + iun + id;
+                        String d = scale(id * 100 / sum, 2);
+                        String n = scale(in * 100 / sum, 2);
+                        String un = scale(iun * 100 / sum, 2);
+                        tempMap.put("D", d);
+                        tempMap.put("N", n);
+                        tempMap.put("UN", un);
+                    }
 
                     datas.add(tempMap);
                     return true;
@@ -1742,7 +1761,7 @@ public class MonitorService {
         //将三个子集添加进去返回对象中
         map.put("types", types);
         //map.put("dates", dates);
-        map.put("datas", datas);
+
 
         types.add("不统计项");
         types.add("标准");
@@ -1755,14 +1774,23 @@ public class MonitorService {
                 e.printStackTrace();
             }
         }
-        datas.sort((o1, o2) -> {
+        //if (datas.size() == 0) {
+        //    try {
+        //        Thread.sleep(1000);
+        //    } catch (InterruptedException e) {
+        //        e.printStackTrace();
+        //    }
+        //}
+        List<Map<String, String>> collect = datas.stream().filter(Objects::nonNull).sorted((o1, o2) -> {
             String time1 = o1.get("time");
             String time2 = o2.get("time");
             long t1 = DateFormat.parseSome(time1).getTime();
             long t2 = DateFormat.parseSome(time2).getTime();
 
             return (int) (t1 - t2);
-        });
+        }).collect(Collectors.toList());
+        map.put("datas", collect);
+
        /* dates.sort((o1, o2) -> {
             long t1 = DateFormat.parseSome(o1).getTime();
             long t2 = DateFormat.parseSome(o2).getTime();
@@ -1772,8 +1800,8 @@ public class MonitorService {
         return map;
     }
 
-    public Map<String, Object> monthOnline(Integer siteId, Integer year, Integer month) {
-        //返回子集1---水质分类
+    public Map<String, Object> monthOnline(Integer siteId, Integer year, Integer month, Boolean isPercent) {
+        //返回子集1---联网分类
         List<String> types = new ArrayList<>();
         //返回子集2---日期
         //List<String> dates = new ArrayList<String>();
@@ -1807,12 +1835,22 @@ public class MonitorService {
                     String date = DateFormat.formatSome(netWork.getDate());
                     //dates.add(date);
 
-                    Map<String,String> tempMap = new LinkedHashMap<>();
-                    tempMap.put("on", onLine+"");
-                    tempMap.put("off", offLine+"");
+                    Map<String, String> tempMap = new LinkedHashMap<>();
+                    tempMap.put("on", onLine + "");
+                    tempMap.put("off", offLine + "");
                     tempMap.put("time", date);
-                    datas.add(tempMap);
 
+                    if (isPercent) {
+                        int in = Integer.parseInt(tempMap.get("on"));
+                        int iun = Integer.parseInt(tempMap.get("off"));
+                        double sum = in + iun;
+                        String n = scale(in * 100 / sum, 2);
+                        String un = scale(100 - Double.parseDouble(n), 2);
+                        tempMap.put("on", n);
+                        tempMap.put("off", un);
+                    }
+
+                    datas.add(tempMap);
                     return true;
                 }
             });
@@ -1853,4 +1891,120 @@ public class MonitorService {
         //System.out.println(map);
         return map;
     }
+
+    public Map<String, Object> monthEfficiency(Integer siteId, Integer year, Integer month, Boolean isPercent) {
+        //返回子集1---有效无效分类分类
+        List<String> types = new ArrayList<>();
+        //返回子集2---日期
+        //List<String> dates = new ArrayList<String>();
+        //返回子集3---数据
+        List<Map<String, String>> datas = new ArrayList<>();
+
+        //数据处理主过程
+        List<Map<String, String>> monthList = realMonth(siteId, year, month, null, false);
+        //去掉平均值一项数据
+        monthList.remove(monthList.size() - 1);
+        //标准水质
+        Integer standard = getSlevel(siteId + "");
+        //质量类别转换为键值对形式
+        Map<String, List<EnvQualityConf>> eqMap = new HashMap<>();
+        for (EnvQualityConf envQualityConf : commonService.getEnvQualityConfList()) {
+            String kpiName = envQualityConf.getKpiName();
+            eqMap.computeIfAbsent(kpiName, k -> new ArrayList<>()).add(envQualityConf);
+        }
+
+        List<Future<Boolean>> tt = new ArrayList<>();
+        for (Map<String, String> dayList : monthList) {
+            Future<Boolean> submit = PoolExecutor.submit(new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws Exception {
+                    //等级统计
+                    Map<String, String> tempMap = new LinkedHashMap<>();
+                    tempMap.put("N", "0");
+                    tempMap.put("UN", "0");
+
+                    for (Map.Entry<String, String> entry : dayList.entrySet()) {
+
+                        String key = entry.getKey();
+                        String value = entry.getValue();
+
+                        if ("moniterTime".equals(key)) {
+                            //value是日期
+                            //dates.add(value);
+                            tempMap.put("time", value);
+                        } else {
+                            //key是监测指标名称，value是值，level是等级，这里只查询
+                            String level = "";
+                            if (value != null && !"".equals(value)) {
+                                List<EnvQualityConf> envQualityConfs = eqMap.get(key);
+                                if (envQualityConfs != null) {
+
+                                    for (EnvQualityConf temp : envQualityConfs) {
+                                        if (Double.parseDouble(temp.getMinVal()) <= Double.parseDouble(value) && Double.parseDouble(temp.getMaxVal()) >= Double.parseDouble(value)) {
+                                            level = temp.getLevel();
+                                            if (WaterLevelTransformUtil.levelStringToLevelInt(level) > standard) {
+                                                level = level + "$$";
+                                            }
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (level.contains("$")) {
+                                tempMap.put("UN", Integer.parseInt(tempMap.get("UN")) + 1 + "");
+                            } else {
+                                tempMap.put("N", Integer.parseInt(tempMap.get("N")) + 1 + "");
+                            }
+                        }
+                    }
+
+                    if (isPercent) {
+                        int in = Integer.parseInt(tempMap.get("N"));
+                        int iun = Integer.parseInt(tempMap.get("UN"));
+                        double sum = in + iun;
+                        String n = scale(in * 100 / sum, 2);
+                        String un = scale(100 - Double.parseDouble(n), 2);
+                        tempMap.put("N", n);
+                        tempMap.put("UN", un);
+                    }
+                    datas.add(tempMap);
+                    return true;
+                }
+            });
+            tt.add(submit);
+        }
+        Map<String, Object> map = new LinkedHashMap<>();//返回对象
+        //将三个子集添加进去返回对象中
+        map.put("types", types);
+        //map.put("dates", dates);
+        map.put("datas", datas);
+
+        types.add("有效");
+        types.add("无效");
+        //等待多线程执行完毕
+        for (Future<Boolean> future : tt) {
+            try {
+                future.get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+        datas.sort((o1, o2) -> {
+            String time1 = o1.get("time");
+            String time2 = o2.get("time");
+            long t1 = DateFormat.parseSome(time1).getTime();
+            long t2 = DateFormat.parseSome(time2).getTime();
+
+            return (int) (t1 - t2);
+        });
+       /* dates.sort((o1, o2) -> {
+            long t1 = DateFormat.parseSome(o1).getTime();
+            long t2 = DateFormat.parseSome(o2).getTime();
+
+            return (int) (t1 - t2);
+        });*/
+        return map;
+    }
+
 }
