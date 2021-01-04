@@ -31,7 +31,7 @@ public class NewFunctionController {
      * @return
      */
     @GetMapping("/month/quality")
-    public ResponseEntity<Map> monthQuality(@RequestParam("siteId") Integer siteId, @RequestParam("year") Integer year, @RequestParam("month") Integer month, @RequestParam(value = "isPercent", defaultValue = "false") Boolean isPercent) {
+    public ResponseEntity<Map> monthQuality(@RequestParam("siteId") Integer siteId, @RequestParam("year") Integer year, @RequestParam("month") Integer month, @RequestParam(value = "isPercent", defaultValue = "true") Boolean isPercent) {
         return ResponseEntity.ok(monitorService.monthQuality(siteId, year, month, isPercent));
     }
 
@@ -44,8 +44,21 @@ public class NewFunctionController {
      * @return
      */
     @GetMapping("/month/efficiency")
-    public ResponseEntity<Map> monthEfficiency(@RequestParam("siteId") Integer siteId, @RequestParam("year") Integer year, @RequestParam("month") Integer month, @RequestParam(value = "isPercent", defaultValue = "false") Boolean isPercent) {
+    public ResponseEntity<Map> monthEfficiency(@RequestParam("siteId") Integer siteId, @RequestParam("year") Integer year, @RequestParam("month") Integer month, @RequestParam(value = "isPercent", defaultValue = "true") Boolean isPercent) {
         return ResponseEntity.ok(monitorService.monthEfficiency(siteId, year, month, isPercent));
+    }
+
+    /**
+     * 月数据补获率统计
+     *
+     * @param siteId
+     * @param year
+     * @param month
+     * @return
+     */
+    @GetMapping("/month/capturerate")
+    public ResponseEntity<Map> monthCaptureRate(@RequestParam("siteId") Integer siteId, @RequestParam("year") Integer year, @RequestParam("month") Integer month, @RequestParam(value = "isPercent", defaultValue = "true") Boolean isPercent) {
+        return ResponseEntity.ok(monitorService.monthCaptureRate(siteId, year, month, isPercent));
     }
 
     /**
@@ -57,7 +70,7 @@ public class NewFunctionController {
      * @return
      */
     @GetMapping("/month/onLine")
-    public ResponseEntity<Map> monthOnline(@RequestParam("siteId") Integer siteId, @RequestParam("year") Integer year, @RequestParam("month") Integer month, @RequestParam(value = "isPercent", defaultValue = "false") Boolean isPercent) {
+    public ResponseEntity<Map> monthOnline(@RequestParam("siteId") Integer siteId, @RequestParam("year") Integer year, @RequestParam("month") Integer month, @RequestParam(value = "isPercent", defaultValue = "true") Boolean isPercent) {
         return ResponseEntity.ok(monitorService.monthOnline(siteId, year, month, isPercent));
     }
 }
