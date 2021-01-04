@@ -270,14 +270,14 @@ public class TestDataService {
                 specific.setAbsoluteError(absolute);
                 specific.setRelativeError(relative);
                 //是否合格
-                Map<String, String> map1 = isQualifiedscope(relativeStr, absoluteStr);
+                Map<String, String> map1 = isQualifiedscope(absoluteStr);
                 for (String key1 : map1.keySet()) {
                     specific.setQualified1(key1);
                     String value = map1.get(key1);
                     specific.setTitle1(value);
                 }
                 //是否合格
-                Map<String, String> map2 = isQualifiedscope(relativeStr, absoluteStr);
+                Map<String, String> map2 = isQualifiedscope(relativeStr);
                 for (String key2 : map2.keySet()) {
                     specific.setQualified2(key2);
                     String value = map2.get(key2);
@@ -598,11 +598,11 @@ public class TestDataService {
         }
     }
 
-    private static Map<String, String> isQualifiedscope(double relativeStr, double absolute) {
+    private static Map<String, String> isQualifiedscope(double absolute) {
 
         String qualified = null;
         String title = null;
-        if (Math.abs(absolute) <= 10 || Math.abs(relativeStr) <= 10) {
+        if (Math.abs(absolute) <= 10 ) {
             qualified = "合格";
             title = "合格范围：≤±10%";
         } else {
