@@ -19,21 +19,8 @@ public class TestDataController {
     @Autowired
     private TestDataService testDataService;
 
-
     /**
-     * 获取树形列表
-     *
-     * @return
-     */
-   /* @GetMapping("/getTreeData")
-    @SystemControllerLog(descrption = "查询树形站点列表", actionType = "4")
-    public ResponseEntity<List<TreeData>> getTreeData() {
-        List<TreeData> list = testDataService.getTreeData();
-        return ResponseEntity.ok(list);
-    }*/
-
-    /**
-     * 查询零点核查，零点漂移数据1
+     * 查询零点核查，零点漂移数据
      *
      * @return
      */

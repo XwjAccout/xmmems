@@ -739,13 +739,6 @@ public class MonitorService {
         return new Res(dayNum, listMap);
     }
 
-    public List<Map<String, String>> weekData(Integer siteId, Integer year, Integer week) {
-        //获取year年第year周的开始日期与结束日期
-        String start = WeekToDateUtil.getStartDay(year, week);
-        String end = WeekToDateUtil.getEndDay(year, week);
-        return monthData(siteId, start, end);
-    }
-
     //isDayAvg true 返回日均值 false 返回月均值
     public List<Map<String, String>> seasons(Integer siteId, Integer seasons, Integer year, List<Integer> statistics, Boolean limit, Boolean isDayAvg) {
         String startTime = year + "-";
