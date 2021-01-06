@@ -1,7 +1,5 @@
 package com.xmmems.service.quality;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.xmmems.common.exception.XMException;
 import com.xmmems.common.utils.BeanHelper;
 import com.xmmems.common.utils.DateFormat;
@@ -10,7 +8,6 @@ import com.xmmems.domain.*;
 import com.xmmems.dto.Specific;
 import com.xmmems.dto.ZeroSpan;
 import com.xmmems.mapper.InspectDataMapper;
-import com.xmmems.mapper.TreeDataMapper;
 import com.xmmems.mapper.ZeroCheckHandledMapper;
 import com.xmmems.mapper.ZeroCheckMapper;
 import com.xmmems.service.ReportConfig;
@@ -27,8 +24,6 @@ import java.util.*;
 @Transactional
 public class TestDataService {
     @Autowired
-    private TreeDataMapper treeDataMapper;
-    @Autowired
     private ZeroCheckHandledMapper zeroCheckHandledMapper;
     @Autowired
     private InspectDataMapper inspectDataMapper;
@@ -36,20 +31,6 @@ public class TestDataService {
     private ZeroCheckMapper zeroCheckMapper;
 
     private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-    public List<TreeData> getTreeData() {
-        Gson gson = new Gson();
-        List<TreeData> list = treeDataMapper.getTreeData();
-        list.forEach(tem -> {
-
-            Map<String, Object> o = gson.fromJson(tem.getAttributes(), new TypeToken<Map<String, String>>() {
-            }.getType());
-            tem.setAttributeMap(o);
-            //设置为空字符串，减少传递数据，加快网络传递速度
-            tem.setAttributes("");
-        });
-        return list;
-    }
 
     //查询零点核查数据1
     public List<Map<String, Object>> zeroData(String start, String end, Integer siteId) {

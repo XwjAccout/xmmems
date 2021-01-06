@@ -699,12 +699,21 @@ public class MonitorService {
     private static Map<String, List<Map<String, Object>>> TREND_MAP = new HashMap<>();
     private static long TREND_TIME = 0;
 
+    //key 为站点名称  value 为对应的每天测试数集合
+    private static Map<Integer, Map<String, Integer>> name_number_map = new HashMap<>();
+    private static long name_number_map_time = 0;
+
     private Map<String, Integer> getitemNameAndNumbersMap(Integer siteId) {
-        //获取站点siteId对应的有效的监测指标
-        List<Map<String, String>> itemNameAndNumbers = baseSiteitemMapper.selectBySiteId(siteId);
-        Map<String, Integer> itemNameAndNumbersMap = new HashMap<>();
-        for (Map<String, String> en : itemNameAndNumbers) {
-            itemNameAndNumbersMap.put(en.get("itemName"), Integer.valueOf((Object) en.get("number") + ""));
+        Map<String, Integer> itemNameAndNumbersMap = name_number_map.get(siteId);
+        if (itemNameAndNumbersMap == null || System.currentTimeMillis() - name_number_map_time > 30_000) {
+            //获取站点siteId对应的有效的监测指标
+            List<Map<String, String>> itemNameAndNumbers = baseSiteitemMapper.selectBySiteId(siteId);
+            itemNameAndNumbersMap = new HashMap<>();
+            for (Map<String, String> en : itemNameAndNumbers) {
+                itemNameAndNumbersMap.put(en.get("itemName"), Integer.valueOf((Object) en.get("number") + ""));
+            }
+            name_number_map.put(siteId, itemNameAndNumbersMap);
+            name_number_map_time = System.currentTimeMillis();
         }
         return itemNameAndNumbersMap;
     }
@@ -722,6 +731,7 @@ public class MonitorService {
         //int dayNum = Integer.parseInt(map.get("dayNum"));
         //查询siteId对应站点在时间段startTime, endTime 的历史数据集合，
         // listMap key 值有 content,siteName,DATE_FORMAT(genTime,'%Y-%m-%d %H:00:00') moniterTime
+
         List<Map<String, Object>> listMap = envHourDataMapper.monitorReportDayGetData(siteId, startTime, endTime);
         if (listMap.size() <= 0) {
             throw new XMException(500, "没有数据");
@@ -1063,7 +1073,7 @@ public class MonitorService {
                 startTime = simpleDateFormat.format(simpleDateFormat.parse(startTime).getTime() - 10000);
                 s = startTime.split(" ")[1];
             } catch (ParseException e) {
-                throw new XMException(500, "com.xmmems.service.MonitorService 1036行，日期格式化出错");
+                throw new XMException(500, "com.xmmems.service.MonitorService 1067行，日期格式化出错");
             }
         }
         String sH = s.substring(0, 2);
@@ -1761,7 +1771,7 @@ public class MonitorService {
         //将三个子集添加进去返回对象中
         map.put("types", types);
         //map.put("dates", dates);
-
+        map.put("datas", datas);
 
         types.add("不统计项");
         types.add("标准");
@@ -1774,23 +1784,7 @@ public class MonitorService {
                 e.printStackTrace();
             }
         }
-        //if (datas.size() == 0) {
-        //    try {
-        //        Thread.sleep(1000);
-        //    } catch (InterruptedException e) {
-        //        e.printStackTrace();
-        //    }
-        //}
-        List<Map<String, String>> collect = datas.stream().filter(Objects::nonNull).sorted((o1, o2) -> {
-            String time1 = o1.get("time");
-            String time2 = o2.get("time");
-            long t1 = DateFormat.parseSome(time1).getTime();
-            long t2 = DateFormat.parseSome(time2).getTime();
-
-            return (int) (t1 - t2);
-        }).collect(Collectors.toList());
-        map.put("datas", collect);
-
+        sortByTime(datas);
        /* dates.sort((o1, o2) -> {
             long t1 = DateFormat.parseSome(o1).getTime();
             long t2 = DateFormat.parseSome(o2).getTime();
@@ -1873,14 +1867,7 @@ public class MonitorService {
                 e.printStackTrace();
             }
         }
-        datas.sort((o1, o2) -> {
-            String time1 = o1.get("time");
-            String time2 = o2.get("time");
-            long t1 = DateFormat.parseSome(time1).getTime();
-            long t2 = DateFormat.parseSome(time2).getTime();
-
-            return (int) (t1 - t2);
-        });
+        sortByTime(datas);
         /*dates.sort((o1, o2) -> {
             long t1 = DateFormat.parseSome(o1).getTime();
             long t2 = DateFormat.parseSome(o2).getTime();
@@ -1990,14 +1977,7 @@ public class MonitorService {
                 e.printStackTrace();
             }
         }
-        datas.sort((o1, o2) -> {
-            String time1 = o1.get("time");
-            String time2 = o2.get("time");
-            long t1 = DateFormat.parseSome(time1).getTime();
-            long t2 = DateFormat.parseSome(time2).getTime();
-
-            return (int) (t1 - t2);
-        });
+        sortByTime(datas);
        /* dates.sort((o1, o2) -> {
             long t1 = DateFormat.parseSome(o1).getTime();
             long t2 = DateFormat.parseSome(o2).getTime();
@@ -2007,4 +1987,57 @@ public class MonitorService {
         return map;
     }
 
+    public Map<String, Object> monthCaptureRate(Integer siteId, Integer year, Integer month, Boolean isPercent) {
+        //返回子集1---有效无效分类分类
+        List<String> types = new ArrayList<>();
+        //返回子集3---数据
+        List<Map<String, String>> datas = new ArrayList<>();
+
+        List<Integer> statistics = new ArrayList<>();
+        statistics.add(6);//平均捕捉率
+        //获取月份最后一天
+        StringBuilder endSb = getStringBuilder(year, month);
+        String endYearMonth = endSb.substring(0, 8); //2020-08-
+        int endDay = Integer.parseInt(endSb.substring(8, 10));  //01
+        for (int i = 1; i <= endDay; i++) {
+            String day = (i < 10 ? ("0" + i) : i + "");
+
+            day = endYearMonth + day;
+            List<Map<String, String>> dayList = realDay(siteId, day, statistics, false);
+            if (dayList.size() > 0) {
+
+                Map<String, String> tempMap = new LinkedHashMap<>();
+                Map<String, String> map = dayList.get(dayList.size() - 1);
+                map.remove("moniterTime");
+                String next = map.values().iterator().next();
+
+                tempMap.put("N", next);
+                tempMap.put("UN", scale(100d - Double.parseDouble(next), 2));
+                tempMap.put("time", day);
+
+                datas.add(tempMap);
+            }
+
+        }
+        types.add("捕捉率");
+        types.add("其它");
+        Map<String, Object> map = new LinkedHashMap<>();//返回对象
+        //将三个子集添加进去返回对象中
+        map.put("types", types);
+        map.put("datas", datas);
+
+        return map;
+    }
+
+    //月饼图专用排序方法，按照日期升序
+    private static void sortByTime(List<Map<String, String>> datas) {
+        datas.sort((o1, o2) -> {
+            String time1 = o1.get("time");
+            String time2 = o2.get("time");
+            long t1 = DateFormat.parseSome(time1).getTime();
+            long t2 = DateFormat.parseSome(time2).getTime();
+
+            return (int) (t1 - t2);
+        });
+    }
 }
