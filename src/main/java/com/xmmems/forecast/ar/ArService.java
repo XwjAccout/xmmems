@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -26,10 +27,9 @@ public class ArService {
     private BaseSiteitemMapper baseSiteitemMapper;
 
     //定時預測數據
-    @Scheduled(cron = "0 40 * * * ?")
+    @Scheduled(cron = "0 35 * * * ?")
     //@Scheduled(fixedRate = 10000000)
     public void te() {
-        //ARIMA(22, 13);
         List<Map<String, Integer>> list = baseSiteitemMapper.getValidSiteIdItemId();
 
         list.forEach(map -> {
@@ -43,35 +43,28 @@ public class ArService {
 
     private void ar(Integer siteId, Integer itemId, Integer number) {
 
+        //获取5条
         List<Map<String, String>> mapList = simpleHourDataMapper.select50(siteId, itemId);
 
         List<Double> list = new ArrayList<>();
 
         for (Map<String, String> map : mapList) {
-            String troubleCode = map.get("troubleCode");
-            if ("N".equals(troubleCode.trim())) {
-                list.add(Double.parseDouble(map.get("value")));
-            }
+            //String troubleCode = map.get("troubleCode");
+            //if ("N".equals(troubleCode.trim())) {
+            list.add(Double.parseDouble(map.get("value")));
+            //}
         }
 
         Collections.reverse(list);
 
         if (list.size() > 0) {
 
-            String preValue1 = ArUtil.getArithmeticMean(list);
-            String preValue2 = ArUtil.getWeightedArithmeticMean(list);
-            String preValue3;
-            if (itemId <= 9) {
-                preValue3 = ArUtil.getExponentialSmoothingOne(list, 0.3);
-            } else {
-                preValue3 = ArUtil.getExponentialSmoothingOne(list, 0.7);
-            }
+            String preValue = getWeightedArithmeticMean(list);
 
             //这里把预测值存进数据库
             SimpleHourData record = new SimpleHourData();
             Map<String, String> map = mapList.get(0);
             String timeStr = map.get("timeStr");
-            //List<Map<String, String>> siteItems = baseSiteitemMapper.selectBySiteId(siteId);
             int subHour = 1;
             switch (number) {
                 case 24:
@@ -93,9 +86,7 @@ public class ArService {
             record.setTimeStr(DateFormat.formatAll(date));
             record.setSiteId(siteId);
             record.setItemId(itemId);
-            record.setPreValue1(preValue1);
-            record.setPreValue2(preValue2);
-            record.setPreValue3(preValue3);
+            record.setPreValue(preValue);
             record.setNumber(number);
             try {
                 simpleHourDataMapper.insertSelective(record);
@@ -104,9 +95,54 @@ public class ArService {
                     simpleHourDataMapper.updateByPrimaryKeySelective(record);
                 }
             }
-            System.out.println();
         }
-
     }
 
+    /**
+     * 算术平均数
+     *
+     * @param list 存储数据的List<Double> 集合
+     * @return 算术平均数
+     */
+    public static String getArithmeticMean(List<Double> list) {
+        if (list != null && list.size() > 0) {
+            double sum = 0;
+            for (Double d : list) {
+                sum += d;
+            }
+            sum = sum / list.size();
+            return scale(sum);
+        } else {
+            throw new RuntimeException("参数 list 为 NULL 或者没有数据");
+        }
+    }
+
+    /**
+     * 加权算数平均数
+     *
+     * @param list 存储数据的List<Double> 集合
+     * @return 加权算数平均数
+     */
+    public static String getWeightedArithmeticMean(List<Double> list) {
+        if (list != null && list.size() > 0) {
+            int size = list.size();
+            int all = 0;
+            for (int i = 1; i <= size; i++) {
+                all += i;
+            }
+            double sum = 0;
+            for (int i = 1; i <= size; i++) {
+                Double d = list.get(i - 1);
+                sum += d * i;
+            }
+            sum = sum / all;
+            return scale(sum);
+        } else {
+            throw new RuntimeException("参数 list 为 NULL 或者没有数据");
+        }
+    }
+
+    private static String scale(double d) {
+        return new BigDecimal(d).setScale(6, BigDecimal.ROUND_HALF_EVEN).stripTrailingZeros().toPlainString();
+    }
 }

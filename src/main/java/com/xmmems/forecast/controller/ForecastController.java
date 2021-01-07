@@ -26,7 +26,7 @@ public class ForecastController {
     @GetMapping("/arima")
     public ResponseEntity<List<Map<String, String>>> preValue(@RequestParam("siteId") Integer siteId,@RequestParam("itemId") Integer itemId,
                                                            @RequestParam("start") String start,@RequestParam("end") String end,
-                                                           @RequestParam(value = "type",defaultValue = "10") Integer type){
+                                                           @RequestParam(value = "type",defaultValue = "1") Integer type){
         List<Map<String, String>> list = forecastService.preValue(siteId,itemId,start,end,type);
         return ResponseEntity.ok(list);
     }

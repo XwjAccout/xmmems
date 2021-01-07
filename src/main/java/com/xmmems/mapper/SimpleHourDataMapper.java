@@ -20,12 +20,6 @@ public interface SimpleHourDataMapper extends Mapper<SimpleHourData> {
 
     Integer selectValuesCount(@Param("siteId") Integer siteId, @Param("itemId") Integer itemId, @Param("start") String start, @Param("end") String end);
 
-    List<Map<String, String>> selectPreValue1(@Param("siteId") Integer siteId, @Param("itemId") Integer itemId, @Param("start") String start, @Param("end") String end);
-
-    List<Map<String, String>> selectPreValue2(@Param("siteId") Integer siteId, @Param("itemId") Integer itemId, @Param("start") String start, @Param("end") String end);
-
-    List<Map<String, String>> selectPreValue3(@Param("siteId") Integer siteId, @Param("itemId") Integer itemId, @Param("start") String start, @Param("end") String end);
-
     List<Map<String, String>> selectValue(@Param("siteId") Integer siteId, @Param("itemId") Integer itemId, @Param("start") String start, @Param("end") String end);
 
     List<Map<String, String>> selectByItemName(@Param("siteIds") List<Integer> siteIds, @Param("itemName") String itemName);

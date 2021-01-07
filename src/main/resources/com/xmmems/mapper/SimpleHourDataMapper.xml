@@ -11,7 +11,7 @@
 			AND `itemId` = #{itemId}
 			AND `value` is not null
 		ORDER BY `time` DESC
-		LIMIT 8
+		LIMIT 5
     </select>
 
     <select id="selectPreValue" resultType="java.util.Map">
@@ -72,32 +72,7 @@
 		ORDER BY `time` ASC
 	</select>
 
-    <select id="selectPreValue1" resultType="java.util.Map">
-		SELECT timeStr,`value`,preValue1 as preValue
-		FROM simhourdata
-		WHERE siteId = #{siteId}
-			AND itemId = #{itemId}
-			AND `time` >= #{start}
-			AND `time` &lt;= #{end}
-	</select>
 
-    <select id="selectPreValue2" resultType="java.util.Map">
-		SELECT timeStr,`value`,preValue2  as preValue
-		FROM simhourdata
-		WHERE siteId = #{siteId}
-			AND itemId = #{itemId}
-			AND `time` >= #{start}
-			AND `time` &lt;= #{end}
-	</select>
-
-    <select id="selectPreValue3" resultType="java.util.Map">
-		SELECT timeStr,`value`,preValue3 as preValue
-		FROM simhourdata
-		WHERE siteId = #{siteId}
-			AND itemId = #{itemId}
-			AND `time` >= #{start}
-			AND `time` &lt;= #{end}
-	</select>
 
     <select id="selectValue" resultType="java.util.Map">
 		SELECT timeStr,`value`

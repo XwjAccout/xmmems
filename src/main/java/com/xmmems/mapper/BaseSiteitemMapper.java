@@ -75,4 +75,6 @@ public interface BaseSiteitemMapper {
 
     //
     List<Map<String, String>> selectByAccountId(Integer loginId);
+
+    Integer selectNumber(@Param("siteId") Integer siteId,@Param("itemId") Integer itemId);
 }
