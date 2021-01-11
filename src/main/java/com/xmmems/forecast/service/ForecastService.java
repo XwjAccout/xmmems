@@ -51,7 +51,7 @@ public class ForecastService {
         return mapList;
     }
 
-    private void addNewPreValue(List<Map<String, String>> mapList, int subHour, boolean size) {
+    private static void addNewPreValue(List<Map<String, String>> mapList, int subHour, boolean size) {
         List<Double> list = new ArrayList<>();
 
         for (Map<String, String> map : mapList) {

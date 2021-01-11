@@ -26,11 +26,11 @@ public interface EnvRealtimeDataMapper {
     int updateByPrimaryKeyWithBLOBs(EnvRealtimeData record);
 
     int updateByPrimaryKey(EnvRealtimeData record);
+
     @Select("select count(1) from env_realtime_data where siteId = #{siteId}")
     Integer getSiteId(@Param("siteId") Integer siteId);
 
-    //@Select("select * from env_realtime_data rd,account_site mas where mas.accountId = #{accountId} and rd.siteId = mas.siteId")
-    @Select("SELECT r.siteId,b.siteName,b.levelStandard,moniterTime,content FROM account_site a,base_site b,env_realtime_data r WHERE a.accountId = #{accountId} AND a.siteId=b.id AND r.siteId = a.siteId ")
+    @Select("SELECT r.siteId,b.siteName,b.levelStandard,moniterTime,content FROM account_site a,base_site b,env_realtime_data r WHERE a.accountId = #{accountId} AND a.siteId=b.id AND r.siteId = a.siteId AND b.isvalid = 1")
     List<Map<String, Object>> getRealTimeData(@Param("accountId") Integer accountId);
 
     @Select("select * from env_realtime_data ")

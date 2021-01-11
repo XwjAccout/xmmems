@@ -1,6 +1,7 @@
 package com.xmmems.forecast.ar;
 
 import com.xmmems.common.utils.DateFormat;
+import com.xmmems.common.utils.PoolExecutor;
 import com.xmmems.domain.SimpleHourData;
 import com.xmmems.mapper.BaseSiteitemMapper;
 import com.xmmems.mapper.SimpleHourDataMapper;
@@ -26,19 +27,22 @@ public class ArService {
     @Autowired
     private BaseSiteitemMapper baseSiteitemMapper;
 
-    //定時預測數據
-    @Scheduled(cron = "0 35 * * * ?")
-    //@Scheduled(fixedRate = 10000000)
+    //定时预测
+    @Scheduled(cron = "0 15 * * * ?")
     public void te() {
         List<Map<String, Integer>> list = baseSiteitemMapper.getValidSiteIdItemId();
-
         list.forEach(map -> {
             Integer siteId = map.get("siteId");
             Integer itemId = map.get("itemId");
-            Integer number = map.get("number");
-            ar(siteId, itemId, number);
-        });
 
+            Integer number = map.get("number");
+            PoolExecutor.submit(new Runnable() {
+                @Override
+                public void run() {
+                    ar(siteId, itemId, number);
+                }
+            });
+        });
     }
 
     private void ar(Integer siteId, Integer itemId, Integer number) {
@@ -60,7 +64,6 @@ public class ArService {
         if (list.size() > 0) {
 
             String preValue = getWeightedArithmeticMean(list);
-
             //这里把预测值存进数据库
             SimpleHourData record = new SimpleHourData();
             Map<String, String> map = mapList.get(0);

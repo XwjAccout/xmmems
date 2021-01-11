@@ -20,14 +20,6 @@ public class FluxService {
     @Autowired
     private SimpleHourDataMapper simpleHourDataMapper;
 
-    //@Autowired
-    //private BaseItemMapper baseItemMapper;
-
-    //@Scheduled(fixedRate = 1000000000)
-    //public void tt() {
-    //    fluxKdiagram(23, 6, "2018-09-23", "2020-09-25", 1003);
-    //}
-
     /**
      * 通量分析
      *
@@ -66,10 +58,6 @@ public class FluxService {
         if (list.size() <= 0) {
             return null;
         }
-        //Integer scale  = baseItemMapper.selectScale(itemId);
-        //if(scale==null) scale = 5;
-
-        //id=34 ,累计流量
 
         //按天分组
         Map<String, List<Double>> mapGroupByDay = new LinkedHashMap<>();
@@ -144,7 +132,7 @@ public class FluxService {
         }
     }
 
-    private String getHandlerTimeStr(Integer type, Map<String, String> map) {
+    private static String getHandlerTimeStr(Integer type, Map<String, String> map) {
         String timeStr = "";
         switch (type) {
             case 1002:
@@ -161,7 +149,7 @@ public class FluxService {
                 break;
             case 1006:
             case 2006:
-                timeStr = CurrentWeek(map.get("timeStr")); //获取时间，精确到周
+                timeStr = currentWeek(map.get("timeStr")); //获取时间，精确到周
                 break;
             case 1007: //获取时间，精确到季度
             case 2007:
@@ -195,7 +183,7 @@ public class FluxService {
     }
 
 
-    private String CurrentWeek(String dateStr) {
+    private static String currentWeek(String dateStr) {
 
         Date date = DateFormat.parseSome(dateStr);
         Calendar calendar = Calendar.getInstance();

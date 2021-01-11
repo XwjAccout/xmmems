@@ -44,7 +44,6 @@ public class MonitorChartController {
                                                              @RequestParam("startTime") String startTime,
                                                              @RequestParam("endTime") String endTime) {
         List<Map<String, String>> list = monitorService.day(siteId, startTime, endTime, null, false);
-        //List<Map<String, String>> list = monitorService.dayData(siteId, startTime, endTime);
         if ("平均值".equals(list.get(list.size() - 1).get("moniterTime"))) {
             list.remove(list.size() - 1);
         }
@@ -60,7 +59,6 @@ public class MonitorChartController {
                                                                @RequestParam("startTime") String startTime,
                                                                @RequestParam("endTime") String endTime) {
         List<Map<String, String>> list = monitorService.month(siteId, startTime, endTime, null, false);
-        //List<Map<String, String>> list = monitorService.monthData(siteId, startTime, endTime);
         if ("平均值".equals(list.get(list.size() - 1).get("moniterTime"))) {
             list.remove(list.size() - 1);
         }
@@ -75,7 +73,6 @@ public class MonitorChartController {
                                                               @RequestParam("startTime") String startTime,
                                                               @RequestParam("endTime") String endTime) {
         List<Map<String, String>> list = monitorService.year(siteId, startTime, endTime, null, false);
-        //List<Map<String, String>> list = monitorService.yearData(siteId, startTime, endTime);
         if ("平均值".equals(list.get(list.size() - 1).get("moniterTime"))) {
             list.remove(list.size() - 1);
         }
