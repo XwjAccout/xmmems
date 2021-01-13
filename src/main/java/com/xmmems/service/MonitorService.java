@@ -562,12 +562,7 @@ public class MonitorService {
                     Map<Integer, List<Integer>> siteIdanditemIds = new HashMap<>();
                     for (Map<String, Integer> siteItem : siteItems) {
                         Integer siteId = siteItem.get("siteId");
-                        List<Integer> itemIds = siteIdanditemIds.get(siteId);
-                        if (itemIds == null) {
-                            itemIds = new ArrayList<>();
-                            siteIdanditemIds.put(siteId, itemIds);
-                        }
-                        itemIds.add(siteItem.get("itemId"));
+                        siteIdanditemIds.computeIfAbsent(siteId, k -> new ArrayList<>()).add(siteItem.get("itemId"));
                     }
                     return siteIdanditemIds;
                 }
@@ -1919,7 +1914,6 @@ public class MonitorService {
 
                 datas.add(tempMap);
             }
-
         }
         types.add("捕捉率");
         types.add("其它");

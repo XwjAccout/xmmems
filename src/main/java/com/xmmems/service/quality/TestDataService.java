@@ -63,14 +63,14 @@ public class TestDataService {
                     last = zeroSpanMap1.get(temp.getItemName()).get(count + 1).getCheck();
                 }
                 specific.setLastResult(last);
-                double absoluteStr = 0;
                 double relativeStr = 0;
-                if (!temp.getCheck().equals("0.0")) {
-                    //计算绝对误差  绝对误差=测试结果-标液浓度(取绝对值）
-                    absoluteStr = Double.parseDouble(temp.getCheck()) - Double.parseDouble(temp.getConcentration());
-                    //计算相对误差  相对误差=（测试结果-前一次测量结果）*100/跨度值
-                    relativeStr = (Double.parseDouble(temp.getCheck()) - Double.parseDouble(specific.getLastResult())) * 100 / Double.parseDouble(temp.getSpanvalues());
-                }
+                double absoluteStr = 0;
+                //if (!temp.getCheck().equals("0.0")) {
+                //计算绝对误差  绝对误差=测试结果-标液浓度(取绝对值）
+                absoluteStr = Double.parseDouble(temp.getCheck()) - Double.parseDouble(temp.getConcentration());
+                //计算相对误差  相对误差=（测试结果-前一次测量结果）*100/跨度值
+                relativeStr = (Double.parseDouble(temp.getCheck()) - Double.parseDouble(specific.getLastResult())) * 100 / Double.parseDouble(temp.getSpanvalues());
+                //}
                 String relative = null;
                 String absolute = null;
                 switch (temp.getItemName()) {
@@ -194,9 +194,10 @@ public class TestDataService {
                 specific.setLastResult(last);
                 double absoluteStr = 0.0;
                 double relativeStr = 0.0;
-                if (!temp.getCheck().equals("0.0")) {
+                double v = Double.parseDouble(temp.getConcentration()); //标液浓度
+                if (v != 0) {
                     //计算相对误差  （测试结果-标液浓度）/标液浓度
-                    absoluteStr = (Double.parseDouble(temp.getCheck()) - Double.parseDouble(temp.getConcentration())) * 100 / Double.parseDouble(temp.getConcentration());
+                    absoluteStr = (Double.parseDouble(temp.getCheck()) - v) * 100 / v;
                     //计算相对误差  相对误差=（测试结果-前一次测量结果）/跨度值
                     relativeStr = (Double.parseDouble(temp.getCheck()) - Double.parseDouble(specific.getLastResult())) * 100 / Double.parseDouble(temp.getSpanvalues());
                 }
@@ -383,11 +384,11 @@ public class TestDataService {
                 BigDecimal percentDecimal = new BigDecimal(percent.replace("-", ""));//取得绝对值
 
                 if (percentDecimal.compareTo(new BigDecimal(compare)) > 0) {
-                    temp.put("nowResult", scale(itemName,nowResultDecimal) + "$$");
+                    temp.put("nowResult", scale(itemName, nowResultDecimal) + "$$");
                     temp.put("percent", percent + "$$");
                     temp.put("qualified", "不合格$$");
                 } else {
-                    temp.put("nowResult", scale(itemName,nowResultDecimal));
+                    temp.put("nowResult", scale(itemName, nowResultDecimal));
                     temp.put("percent", percent);
                     temp.put("qualified", "合格");
                 }
@@ -494,25 +495,25 @@ public class TestDataService {
             } else if ("总氮".equals(itemName) && Math.abs(absolute) <= 0.3) {
                 qualified = "合格";
                 title = "合格范围：≤±0.3";
-            }else if ("挥发酚".equals(itemName) && Math.abs(absolute) <= 0.006 ) {
+            } else if ("挥发酚".equals(itemName) && Math.abs(absolute) <= 0.006) {
                 qualified = "合格";
                 title = "合格范围：≤±0.006";
             } else if ("氰化物".equals(itemName) && Math.abs(absolute) <= 0.015) {
                 qualified = "合格";
                 title = "合格范围：≤±0.015";
-            }  else {
+            } else {
                 qualified = "不合格";
-                if("高锰酸盐指数".equals(itemName)){
+                if ("高锰酸盐指数".equals(itemName)) {
                     title = "合格范围：≤±1";
-                }else if("总磷".equals(itemName)){
+                } else if ("总磷".equals(itemName)) {
                     title = "合格范围：≤±0.02";
-                }else if("氨氮".equals(itemName)){
+                } else if ("氨氮".equals(itemName)) {
                     title = "合格范围：≤±0.2";
-                }else if("总氮".equals(itemName)){
+                } else if ("总氮".equals(itemName)) {
                     title = "合格范围：≤±0.3";
-                }else if("挥发酚".equals(itemName)){
+                } else if ("挥发酚".equals(itemName)) {
                     title = "合格范围：≤±0.001";
-                }else if("氰化物".equals(itemName)){
+                } else if ("氰化物".equals(itemName)) {
                     title = "合格范围：≤±0.002";
                 }
             }
@@ -559,17 +560,17 @@ public class TestDataService {
                 title = "合格范围：≤±5%";
             } else {
                 qualified = "不合格";
-                if("高锰酸盐指数".equals(itemName)){
+                if ("高锰酸盐指数".equals(itemName)) {
                     title = "合格范围：≤±10%";
-                }else if("总磷".equals(itemName)){
+                } else if ("总磷".equals(itemName)) {
                     title = "合格范围：≤±5%";
-                }else if("氨氮".equals(itemName)){
+                } else if ("氨氮".equals(itemName)) {
                     title = "合格范围：≤±5%";
-                }else if("总氮".equals(itemName)){
+                } else if ("总氮".equals(itemName)) {
                     title = "合格范围：≤±5%";
-                }else if("挥发酚".equals(itemName)){
+                } else if ("挥发酚".equals(itemName)) {
                     title = "合格范围：≤±5%";
-                }else if("氰化物".equals(itemName)){
+                } else if ("氰化物".equals(itemName)) {
                     title = "合格范围：≤±5%";
                 }
             }
@@ -583,7 +584,7 @@ public class TestDataService {
 
         String qualified = null;
         String title = null;
-        if (Math.abs(absolute) <= 10 ) {
+        if (Math.abs(absolute) <= 10) {
             qualified = "合格";
             title = "合格范围：≤±10%";
         } else {
@@ -627,7 +628,7 @@ public class TestDataService {
                 BigDecimal solutionDecimal = new BigDecimal(solution);
                 String itemName = contentItem.get("itemName");
                 //零点核查绝对误差 ：测试结果-标液浓度（取绝对值）
-                String percent = scale(itemName,nowResultDecimal.subtract(solutionDecimal));
+                String percent = scale(itemName, nowResultDecimal.subtract(solutionDecimal));
 
                 Map<String, String> temp = new HashMap<>();
                 temp.put("genTime", contentItem.get("genTime"));
@@ -641,11 +642,11 @@ public class TestDataService {
                 BigDecimal percentDecimal = new BigDecimal(percent.replace("-", ""));//取得绝对值
 
                 if (percentDecimal.compareTo(new BigDecimal(compare)) > 0) {
-                    temp.put("nowResult", scale(itemName,nowResultDecimal) + "$$");
+                    temp.put("nowResult", scale(itemName, nowResultDecimal) + "$$");
                     temp.put("percent", percent + "$$");
                     temp.put("qualified", "不合格$$");
                 } else {
-                    temp.put("nowResult", scale(itemName,nowResultDecimal));
+                    temp.put("nowResult", scale(itemName, nowResultDecimal));
                     temp.put("percent", percent);
                     temp.put("qualified", "合格");
                 }
@@ -728,7 +729,16 @@ public class TestDataService {
     }
 
     public List<Map<String, Object>> site() {
-        return zeroCheckMapper.site();
+        List<Map<String, Object>> site = zeroCheckMapper.site();
+        site.forEach(t -> {
+            Map<String, String> map = new HashMap<>();
+            for (String item : (t.get("item") + "").split(",")) {
+                String[] split = item.split("=");
+                map.put(split[0], split[1]);
+            }
+            t.put("item", map);
+        });
+        return site;
     }
 
     private static String scale(String itemName, BigDecimal bd) {
