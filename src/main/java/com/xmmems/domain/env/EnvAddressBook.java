@@ -10,6 +10,9 @@ public class EnvAddressBook {
     private String post;
 
     private String email;
+    private Integer siteId;
+    private String siteName;
+
 
     public Integer getId() {
         return id;
@@ -49,5 +52,21 @@ public class EnvAddressBook {
 
     public void setEmail(String email) {
         this.email = email == null ? null : email.trim();
+    }
+
+    public Integer getSiteId() {
+        return siteId;
+    }
+
+    public void setSiteId(Integer siteId) {
+        this.siteId = siteId;
+    }
+
+    public String getSiteName() {
+        return siteName;
+    }
+
+    public void setSiteName(String siteName) {
+        this.siteName = siteName;
     }
 }
