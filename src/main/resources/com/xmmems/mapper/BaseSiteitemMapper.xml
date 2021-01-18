@@ -272,4 +272,7 @@
     <select id="selectByAccountId" resultType="java.util.Map">
         SELECT DISTINCT bs.itemId,bs.itemName FROM base_siteitem bs ,account_site asi WHERE bs.siteId=asi.siteId AND asi.accountId=#{loginId}
     </select>
+    <select id="selectNumber" resultType="java.lang.Integer">
+        SELECT si.number FROM base_siteitem si ,base_item i,base_site s WHERE si.siteId = s.id AND si.itemId = i.id AND si.siteId = #{siteId} AND si.itemId = #{itemId}
+    </select>
 </mapper>

@@ -11,7 +11,6 @@ import com.xmmems.domain.NetWork;
 import com.xmmems.domain.base.BaseSite;
 import com.xmmems.domain.base.BaseSiteExample;
 import com.xmmems.domain.env.EnvQualityConf;
-import com.xmmems.domain.env.EnvRealtimeData;
 import com.xmmems.dto.BaseSiteDTO;
 import com.xmmems.dto.BaseSiteitemDTO;
 import com.xmmems.dto.PageResult;
@@ -57,6 +56,9 @@ public class MonitorService {
     private SimpleHourDataMapper simpleHourDataMapper;
     @Autowired
     private NetWorkService netWorkService;
+
+    private static final TypeReference<List<Map<String, String>>> type = new TypeReference<List<Map<String, String>>>() {
+    };
 
     public List<BaseSiteitemDTO> getColumns(Integer siteId) {
         return commonService.getBaseSiteItemBySiteId(siteId);
@@ -168,7 +170,7 @@ public class MonitorService {
         }
     }
 
-    private Map<String, List<Map<String, Object>>> handleOneHourDataIntoOneDayDataList(List<Map<String, Object>> listMap) {
+    private static Map<String, List<Map<String, Object>>> handleOneHourDataIntoOneDayDataList(List<Map<String, Object>> listMap) {
         //LinkedHashMap 为了 按照日期排序
         Map<String, List<Map<String, Object>>> moniterTimeList = new LinkedHashMap<>();
 
@@ -187,12 +189,12 @@ public class MonitorService {
         try {
             bef.setTime(sdf.parse(str1));
             aft.setTime(sdf.parse(str2));
-        } catch (ParseException e) {
-
+            int result = aft.get(Calendar.MONTH) - bef.get(Calendar.MONTH);
+            int month = (aft.get(Calendar.YEAR) - bef.get(Calendar.YEAR)) * 12;
+            return Math.abs(month + result) + 1;
+        } catch (ParseException ignore) {
+            throw new XMException(500, "时间解析出错");
         }
-        int result = aft.get(Calendar.MONTH) - bef.get(Calendar.MONTH);
-        int month = (aft.get(Calendar.YEAR) - bef.get(Calendar.YEAR)) * 12;
-        return Math.abs(month + result) + 1;
     }
 
     public List<Map<String, String>> year(Integer siteId, String startTime, String endTime, List<Integer> statistics, Boolean limit) {
@@ -270,14 +272,6 @@ public class MonitorService {
         return moniterTimeList;
     }
 
-    private static String levelCode2LevelName(int code) {
-        return WaterLevelTransformUtil.levelIntToLevelString(code);
-    }
-
-    private static int levelName2LevelCode(String levelName) {
-        return WaterLevelTransformUtil.levelStringToLevelInt(levelName);
-    }
-
     //计算俩个日期的天数差
     public static int getDaysBetween(Date beginDate, Date endDate) {
         //Calendar日历类
@@ -320,8 +314,7 @@ public class MonitorService {
                 List<BaseSiteitemDTO> columns = getColumns(Integer.valueOf(siteId));
                 List<String> collect = columns.stream().map(BaseSiteitemDTO::getItemName).collect(Collectors.toList());
 
-                List<Map<String, String>> monitorItemList = JsonUtils.nativeRead(site.get("content").toString(), new TypeReference<List<Map<String, String>>>() {
-                });
+                List<Map<String, String>> monitorItemList = JsonUtils.nativeRead(site.get("content").toString(), type);
                 site.remove("content");
                 site.put("moniterTime", site.get("moniterTime").toString().replace(".0", ""));
                 //分项类别水质
@@ -345,7 +338,7 @@ public class MonitorService {
                 //总类别水质
                 String level = itemWaterQualityCategory(Integer.parseInt(site.get("siteId") + ""), subCategoryMap);
                 site.put("level", level);
-                site.put("levelStandard", levelCode2LevelName(Integer.parseInt(site.get("levelStandard") + "")));
+                site.put("levelStandard", WaterLevelTransformUtil.levelIntToLevelString(Integer.parseInt(site.get("levelStandard") + "")));
             }
         }
         return list;
@@ -378,13 +371,6 @@ public class MonitorService {
     }
 
     /**
-     * 实时监测数据
-     */
-    public List<EnvRealtimeData> getRealTimeDataNoaccountId(String order) {
-        return envRealtimeDataMapper.getRealTimeDataNoaccountId(order);
-    }
-
-    /**
      * 查询历史数据
      */
     public PageResult<Map<String, Object>> getHistoryData(Integer limit, Integer page, Integer siteId, String startTime, String endTime, String order, Boolean original) {
@@ -400,8 +386,7 @@ public class MonitorService {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         for (Map<String, Object> record : records) {
-            List<Map<String, String>> monitorItemList = JsonUtils.nativeRead(record.get("content").toString(), new TypeReference<List<Map<String, String>>>() {
-            });
+            List<Map<String, String>> monitorItemList = JsonUtils.nativeRead(record.get("content").toString(), type);
             //record.remove("content"); //不可去除，数据审批需要用
             for (Map<String, String> monitorItem : monitorItemList) {
 
@@ -420,26 +405,6 @@ public class MonitorService {
         //因为中间经过处理，所以分页插件总数需要重新设置
         long total = mapPageInfo.getTotal();
         return new PageResult<>(pageSize, page, total, pages, records);
-    }
-
-    /**
-     * 日曲线
-     */
-    public List<Map<String, String>> dayData(Integer siteId, String startTime, String endTime) {
-        List<Map<String, String>> returnData = new ArrayList<>();
-        Res res = getHourDataAndDayNum(siteId, startTime, endTime);
-        handlerDayDataCurve(returnData, res.listMap, null);
-        return returnData;
-    }
-
-    /**
-     * 月曲线
-     */
-    public List<Map<String, String>> monthData(Integer siteId, String startTime, String endTime) {
-        List<Map<String, String>> returnMonthData = new ArrayList<>();
-        List<Map<String, Object>> listMap = getHourDataAndDayNum(siteId, startTime, endTime).listMap;
-        handlerMonthDataCurve(returnMonthData, listMap, false);
-        return returnMonthData;
     }
 
     private void handlerMonthDataCurve(List<Map<String, String>> returnMonthData, List<Map<String, Object>> listMap, Boolean isYear) {
@@ -523,8 +488,7 @@ public class MonitorService {
 
     private void handleOneHourDataIntoReturnDataCurve(List<Map<String, String>> returnData, Map<String, Object> map,
                                                       List<Map<String, String>> monthData) {
-        List<Map<String, String>> contentLists = JsonUtils.nativeRead(map.get("content").toString(), new TypeReference<List<Map<String, String>>>() {
-        });
+        List<Map<String, String>> contentLists = JsonUtils.nativeRead(map.get("content").toString(), type);
         Map<String, String> tempMap = new HashMap<>();
         String moniterTime = map.get("moniterTime").toString();
         tempMap.put("moniterTime", moniterTime);
@@ -543,33 +507,6 @@ public class MonitorService {
             monthData.add(tempMap);
         }
         // if (yearData != null) yearData.add(tempMap);
-    }
-
-    public List<Map<String, String>> yearData(Integer siteId, String startTime, String endTime) {
-        List<Map<String, String>> returnYearData = new ArrayList<>();
-
-        List<Map<String, Object>> listMap = getHourDataAndDayNum(siteId, startTime, endTime).listMap;
-        if (listMap.size() > 0) {
-            //按照月份分組
-            Map<String, List<Map<String, Object>>> moniterTimeList = handleOneHourDataIntoOneMonthDataList(listMap);
-            //按照一月的平均值计算当天的值
-            for (Map.Entry<String, List<Map<String, Object>>> entry0 : moniterTimeList.entrySet()) {
-                //同一个月的数据
-                String monthStr = entry0.getKey();
-                List<Map<String, Object>> monthList = entry0.getValue();
-
-                List<Map<String, String>> returnData = new ArrayList<>();
-                handlerMonthDataCurve(returnData, monthList, true);
-                //获取月份平均值，存进年报表的
-                Map<String, String> avgmap = returnData.get(returnData.size() - 1);
-                if (!"平均值".equals(avgmap.get("moniterTime"))) {
-                    throw new XMException(500, "年曲线时每月的数据不是平均值");
-                }
-                avgmap.put("moniterTime", monthStr);
-                returnYearData.add(avgmap);
-            }
-        }
-        return returnYearData;
     }
 
     public Map<String, Object> getRealTimeDataBySiteId(String siteId) {
@@ -625,12 +562,7 @@ public class MonitorService {
                     Map<Integer, List<Integer>> siteIdanditemIds = new HashMap<>();
                     for (Map<String, Integer> siteItem : siteItems) {
                         Integer siteId = siteItem.get("siteId");
-                        List<Integer> itemIds = siteIdanditemIds.get(siteId);
-                        if (itemIds == null) {
-                            itemIds = new ArrayList<>();
-                            siteIdanditemIds.put(siteId, itemIds);
-                        }
-                        itemIds.add(siteItem.get("itemId"));
+                        siteIdanditemIds.computeIfAbsent(siteId, k -> new ArrayList<>()).add(siteItem.get("itemId"));
                     }
                     return siteIdanditemIds;
                 }
@@ -719,31 +651,16 @@ public class MonitorService {
     }
 
     private Res getHourDataAndDayNum(Integer siteId, String startTime, String endTime) {
-        //startTime = startTime.split(" ")[0];
-        //endTime = endTime.split(" ")[0];
         //两个日期天数差
         Date beginDate = DateFormat.parseSome(startTime.split(" ")[0]);
         Date endDate = DateFormat.parseSome(endTime.split(" ")[0]);
         int dayNum = getDaysBetween(beginDate, endDate);
-        //log.info("*****start 两个日期相差天数" + dayNum + " end*****");
-
-        //endTime = DateFormat.format(DateFormat.yyyy_MM_dd, new Date(endDate.getTime() + 86400000));
-        //int dayNum = Integer.parseInt(map.get("dayNum"));
-        //查询siteId对应站点在时间段startTime, endTime 的历史数据集合，
-        // listMap key 值有 content,siteName,DATE_FORMAT(genTime,'%Y-%m-%d %H:00:00') moniterTime
 
         List<Map<String, Object>> listMap = envHourDataMapper.monitorReportDayGetData(siteId, startTime, endTime);
         if (listMap.size() <= 0) {
             throw new XMException(500, "没有数据");
         }
         return new Res(dayNum, listMap);
-    }
-
-    public List<Map<String, String>> weekData(Integer siteId, Integer year, Integer week) {
-        //获取year年第year周的开始日期与结束日期
-        String start = WeekToDateUtil.getStartDay(year, week);
-        String end = WeekToDateUtil.getEndDay(year, week);
-        return monthData(siteId, start, end);
     }
 
     //isDayAvg true 返回日均值 false 返回月均值
@@ -793,7 +710,7 @@ public class MonitorService {
             if (day.size() > 0) {
                 Map<String, String> temp = new LinkedHashMap<>();
                 temp.put("siteName", baseSite.getSiteName());
-                temp.put("standardLevel", levelCode2LevelName(Integer.parseInt(baseSite.getLevelStandard())));
+                temp.put("standardLevel", WaterLevelTransformUtil.levelIntToLevelString(Integer.parseInt(baseSite.getLevelStandard())));
                 for (int i = day.size() - 12; i < day.size(); i++) {
                     //平均值后面的数据，这里只获取平均数据，所以需要去除
                     Map<String, String> map = day.get(i);
@@ -988,6 +905,8 @@ public class MonitorService {
                 double v = onLine / 1440d;
                 String string = new BigDecimal(v * 100).setScale(2, BigDecimal.ROUND_HALF_EVEN).toPlainString();
                 m1.put("系统在线率", string);
+            } else {
+                m1.put("系统在线率", "0");
             }
         } else if (StringUtils.isNotBlank(yearMonth)) {
             String[] split = yearMonth.split("-");
@@ -1024,7 +943,7 @@ public class MonitorService {
         return res;
     }
 
-    private StringBuilder getStringBuilder(int year, int month) {
+    private static StringBuilder getStringBuilder(int year, int month) {
         StringBuilder endSb = new StringBuilder().append(year).append("-");
         if (month == 2) {
             //二月有閏年29 非閏年28，四年一闰，百年不闰，四百年再闰
@@ -1406,7 +1325,7 @@ public class MonitorService {
             if (level.length() > 3 && of != -1) {
                 level = level.substring(0, of);
             }
-            int i = levelName2LevelCode(level);
+            int i = WaterLevelTransformUtil.levelStringToLevelInt(level);
             max = max > i ? max : i;
         }
 
@@ -1421,7 +1340,7 @@ public class MonitorService {
                 if (level.length() > 3 && of != -1) {
                     level = level.substring(0, of);
                 }
-                int i = levelName2LevelCode(level);
+                int i = WaterLevelTransformUtil.levelStringToLevelInt(level);
 
                 if (i == max) {
                     if (!"".equals(main.toString())) {
@@ -1462,13 +1381,13 @@ public class MonitorService {
             if (of != -1) {
                 level = level.substring(0, of);
             }
-            int i = levelName2LevelCode(level);
+            int i = WaterLevelTransformUtil.levelStringToLevelInt(level);
             max = max > i ? max : i;
         }
 
 
         //从分项水质类别中取出最大的级别
-        String maxLevel = levelCode2LevelName(max);
+        String maxLevel = WaterLevelTransformUtil.levelIntToLevelString(max);
         Integer standard = 3;
         try {
             standard = submit.get();
@@ -1490,7 +1409,7 @@ public class MonitorService {
         if (envQualityConf != null) {
             Integer standard = getSlevel(siteId + "");
             String level = envQualityConf.getLevel();
-            if (levelName2LevelCode(level) > standard) {
+            if (WaterLevelTransformUtil.levelStringToLevelInt(level) > standard) {
                 return level + "$$";
             } else {
                 return level;
@@ -1500,24 +1419,6 @@ public class MonitorService {
     }
 
     public EnvQualityConf waterQualityCategory(@NonNull String itemName, @NonNull String avg) {
-
-       /* List<EnvQualityConf> envQualityConfs = new ArrayList<>();
-        //方法2 查询全部 一次性查询，在根据项目名进行处理
-        for (EnvQualityConf envQualityConf : commonService.getEnvQualityConfList()) {
-            String kpiName = envQualityConf.getKpiName();
-            if (itemName.equals(kpiName)) {
-                envQualityConfs.add(envQualityConf);
-            }
-        }
-
-
-        if (envQualityConfs.size() > 0 && avg != null && !"".equals(avg)) {
-            for (EnvQualityConf envQualityConf : envQualityConfs) {
-                if (Double.parseDouble(envQualityConf.getMinVal()) <= Double.parseDouble(avg) && Double.parseDouble(envQualityConf.getMaxVal()) >= Double.parseDouble(avg)) {
-                    return envQualityConf;
-                }
-            }
-        }*/
 
         //方法3 查到一个质量类别直接进行比较，比方法为减少循环次数
         if (avg != null && !"".equals(avg)) {
@@ -1530,8 +1431,6 @@ public class MonitorService {
                 }
             }
         }
-
-        //方法1 ：List<EnvQualityConf> envQualityConfs = envQualityConfMapper.selectByItemName(itemName); 根据检测项目名查询太多次，淘汰
         return null;
     }
 
@@ -1619,8 +1518,7 @@ public class MonitorService {
 
     public void handleOneHourDataIntoReturnData(List<Map<String, String>> returnData, Map<String, Object> map, Map<String, Integer> itemNameAndNumbersMap,
                                                 List<Map<String, String>> MonthData, List<Map<String, String>> yearData, Map<String, String> limit) {
-        List<Map<String, String>> contentLists = JsonUtils.nativeRead(map.get("content").toString(), new TypeReference<List<Map<String, String>>>() {
-        });
+        List<Map<String, String>> contentLists = JsonUtils.nativeRead(map.get("content").toString(), type);
         Map<String, String> tempMap = new HashMap<>();
         String moniterTime = map.get("moniterTime").toString();
         tempMap.put("moniterTime", moniterTime);
@@ -1665,8 +1563,7 @@ public class MonitorService {
         List<Map<String, Object>> list = res.listMap;
         if (list.size() > 0) {
             for (Map<String, Object> hourData : list) {
-                List<Map<String, String>> monitorItemList = JsonUtils.nativeRead(hourData.get("content").toString(), new TypeReference<List<Map<String, String>>>() {
-                });
+                List<Map<String, String>> monitorItemList = JsonUtils.nativeRead(hourData.get("content").toString(), type);
                 hourData.remove("content");
                 for (Map<String, String> monitorItem : monitorItemList) {
                     String value = rds.formatValue(monitorItem.get("itemName"), monitorItem.get("value"));
@@ -2017,7 +1914,6 @@ public class MonitorService {
 
                 datas.add(tempMap);
             }
-
         }
         types.add("捕捉率");
         types.add("其它");

@@ -110,7 +110,7 @@ public class ApproveController {
             @RequestParam("monitorTime") String monitorTime,
             @RequestParam("itemData") String itemData,
             @RequestParam("time") String[] time) {
-        boolean b = approveService.addDataSave(siteId, siteName, monitorTime, itemData, time);
+        approveService.addDataSave(siteId, siteName, monitorTime, itemData, time);
         return ResponseEntity.ok().build();
     }
 

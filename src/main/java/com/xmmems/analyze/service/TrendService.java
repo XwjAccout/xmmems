@@ -20,26 +20,6 @@ public class TrendService {
     @Autowired
     private SimpleHourDataMapper simpleHourDataMapper;
 
-    //指数回归
-    public List<double[]> mkdl(Integer siteId, Integer itemId, String start, String end, Integer space) {
-
-        Integer count = simpleHourDataMapper.selectValuesCount(siteId, itemId, start, end);
-        List<String> list = simpleHourDataMapper.selectValues(siteId, itemId, start, end, space, count);
-        List<double[]> temp = new ArrayList<>();
-        if (list.size() > 0) {
-            double[] doubles = list.stream().mapToDouble(dd -> new BigDecimal(dd).doubleValue()).toArray();
-
-            for (int i = 0; i < doubles.length; i++) {
-                double[] d = new double[2];
-                d[0] = i + 1;
-                d[1] = doubles[i];
-                temp.add(d);
-            }
-        }
-
-        return temp;
-    }
-
     public String mannKendall(Integer siteId, Integer itemId, String start, String end, Integer space) {
         Integer count = simpleHourDataMapper.selectValuesCount(siteId, itemId, start, end);
         List<String> list = simpleHourDataMapper.selectValues(siteId, itemId, start, end, space, count);

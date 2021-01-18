@@ -77,5 +77,4 @@ public class MonitorHistoryController {
         return ResponseEntity.ok(list);
     }
 
-
 }

@@ -41,27 +41,7 @@ public class SimpleHourData {
     @Column(name = "number")
     private Integer number;              //一天测几次
     @Column(name = "preValue")
-    private String preValue;              //arima预测值
-    @Column(name = "preValue1")
-    private String preValue1;              //算数平均预测值
-    @Column(name = "preValue2")
-    private String preValue2;              //加权平局预测值
-    @Column(name = "preValue3")
-    private String preValue3;              //一次指数平滑预测值
-    @Column(name = "preValue4")
-    private String preValue4;              //ar预测值
-    @Column(name = "preValue5")
-    private String preValue5;              //arima预测值
-    @Column(name = "preValue6")
-    private String preValue6;              //arima预测值
-    @Column(name = "preValue7")
-    private String preValue7;              //arima预测值
-    @Column(name = "preValue8")
-    private String preValue8;              //arima预测值
-    @Column(name = "preValue9")
-    private String preValue9;              //arima预测值
-    @Column(name = "preValue10")
-    private String preValue10;              //arima预测值
+    private String preValue;              //预测值
     @Column(name = "trend")
     private Integer trend;             //数据变化趋势
     @Column(name = "valueUnchanged")

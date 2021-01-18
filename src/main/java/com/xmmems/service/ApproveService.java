@@ -7,6 +7,7 @@ import com.google.gson.reflect.TypeToken;
 import com.xmmems.common.auth.domain.UserHolder;
 import com.xmmems.common.exception.ExceptionEnum;
 import com.xmmems.common.exception.XMException;
+import com.xmmems.common.utils.DateFormat;
 import com.xmmems.common.utils.JsonUtils;
 import com.xmmems.domain.base.BaseItem;
 import com.xmmems.domain.env.EnvHourData;
@@ -20,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -45,11 +45,10 @@ public class ApproveService {
 
     public PageResult<Map<String, Object>> getHistoryDataHandled(Integer limit, Integer page, Integer siteId, String startTime, String endTime) {
         //查询历史分页数据
-        PageResult<Map<String, Object>> pageResult = monitorService.getHistoryData(limit, page, siteId, startTime, endTime,"DESC",false);
+        PageResult<Map<String, Object>> pageResult = monitorService.getHistoryData(limit, page, siteId, startTime, endTime, "DESC", false);
 
         List<Map<String, Object>> siteList = pageResult.getRows();
 
-        //List<Record> siteList = Record.listMapToListRecord(maps);
         for (Map<String, Object> site : siteList) {
             //处理数据(比查询历史数据多了这个操作)
             handleApproveItem(site);
@@ -60,50 +59,42 @@ public class ApproveService {
     /**
      * 处理数据
      */
-    public Map<String, Object> handleApproveItem(Map<String, Object> record) {
+    public void handleApproveItem(Map<String, Object> record) {
 
         List<Map<String, String>> monitorItemList = JsonUtils.nativeRead(record.get("content").toString(), new TypeReference<List<Map<String, String>>>() {
         });
         for (Map<String, String> monitorItem : monitorItemList) {
-            /*if (ProConstant.existModifyItem(monitorItem.get("itemName"))) {
-                monitorItem.put("itemName", ProConstant.getModifyValueByKey(monitorItem.get("itemName")));
-            }*/
             String v = monitorItem.get("value");
             String value = rds.formatValue(monitorItem.get("itemName"), v);
-            if (!StringUtils.isBlank(monitorItem.get("troubleCode")) && !"N".equals(monitorItem.get("troubleCode"))&& !" N".equals(monitorItem.get("troubleCode"))) {
+            if (!StringUtils.isBlank(monitorItem.get("troubleCode")) && !"N".equals(monitorItem.get("troubleCode")) && !" N".equals(monitorItem.get("troubleCode"))) {
                 value = value + "$$" + monitorItem.get("troubleCode");
             }
-            record.put(monitorItem.get("itemName"), value+"^"+v);
+            record.put(monitorItem.get("itemName"), value + "^" + v);
         }
 
         record.remove("content");
-        return record;
     }
 
     //保存处理修正的数据1
     public void saveAdjust(String adjust, Integer siteId, Integer recordId, String adjustKey, String adjustValue, String originValue,
                            String troubleCode, String troubleName, String multipleAdjust, String startTime, String endTime, String multipleParam) {
 
-
         List<Map<String, Object>> hourDatas = new ArrayList<>();
         if ("true".equals(multipleAdjust)) {
-            //hourDatas = Record.listMapToListRecord(list);
-            hourDatas = envHourDataMapper.selectHistoryData(siteId, startTime, endTime,"desc");
+            hourDatas = envHourDataMapper.selectHistoryData(siteId, startTime, endTime, "desc");
         } else {
             //单个修正
             EnvHourData envHourData = envHourDataMapper.selectByPrimaryKey(recordId);
             Map<String, Object> map = JsonUtils.toMap(JsonUtils.toString(envHourData), String.class, Object.class);
             hourDatas.add(map);
-            //Record record = new Record(JsonUtils.toMap(JsonUtils.toString(envHourData), String.class, Object.class));
-            //hourDatas.add(record);
         }
 
         for (Map<String, Object> hourData : hourDatas) {
             Map item = null;
-            List<Map> monitorItems = JsonUtils.nativeRead(hourData.get("content") + "", new TypeReference<List<Map>>() {
+            List<Map<String,String>> monitorItems = JsonUtils.nativeRead(hourData.get("content") + "", new TypeReference<List<Map<String,String>>>() {
             });
 
-            for (Map map : monitorItems) {
+            for (Map<String,String> map : monitorItems) {
                 item = map;
                 if (StrUtil.equals("3", adjust)) {
                     if (adjustKey.equals(map.get("itemName"))) {
@@ -174,18 +165,18 @@ public class ApproveService {
     public void resetAdjust(Integer siteId, String siteName, String adjustKey, String startTime, String endTime) {
         String itemId = "";
 
-        List<Map<String, Object>> hourDatas = envHourDataMapper.selectHistoryData(siteId, startTime, endTime,"desc");
+        List<Map<String, Object>> hourDatas = envHourDataMapper.selectHistoryData(siteId, startTime, endTime, "desc");
         for (Map<String, Object> hourData : hourDatas) {
             String content = hourData.get("content") + "";
             if (StringUtils.isNotBlank(content)) {
-                List<Map> monitorItems = JsonUtils.nativeRead(content, new TypeReference<List<Map>>() {                });
-                for (Map map : monitorItems) {
+                List<Map<String,String>> monitorItems = JsonUtils.nativeRead(content, new TypeReference<List<Map<String,String>>>() {
+                });
+                for (Map<String,String> map : monitorItems) {
                     if (StringUtils.isBlank(adjustKey)) {
-                        // itemId = String.valueOf(map.get("itemId"));
                         map.put("troubleCode", "");
                         map.put("troubleName", "");
                         map.put("value", map.get("originValue"));
-                    }else {
+                    } else {
                         if (map.get("itemName").equals(adjustKey)) {
                             itemId = String.valueOf(map.get("itemId"));
                             map.put("troubleCode", "");
@@ -194,7 +185,6 @@ public class ApproveService {
                         }
                     }
                 }
-                //hourData.put("content", monitorItems); 不要这行代码也行
                 EnvHourData envHourData = EnvHourData.builder().id((Integer) hourData.get("id")).content(JsonUtils.toString(monitorItems)).build();
                 envHourDataMapper.updateByPrimaryKeySelective(envHourData);
             }
@@ -272,36 +262,24 @@ public class ApproveService {
         return ret;
     }
 
-    public boolean addDataSave(Integer siteId, String siteName, String monitorTime, String itemData, String[] times) {
-
-        String mtime = null;
-        boolean flag = true;
+    public void addDataSave(Integer siteId, String siteName, String monitorTime, String itemData, String[] times) {
 
         for (String m : times) {
-            mtime = monitorTime + " " + m + ":00:00";
+            String mtime = monitorTime + " " + m + ":00:00";
 
             EnvHourData envHourData = envHourDataMapper.selectBySiteIdAndGenTime(siteId, mtime);
             if (envHourData == null) {
                 envHourData = new EnvHourData();
                 envHourData.setSiteId(siteId);
                 envHourData.setSiteName(siteName);
-                try {
-                    envHourData.setGenTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(mtime));
-                } catch (ParseException e) {
-                    throw new XMException(500, "字符串转换成日期异常");
-                }
-
+                envHourData.setGenTime(DateFormat.parseAll(mtime));
                 envHourData.setContent(itemData);
-                int i = envHourDataMapper.insertSelective(envHourData);
-                flag = i == 1;
+                envHourDataMapper.insertSelective(envHourData);
             } else {
                 envHourData.setContent(itemData);
-                int i = envHourDataMapper.updateByPrimaryKeyWithBLOBs(envHourData);
-
-                flag = i == 1;
+                envHourDataMapper.updateByPrimaryKeyWithBLOBs(envHourData);
             }
         }
-        return flag;
     }
 
     public void deleteByIds(Integer[] ids) {

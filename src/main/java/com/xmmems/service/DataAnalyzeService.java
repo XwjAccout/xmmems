@@ -108,7 +108,6 @@ public class DataAnalyzeService {
             }
         }
 
-
         return list;
     }
 }

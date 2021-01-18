@@ -19,13 +19,6 @@ public class TrendController {
     @Autowired
     private TrendService trendService;
 
-    //指数回归  List<double[]>
-    @GetMapping("/mkdl")
-    public Object mkdl(@RequestParam("siteId") Integer siteId, @RequestParam("itemId") Integer itemId,
-                               @RequestParam("start") String start, @RequestParam("end") String end, @RequestParam("space") Integer space){
-        return ResponseEntity.ok(trendService.mkdl(siteId, itemId, start, end, space));
-    }
-
     /**
      *
      * @param siteId 站点id
@@ -60,8 +53,5 @@ public class TrendController {
 
         return ResponseEntity.ok(trendService.spearman(siteId, itemId, start, end, space));
     }
-
-
-
 }
 

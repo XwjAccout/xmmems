@@ -46,15 +46,11 @@ public class QualityAnalysisService {
         List<ClusterHourDto> hours = simpleHourDataMapper.selectCluster(year + "-01-01 00:00:00.000", year + "-12-31 23:59:59.999", siteId, newItemIds);
         for (ClusterHourDto hour : hours) {
             Integer itemId = hour.getItemId();
-            //String troubleCode = hour.getTroubleCode();
-            //String timeStr = hour.getTimeStr();
-            //String value = hour.getValue();
             String itemName = hour.getItemName();
             BigDecimal valueBigDecimal = hour.getValueBigDecimal();
             List<EnvQualityConfDTO> envQualityConfDTOS = envQualityConfMap.get(itemId);
             for (EnvQualityConfDTO confDTO : envQualityConfDTOS) {
                 if (confDTO.compareTo(valueBigDecimal)) {
-                    //String tempItemName = confDTO.getItemName();
                     Map<String, Integer> map = temp.computeIfAbsent(itemName, k -> new TreeMap<>(new Comparator<String>() {
                         @Override
                         public int compare(String o1, String o2) {
