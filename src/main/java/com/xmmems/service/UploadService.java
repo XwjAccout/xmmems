@@ -76,18 +76,21 @@ public class UploadService {
 
     /**
      * 上传图片或文件
+     *
      * @return 上传后对应的文件名称
      */
     private String uploadToLocal(MultipartFile file, String uploadPath) {
         File pathFile = new File(uploadPath);
         //创建文件在服务器的名称
         String fileName = UUID.randomUUID() + file.getOriginalFilename();
-
+        if (!pathFile.exists()) {
+            pathFile.mkdirs();
+        }
         //上传文件到本地的api
         try {
             file.transferTo(new File(pathFile, fileName));
         } catch (IOException e) {
-            return null;
+            throw new XMException(500, e.getMessage());
         }
         return fileName;
     }
@@ -139,7 +142,9 @@ public class UploadService {
      */
     public String findBackground() {
         String url = uploadMapper.selectNewestBackground();
-        if (StringUtils.isBlank(url)) return null;
+        if (StringUtils.isBlank(url)) {
+            return null;
+        }
         return url;
     }
 
@@ -155,33 +160,25 @@ public class UploadService {
 
         //是否允许上传
         boolean uploadFile = isUploadFile(file, contentType);
-        if (!uploadFile) throw new XMException(ExceptionEnum.INVALID_FILE_TYPE);
+        if (!uploadFile) {
+            throw new XMException(ExceptionEnum.INVALID_FILE_TYPE);
+        }
 
         //文件大小
         double size = file.getSize() / 1024d;
-        if (size > 1024 * 5) throw new XMException(500, "文件大小不合适，不能超过5M");
+        if (size > 1024 * 5) {
+            throw new XMException(500, "文件大小不合适，不能超过5M");
+        }
+
         //指定文件上传的文件夹
         String fileName = uploadToLocal(file, XmmemsConstants.UPLOAD_FILE_PATH);
         //保存文件
-        if (fileName == null)
+        if (fileName == null) {
             throw new XMException(ExceptionEnum.FILE_UPLOAD_ERROR);
-
+        }
         String url = XmmemsConstants.UPLOAD_FILE_URL + fileName;
-
-        Upload record = new Upload();
-        record.setDate(new Date());
-        record.setUrl(url);
-        record.setSize(size);
-        record.setPurpose("附件");
-        record.setType("file");
-        record.setIsValid(1);
-        record.setName(file.getOriginalFilename());
-
-        int i = uploadMapper.insertSelective(record);
-        if (i < 1) throw new XMException(ExceptionEnum.FILE_UPLOAD_ERROR);
         return url;
     }
-
 
     public List<Upload> findFiles() {
         return uploadMapper.selectAllFiles();

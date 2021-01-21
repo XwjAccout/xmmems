@@ -1,5 +1,7 @@
 server:
   port: 6689
+  servlet:
+    context-path: /thankung
 
 spring:
   profiles:
@@ -22,9 +24,9 @@ spring:
       read-only: false
       login-timeout: 5
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://59.39.56.6:3306/sdmems?useSSL=false&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
+    url: jdbc:mysql://127.0.0.1:3306/thankung?useSSL=false&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
     username: root
-    password: sg12345
+    password: 123456
 
 
 mybatis:
@@ -35,7 +37,7 @@ mybatis:
 
 logging:
   level:
-    com.xmmems: info
+    com.xmmems: debug
 
 mapper:
   wrap-keyword: "`{0}`"
@@ -71,14 +73,23 @@ ly:
       cookieDomain: xmmems.com # cookie的域
   filter:  #提供过滤白名单
     allowPaths:
+      - /thankung/login
+      - /thankung/log
+      - /thankung/upload
+      - /thankung/poi
+      - /thankung/pdf
+      #- /exceed
+      - /thankung/favicon.ico
+      - /thankung/water/save
+      - /thankung/assessment
       - /login
       - /log
       - /upload
       - /poi
       - /pdf
-      #- /exceed
       - /favicon.ico
       - /water/save
+      - /assessment
 
 network: "0 31 21 * * ?"
 

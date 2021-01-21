@@ -75,4 +75,7 @@ public class OperationPersonSerice {
     }
 
 
+    public List<OperationPerson> findAll() {
+        return operationPersonMapper.selectByExample(new OperationPersonExample());
+    }
 }

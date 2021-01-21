@@ -1,13 +1,7 @@
 package com.xmmems.mapper;
 
 import com.xmmems.domain.Repository;
-import com.xmmems.domain.RepositoryExample;
-import java.util.List;
+import tk.mybatis.mapper.common.Mapper;
 
-public interface RepositoryMapper {
-    int insert(Repository record);
-
-    int insertSelective(Repository record);
-
-    List<Repository> selectByExample(RepositoryExample example);
+public interface RepositoryMapper extends Mapper<Repository> {
 }
