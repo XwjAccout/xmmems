@@ -1,6 +1,7 @@
 package com.xmmems.task.controller;
 
 import com.xmmems.dto.PageResult;
+import com.xmmems.service.RepositoryService;
 import com.xmmems.task.domain.Sendnotice;
 import com.xmmems.task.domain.Tasktemplate;
 import com.xmmems.task.service.SendnoticeService;
@@ -28,8 +29,12 @@ public class SendnoticeController {
     @Autowired
     private TasktemplateService tasktemplateService;
 
+    @Autowired
+    private RepositoryService repositoryService;
+
     /**
      * 添加模板
+     *
      * @param tasktemplate
      */
     @PostMapping("/task/insertSelective")
@@ -40,20 +45,20 @@ public class SendnoticeController {
 
     /**
      * 查询模板
+     *
      * @param limit
      * @param page
      * @return
      */
     @GetMapping("/task/selectByExample")
-    public PageResult<Tasktemplate> selectByExample(
-            @RequestParam(value = "limit") Integer limit,
-            @RequestParam(value = "page") Integer page) {
+    public PageResult<Tasktemplate> selectByExample(@RequestParam(value = "limit") Integer limit, @RequestParam(value = "page") Integer page) {
 
         return tasktemplateService.selectByExample(limit, page);
     }
 
     /**
      * 发送任务
+     *
      * @param sendnotice
      * @param receiveAccountIds
      * @return
@@ -66,6 +71,7 @@ public class SendnoticeController {
 
     /**
      * 查找任务
+     *
      * @param limit
      * @param page
      * @param createTimeStart
@@ -79,23 +85,13 @@ public class SendnoticeController {
      * @return
      */
     @GetMapping("task/findTask")
-    public PageResult<Sendnotice> findTask(
-            @RequestParam(value = "limit") Integer limit,
-            @RequestParam(value = "page") Integer page,
-            @RequestParam(value = "createTimeStart", required = false) String createTimeStart,
-            @RequestParam(value = "createTimeEnd", required = false) String createTimeEnd,
-            @RequestParam(value = "sendTimeStart", required = false) String sendTimeStart,
-            @RequestParam(value = "sendTimeEnd", required = false) String sendTimeEnd,
-            @RequestParam(value = "receiptTimeStart", required = false) String receiptTimeStart,
-            @RequestParam(value = "receiptTimeEnd", required = false) String receiptTimeEnd,
-            @RequestParam(value = "isReceipt", required = false) Boolean isReceipt,
-            @RequestParam(value = "readType", required = false) String readType
-    ) {
+    public PageResult<Sendnotice> findTask(@RequestParam(value = "limit") Integer limit, @RequestParam(value = "page") Integer page, @RequestParam(value = "createTimeStart", required = false) String createTimeStart, @RequestParam(value = "createTimeEnd", required = false) String createTimeEnd, @RequestParam(value = "sendTimeStart", required = false) String sendTimeStart, @RequestParam(value = "sendTimeEnd", required = false) String sendTimeEnd, @RequestParam(value = "receiptTimeStart", required = false) String receiptTimeStart, @RequestParam(value = "receiptTimeEnd", required = false) String receiptTimeEnd, @RequestParam(value = "isReceipt", required = false) Boolean isReceipt, @RequestParam(value = "readType", required = false) String readType) {
         return sendnoticeService.findTask(limit, page, createTimeStart, createTimeEnd, sendTimeStart, sendTimeEnd, receiptTimeStart, receiptTimeEnd, isReceipt, readType);
     }
 
     /**
      * 接收任务
+     *
      * @param readType
      * @param noticeId
      * @return
@@ -108,18 +104,26 @@ public class SendnoticeController {
 
     /**
      * 上传回执
+     *
      * @param noticeId
      * @param file
      * @return
      */
-    @PostMapping("upload/updateUrl")
-    public Integer updateUrl(@RequestParam("noticeId") Integer noticeId,@RequestParam("file") MultipartFile file) {
+    @PostMapping("task/updateUrl")
+    public Integer updateUrl(@RequestParam(value = "noticeId", required = false) Integer noticeId, @RequestParam("file") MultipartFile file, @RequestParam(value = "id", required = false) Integer id) {
 
-        return sendnoticeService.updateUrl(noticeId,file);
+        if (noticeId != null) {
+            return sendnoticeService.updateUrl(noticeId, file);
+        }
+        if (id != null) {
+            return repositoryService.updateUrl(id, file);
+        }
+        return null;
     }
 
     /**
      * 填写意见
+     *
      * @param opinion
      * @param noticeId
      * @return

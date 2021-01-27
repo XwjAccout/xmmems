@@ -2,8 +2,6 @@ package com.xmmems.service;
 
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.xmmems.common.auth.domain.UserHolder;
 import com.xmmems.common.exception.ExceptionEnum;
 import com.xmmems.common.exception.XMException;
@@ -61,8 +59,7 @@ public class ApproveService {
      */
     public void handleApproveItem(Map<String, Object> record) {
 
-        List<Map<String, String>> monitorItemList = JsonUtils.nativeRead(record.get("content").toString(), new TypeReference<List<Map<String, String>>>() {
-        });
+        List<Map<String, String>> monitorItemList = JsonUtils.nativeRead(record.get("content").toString(), new TypeReference<List<Map<String, String>>>() {});
         for (Map<String, String> monitorItem : monitorItemList) {
             String v = monitorItem.get("value");
             String value = rds.formatValue(monitorItem.get("itemName"), v);
@@ -76,8 +73,7 @@ public class ApproveService {
     }
 
     //保存处理修正的数据1
-    public void saveAdjust(String adjust, Integer siteId, Integer recordId, String adjustKey, String adjustValue, String originValue,
-                           String troubleCode, String troubleName, String multipleAdjust, String startTime, String endTime, String multipleParam) {
+    public void saveAdjust(String adjust, Integer siteId, Integer recordId, String adjustKey, String adjustValue, String originValue, String troubleCode, String troubleName, String multipleAdjust, String startTime, String endTime, String multipleParam) {
 
         List<Map<String, Object>> hourDatas = new ArrayList<>();
         if ("true".equals(multipleAdjust)) {
@@ -91,10 +87,9 @@ public class ApproveService {
 
         for (Map<String, Object> hourData : hourDatas) {
             Map item = null;
-            List<Map<String,String>> monitorItems = JsonUtils.nativeRead(hourData.get("content") + "", new TypeReference<List<Map<String,String>>>() {
-            });
+            List<Map<String, String>> monitorItems = JsonUtils.nativeRead(hourData.get("content") + "", new TypeReference<List<Map<String, String>>>() {});
 
-            for (Map<String,String> map : monitorItems) {
+            for (Map<String, String> map : monitorItems) {
                 item = map;
                 if (StrUtil.equals("3", adjust)) {
                     if (adjustKey.equals(map.get("itemName"))) {
@@ -120,9 +115,8 @@ public class ApproveService {
 
             }
             if (item != null) {
-                //System.out.println(JsonUtils.toString(monitorItems));
                 hourData.put("content", monitorItems);
-                EnvHourData envHourData = EnvHourData.builder().id((Integer) hourData.get("id")).content(JsonUtils.toString(monitorItems)).build();
+                EnvHourData envHourData = EnvHourData.builder().id((Integer)hourData.get("id")).content(JsonUtils.toString(monitorItems)).build();
 
                 int i = envHourDataMapper.updateByPrimaryKeySelective(envHourData);
                 if (i < 1) {
@@ -169,9 +163,8 @@ public class ApproveService {
         for (Map<String, Object> hourData : hourDatas) {
             String content = hourData.get("content") + "";
             if (StringUtils.isNotBlank(content)) {
-                List<Map<String,String>> monitorItems = JsonUtils.nativeRead(content, new TypeReference<List<Map<String,String>>>() {
-                });
-                for (Map<String,String> map : monitorItems) {
+                List<Map<String, String>> monitorItems = JsonUtils.nativeRead(content, new TypeReference<List<Map<String, String>>>() {});
+                for (Map<String, String> map : monitorItems) {
                     if (StringUtils.isBlank(adjustKey)) {
                         map.put("troubleCode", "");
                         map.put("troubleName", "");
@@ -185,7 +178,7 @@ public class ApproveService {
                         }
                     }
                 }
-                EnvHourData envHourData = EnvHourData.builder().id((Integer) hourData.get("id")).content(JsonUtils.toString(monitorItems)).build();
+                EnvHourData envHourData = EnvHourData.builder().id((Integer)hourData.get("id")).content(JsonUtils.toString(monitorItems)).build();
                 envHourDataMapper.updateByPrimaryKeySelective(envHourData);
             }
         }
@@ -215,15 +208,10 @@ public class ApproveService {
      * 根据id查找监测数据，并处理
      */
     public List<Map<String, String>> getColumns(Integer id) {
-        Gson gson = new Gson();
         EnvHourData envHourData = envHourDataMapper.selectByPrimaryKey(id);
         List<Map<String, String>> columns = new ArrayList<>();
-
         if (envHourData != null) {
-            List<Map<String, String>> monitorItemList = gson.fromJson(envHourData.getContent(),
-                    new TypeToken<List<Map<String, String>>>() {
-                    }.getType());
-
+            List<Map<String, String>> monitorItemList = JsonUtils.nativeRead(envHourData.getContent(), new TypeReference<List<Map<String, String>>>() {});
             for (Map<String, String> monitorItem : monitorItemList) {
                 Map<String, String> param = new HashMap<>();
                 String genTime = new SimpleDateFormat("yyyy-MM-dd").format(envHourData.getGenTime());
@@ -285,7 +273,9 @@ public class ApproveService {
     public void deleteByIds(Integer[] ids) {
         for (Integer id : ids) {
             int i = envHourDataMapper.deleteByPrimaryKey(id);
-            if (i < 1) throw new XMException(ExceptionEnum.DELETE_OPERATION_FAIL);
+            if (i < 1) {
+                throw new XMException(ExceptionEnum.DELETE_OPERATION_FAIL);
+            }
         }
     }
 }

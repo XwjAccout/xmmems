@@ -24,10 +24,12 @@ spring:
       read-only: false
       login-timeout: 5
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/thankung?useSSL=false&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
+    url: jdbc:mysql://127.0.0.1:3306/thankung?useSSL=false&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&autoReconnect=true
     username: root
     password: 123456
-
+  pid:
+    file: D:/java/pid.txt
+    fail-on-write-error: true
 
 mybatis:
   type-aliases-package: com.xmmems.domain
@@ -82,6 +84,7 @@ ly:
       - /thankung/favicon.ico
       - /thankung/water/save
       - /thankung/assessment
+      - /thankung/task
       - /login
       - /log
       - /upload
@@ -90,6 +93,7 @@ ly:
       - /favicon.ico
       - /water/save
       - /assessment
+      - /task
 
 network: "0 31 21 * * ?"
 
