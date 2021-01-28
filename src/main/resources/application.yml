@@ -1,5 +1,7 @@
 server:
   port: 6689
+  servlet:
+    context-path: /thankung
 
 spring:
   profiles:
@@ -22,10 +24,9 @@ spring:
       read-only: false
       login-timeout: 5
     driver-class-name: com.mysql.jdbc.Driver
-#    url: jdbc:mysql://59.39.56.6:3306/sdmems?useSSL=false&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
-    url: jdbc:mysql://127.0.0.1:3306/sdmems?useSSL=false&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
+    url: jdbc:mysql://112.94.22.48:3306/thankung?useSSL=false&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
     username: root
-    password: sg12345
+    password: 123456
 
 
 mybatis:
@@ -77,6 +78,7 @@ ly:
       - /upload
       - /poi
       - /pdf
+      - /task/updateUrl
       #- /exceed
       - /favicon.ico
       - /water/save

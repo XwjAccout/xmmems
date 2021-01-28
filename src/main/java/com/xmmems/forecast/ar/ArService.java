@@ -6,7 +6,6 @@ import com.xmmems.domain.SimpleHourData;
 import com.xmmems.mapper.BaseSiteitemMapper;
 import com.xmmems.mapper.SimpleHourDataMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +27,7 @@ public class ArService {
     private BaseSiteitemMapper baseSiteitemMapper;
 
     //定时预测
-    @Scheduled(cron = "0 15 * * * ?")
+    //@Scheduled(cron = "0 15 * * * ?")
     public void te() {
         List<Map<String, Integer>> list = baseSiteitemMapper.getValidSiteIdItemId();
         list.forEach(map -> {

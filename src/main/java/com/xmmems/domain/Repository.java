@@ -1,55 +1,32 @@
 package com.xmmems.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
+
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.Date;
 
+@Table(name = "repository")
+@Data
 public class Repository {
+    @Id
+    @Column(name = "id")
+    private Integer id;
+    @Column(name = "essayClass")
     private String essayClass;
-
+    @Column(name = "essayTitle")
     private String essayTitle;
-
+    @Column(name = "author")
     private String author;
-
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
+    @Column(name = "createTime")
     private Date createTime;
-
+    @Column(name = "type")
     private Integer type;
+    @Column(name = "url")
+    private String url;
 
-    public String getEssayClass() {
-        return essayClass;
-    }
 
-    public void setEssayClass(String essayClass) {
-        this.essayClass = essayClass == null ? null : essayClass.trim();
-    }
-
-    public String getEssayTitle() {
-        return essayTitle;
-    }
-
-    public void setEssayTitle(String essayTitle) {
-        this.essayTitle = essayTitle == null ? null : essayTitle.trim();
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author == null ? null : author.trim();
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Integer getType() {
-        return type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
-    }
 }
