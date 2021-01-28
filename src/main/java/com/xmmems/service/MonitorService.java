@@ -24,8 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -57,8 +55,7 @@ public class MonitorService {
     @Autowired
     private NetWorkService netWorkService;
 
-    private static final TypeReference<List<Map<String, String>>> type = new TypeReference<List<Map<String, String>>>() {
-    };
+    private static final TypeReference<List<Map<String, String>>> type = new TypeReference<List<Map<String, String>>>() {};
 
     public List<BaseSiteitemDTO> getColumns(Integer siteId) {
         return commonService.getBaseSiteItemBySiteId(siteId);
@@ -80,7 +77,7 @@ public class MonitorService {
         //根据所有站点id查询监测项目
         List<BaseSiteitemDTO> list = baseSiteitemMapper.getColumnsAll(s);
 
-        if (list.size() == 0) {
+        if (list.isEmpty()) {
             throw new XMException(ExceptionEnum.MONITORREPORT_NOT_FOUND);
         }
         return list;
@@ -88,7 +85,7 @@ public class MonitorService {
 
     public List<BaseSiteDTO> getSites() {
         List<BaseSiteDTO> list = baseSiteMapper.getSites(UserHolder.loginId());
-        if (list.size() == 0) {
+        if (list.isEmpty()) {
             throw new XMException(ExceptionEnum.BASESITE_NOT_FOUND);
         }
         return list;
@@ -112,13 +109,9 @@ public class MonitorService {
         String eH = endTime.split(" ")[1].substring(0, 2);
         String s = startTime.split(" ")[1];
         if (s.equals("00:00:00")) {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            try {
-                startTime = simpleDateFormat.format(simpleDateFormat.parse(startTime).getTime() - 10000);
-                s = startTime.split(" ")[1];
-            } catch (ParseException e) {
-                throw new XMException(500, "com.xmmems.service.MonitorService 821行，日期格式化出错");
-            }
+            startTime = DateFormat.formatAll(DateFormat.parseAll(startTime).getTime() - 10000);
+            s = startTime.split(" ")[1];
+
         }
         String sH = s.substring(0, 2);
 
@@ -135,8 +128,7 @@ public class MonitorService {
     /**
      * 处理月份集合
      */
-    private void handlerMonthDataList(Integer siteId, List<Map<String, String>> returnMonthData, int dayNum, Map<String, Integer> itemNameAndNumbersMap,
-                                      List<Map<String, Object>> listMap, List<Map<String, String>> returnYearData, List<Integer> statistics, String eH, String sH) {
+    private void handlerMonthDataList(Integer siteId, List<Map<String, String>> returnMonthData, int dayNum, Map<String, Integer> itemNameAndNumbersMap, List<Map<String, Object>> listMap, List<Map<String, String>> returnYearData, List<Integer> statistics, String eH, String sH) {
         if (listMap.size() > 0) {
             //按照日期分组
             Map<String, List<Map<String, Object>>> moniterTimeList = handleOneHourDataIntoOneDayDataList(listMap);
@@ -183,18 +175,15 @@ public class MonitorService {
     }
 
     public static int getMonthNum(String str1, String str2) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
         Calendar bef = Calendar.getInstance();
         Calendar aft = Calendar.getInstance();
-        try {
-            bef.setTime(sdf.parse(str1));
-            aft.setTime(sdf.parse(str2));
-            int result = aft.get(Calendar.MONTH) - bef.get(Calendar.MONTH);
-            int month = (aft.get(Calendar.YEAR) - bef.get(Calendar.YEAR)) * 12;
-            return Math.abs(month + result) + 1;
-        } catch (ParseException ignore) {
-            throw new XMException(500, "时间解析出错");
-        }
+
+        bef.setTime(DateFormat.parse(DateFormat.yyyy_MM, str1));
+        aft.setTime(DateFormat.parse(DateFormat.yyyy_MM, str2));
+        int result = aft.get(Calendar.MONTH) - bef.get(Calendar.MONTH);
+        int month = (aft.get(Calendar.YEAR) - bef.get(Calendar.YEAR)) * 12;
+        return Math.abs(month + result) + 1;
+
     }
 
     public List<Map<String, String>> year(Integer siteId, String startTime, String endTime, List<Integer> statistics, Boolean limit) {
@@ -212,13 +201,8 @@ public class MonitorService {
         String eH = endTime.split(" ")[1].substring(0, 2);
         String s = startTime.split(" ")[1];
         if (s.equals("00:00:00")) {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            try {
-                startTime = simpleDateFormat.format(simpleDateFormat.parse(startTime).getTime() - 10000);
-                s = startTime.split(" ")[1];
-            } catch (ParseException e) {
-                throw new XMException(500, "com.xmmems.service.MonitorService 224行，日期格式化出错");
-            }
+            startTime = DateFormat.formatAll(DateFormat.parseAll(startTime).getTime() - 10000);
+            s = startTime.split(" ")[1];
         }
         String sH = s.substring(0, 2);
 
@@ -284,7 +268,7 @@ public class MonitorService {
         long beginTime = beginCalendar.getTime().getTime();
         long endTime = endCalendar.getTime().getTime() + 86400000;
 
-        int betweenDays = (int) ((endTime - beginTime) / 86400000);//先算出两时间的毫秒数之差大于一天的天数
+        int betweenDays = (int)((endTime - beginTime) / 86400000);//先算出两时间的毫秒数之差大于一天的天数
 
         endCalendar.add(Calendar.DAY_OF_MONTH, -betweenDays - 1);//使endCalendar减去这些天数，将问题转换为两时间的毫秒数之差不足一天的情况
         //endCalendar.add(Calendar.DAY_OF_MONTH, -1);//再使endCalendar减去1天
@@ -384,7 +368,6 @@ public class MonitorService {
         }
         PageInfo<Map<String, Object>> mapPageInfo = new PageInfo<>(records);
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         for (Map<String, Object> record : records) {
             List<Map<String, String>> monitorItemList = JsonUtils.nativeRead(record.get("content").toString(), type);
             //record.remove("content"); //不可去除，数据审批需要用
@@ -392,10 +375,12 @@ public class MonitorService {
 
                 String v = monitorItem.get("value");
                 String value = rds.formatValue(monitorItem.get("itemName"), v);
-                if (original) record.put(monitorItem.get("itemName"), value + "^" + v);
-                else record.put(monitorItem.get("itemName"), value);
+                if (original)
+                    record.put(monitorItem.get("itemName"), value + "^" + v);
+                else
+                    record.put(monitorItem.get("itemName"), value);
             }
-            record.put("genTime", sdf.format(record.get("genTime")));
+            record.put("genTime", DateFormat.formatAll(record.get("genTime")));
         }
 
         //因为中间经过处理，所以分页插件总数需要重新设置
@@ -486,8 +471,7 @@ public class MonitorService {
         }
     }
 
-    private void handleOneHourDataIntoReturnDataCurve(List<Map<String, String>> returnData, Map<String, Object> map,
-                                                      List<Map<String, String>> monthData) {
+    private void handleOneHourDataIntoReturnDataCurve(List<Map<String, String>> returnData, Map<String, Object> map, List<Map<String, String>> monthData) {
         List<Map<String, String>> contentLists = JsonUtils.nativeRead(map.get("content").toString(), type);
         Map<String, String> tempMap = new HashMap<>();
         String moniterTime = map.get("moniterTime").toString();
@@ -544,7 +528,7 @@ public class MonitorService {
             if (System.currentTimeMillis() - TREND_TIME > 5 * 60000) {
                 TREND_TIME = System.currentTimeMillis();
             } else {
-                String mm = new SimpleDateFormat("mm").format(System.currentTimeMillis());
+                String mm = DateFormat.mm.format(System.currentTimeMillis());
                 int i = Integer.parseInt(mm);
                 if (i > 10 && TREND_LIST.size() > 0) {
 
@@ -642,7 +626,7 @@ public class MonitorService {
             List<Map<String, String>> itemNameAndNumbers = baseSiteitemMapper.selectBySiteId(siteId);
             itemNameAndNumbersMap = new HashMap<>();
             for (Map<String, String> en : itemNameAndNumbers) {
-                itemNameAndNumbersMap.put(en.get("itemName"), Integer.valueOf((Object) en.get("number") + ""));
+                itemNameAndNumbersMap.put(en.get("itemName"), Integer.valueOf((Object)en.get("number") + ""));
             }
             name_number_map.put(siteId, itemNameAndNumbersMap);
             name_number_map_time = System.currentTimeMillis();
@@ -776,7 +760,7 @@ public class MonitorService {
         for (Map<String, Object> map : site) {
             Integer siteId = Integer.valueOf(map.get("id") + "");
             String siteName = map.get("siteName") + "";
-            List<Map<String, String>> datas = null;
+            List<Map<String, String>> datas = new ArrayList<>();
             switch (type) {
                 case 1:
                     datas = day(siteId, startTime, endTime, null, true);
@@ -790,8 +774,6 @@ public class MonitorService {
                 case 4:
                     datas = year(siteId, startTime, endTime, null, true);
                     break;
-                default:
-                    datas = new ArrayList<>();
             }
             if (datas.size() > 0) {
                 Map<String, String> avgMap = datas.get(datas.size() - 1);
@@ -987,13 +969,8 @@ public class MonitorService {
         }
         String s = startTime.split(" ")[1];
         if (s.equals("00:00:00")) {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            try {
-                startTime = simpleDateFormat.format(simpleDateFormat.parse(startTime).getTime() - 10000);
-                s = startTime.split(" ")[1];
-            } catch (ParseException e) {
-                throw new XMException(500, "com.xmmems.service.MonitorService 1067行，日期格式化出错");
-            }
+            startTime = DateFormat.formatAll(DateFormat.parseAll(startTime).getTime() - 10000);
+            s = startTime.split(" ")[1];
         }
         String sH = s.substring(0, 2);
         String eH = endTime.split(" ")[1].substring(0, 2); //用来去除还超过时间的测试次数  如一天测试6次，那么如果只是到13点，实际只测试了3次，那么捕捉率 应该为3除以3 100%
@@ -1007,9 +984,7 @@ public class MonitorService {
         return returnData;
     }
 
-    private void handlerDayDataList(Integer siteId, List<Map<String, String>> returnData, int dayNum, Map<String, Integer> itemNameAndNumbersMap,
-                                    List<Map<String, Object>> listMap, List<Map<String, String>> MonthData, List<Map<String, String>> yearData,
-                                    List<Integer> statistics, String eH, String sH) {
+    private void handlerDayDataList(Integer siteId, List<Map<String, String>> returnData, int dayNum, Map<String, Integer> itemNameAndNumbersMap, List<Map<String, Object>> listMap, List<Map<String, String>> MonthData, List<Map<String, String>> yearData, List<Integer> statistics, String eH, String sH) {
         if (listMap.size() > 0) {
 
             //获取所有检出限
@@ -1046,10 +1021,7 @@ public class MonitorService {
      * @param itemNameAndNumbersMap 存储指标名与其对应的一天应册多少次
      * @param isAvg                 是否只处理平均值
      */
-    private void handleOtherIntoReturnData(List<Map<String, String>> returnData, Map<String, List<String>> itemNameAndValuesList,
-                                           Integer siteId, int dayNum, Map<String, Integer> itemNameAndNumbersMap, boolean isAvg,
-                                           List<Integer> statistics, String flag, Map<String, List<String>> itemNameAndNumbersMapOfDay,
-                                           String eH, String sH) {
+    private void handleOtherIntoReturnData(List<Map<String, String>> returnData, Map<String, List<String>> itemNameAndValuesList, Integer siteId, int dayNum, Map<String, Integer> itemNameAndNumbersMap, boolean isAvg, List<Integer> statistics, String flag, Map<String, List<String>> itemNameAndNumbersMapOfDay, String eH, String sH) {
         Map<String, String> minMap = new HashMap<>();    //最小值
         Map<String, String> maxMap = new HashMap<>();    //最大值
         Map<String, String> avgMap = new HashMap<>();    //平均值
@@ -1306,7 +1278,7 @@ public class MonitorService {
     private static String itemSinIntegrity(List<String> values, double all) {
 
         //实际次数
-        int realnum = (int) values.stream().filter(v -> !v.trim().equals("")).count();
+        int realnum = (int)values.stream().filter(v -> !v.trim().equals("")).count();
         //int realnum = values.size();
         double rate = realnum / all * 100;
         if (rate > 100) {
@@ -1449,7 +1421,8 @@ public class MonitorService {
             }
         }
 
-        if (num == 0) return "";
+        if (num == 0)
+            return "";
         double v = d / num;
         return rds.scale(itemName, v + "");
 
@@ -1516,8 +1489,7 @@ public class MonitorService {
         }
     }
 
-    public void handleOneHourDataIntoReturnData(List<Map<String, String>> returnData, Map<String, Object> map, Map<String, Integer> itemNameAndNumbersMap,
-                                                List<Map<String, String>> MonthData, List<Map<String, String>> yearData, Map<String, String> limit) {
+    public void handleOneHourDataIntoReturnData(List<Map<String, String>> returnData, Map<String, Object> map, Map<String, Integer> itemNameAndNumbersMap, List<Map<String, String>> MonthData, List<Map<String, String>> yearData, Map<String, String> limit) {
         List<Map<String, String>> contentLists = JsonUtils.nativeRead(map.get("content").toString(), type);
         Map<String, String> tempMap = new HashMap<>();
         String moniterTime = map.get("moniterTime").toString();
@@ -1554,8 +1526,10 @@ public class MonitorService {
             }
         }
         returnData.add(tempMap);
-        if (MonthData != null) MonthData.add(tempMap);
-        if (yearData != null) yearData.add(tempMap);
+        if (MonthData != null)
+            MonthData.add(tempMap);
+        if (yearData != null)
+            yearData.add(tempMap);
     }
 
     public List<Map<String, Object>> initData(Integer siteId, String startTime, String endTime) {
@@ -1933,7 +1907,8 @@ public class MonitorService {
             long t1 = DateFormat.parseSome(time1).getTime();
             long t2 = DateFormat.parseSome(time2).getTime();
 
-            return (int) (t1 - t2);
+            return (int)(t1 - t2);
         });
     }
+
 }
