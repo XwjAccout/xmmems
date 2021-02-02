@@ -2,6 +2,7 @@ package com.xmmems.mapper;
 
 import com.xmmems.domain.account.Account;
 import com.xmmems.domain.account.AccountExample;
+import com.xmmems.domain.base.BaseSite;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -40,4 +41,6 @@ public interface AccountMapper {
 
     @Select("SELECT * FROM `account` WHERE id = #{id}")
     Account selectById(Integer id);
+    @Select(" SELECT * from base_site b,account a where b.id=a.centerSiteId and a.id=#{id}")
+    BaseSite findBycenterSiteId(@Param("id") Integer id);
 }

@@ -26,6 +26,7 @@ public class DateFormat {
     public static final SimpleDateFormat yyyy_MM = new SimpleDateFormat("yyyy-MM");
     public static final SimpleDateFormat yyyy = new SimpleDateFormat("yyyy");
     public static final SimpleDateFormat MM = new SimpleDateFormat("MM");
+    public static final SimpleDateFormat mm = new SimpleDateFormat("mm");
     public static final SimpleDateFormat HH_mm_ss = new SimpleDateFormat("HH:mm:ss");
     public static final SimpleDateFormat HH_mm = new SimpleDateFormat("HH:mm");
     public static final SimpleDateFormat HH = new SimpleDateFormat("HH");
@@ -36,22 +37,19 @@ public class DateFormat {
 
     private static final Logger log = LoggerFactory.getLogger(JsonUtils.class);
 
-    public static String formatAll(Date date) {
-        if (date == null) return null;
-        synchronized (yyyy_MM_dd_HH_mm_ss) {
-            return yyyy_MM_dd_HH_mm_ss.format(date);
+    public static String formatAll(Object date) {
+        if (date == null) {
+            return null;
         }
-    }
-
-    public static String formatAll(Long date) {
-        if (date == null) return null;
         synchronized (yyyy_MM_dd_HH_mm_ss) {
             return yyyy_MM_dd_HH_mm_ss.format(date);
         }
     }
 
     public static Date parseAll(String DateStr) {
-        if (DateStr == null) return null;
+        if (DateStr == null) {
+            return new Date();
+        }
         try {
             synchronized (yyyy_MM_dd_HH_mm_ss) {
                 return yyyy_MM_dd_HH_mm_ss.parse(DateStr);
@@ -63,21 +61,29 @@ public class DateFormat {
     }
 
     public static String formatSome(Date date) {
-        if (date == null) return null;
+        if (date == null) {
+            return null;
+        }
         synchronized (yyyy_MM_dd) {
             return yyyy_MM_dd.format(date);
         }
     }
 
     public static String formatSome(Long date) {
-        if (date == null) return null;
+        if (date == null) {
+            return null;
+        }
+
         synchronized (yyyy_MM_dd) {
             return yyyy_MM_dd.format(date);
         }
     }
 
     public static Date parseSome(String DateStr) {
-        if (DateStr == null) return null;
+        if (DateStr == null) {
+            return null;
+        }
+
         try {
             synchronized (yyyy_MM_dd) {
                 return yyyy_MM_dd.parse(DateStr);

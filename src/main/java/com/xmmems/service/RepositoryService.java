@@ -70,4 +70,9 @@ public class RepositoryService {
     public void delete(Integer id) {
         repositoryMapper.deleteByPrimaryKey(id);
     }
+
+    public Integer updateUrl(Integer id, MultipartFile file) {
+        String url = uploadService.file(file);
+        return repositoryMapper.updateUrl(id, url);
+    }
 }

@@ -295,7 +295,9 @@ public class BaseService {
     public List<Map<String, Object>> findBaseSiteByAccountId() {
         return baseSiteMapper.getSiteIdAndNameByAccountId(UserHolder.loginId());
     }
-
+    public List<Map<String, Object>> findAccountId(Integer id) {
+        return baseSiteMapper.getSiteIdAndNameByAccountId(id);
+    }
     public List<BaseSiteitem> getSiteItem(Integer siteId) {
         return baseSiteitemMapper.getSiteItem(siteId);
     }

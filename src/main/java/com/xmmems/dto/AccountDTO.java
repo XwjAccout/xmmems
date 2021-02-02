@@ -14,6 +14,7 @@ public class AccountDTO {
     private String userName;
     private Integer status;
     private Date createAt;
+    private Integer centerSiteId;
     //角色信息
     private List<RoleDTO> roleDTOS;
 
