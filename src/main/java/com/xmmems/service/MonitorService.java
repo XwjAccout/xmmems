@@ -290,7 +290,7 @@ public class MonitorService {
             for (Map<String, Object> site : list) {
                 String siteId = site.get("siteId") + "";
                 List<Map<String, String>> limit = baseSiteitemMapper.getDetectionLimit(Integer.valueOf(siteId));
-                Map<String, String> limitMap = new HashMap<>();
+                Map<String, String> limitMap = new HashMap<>(32);
                 if (limit.size() > 0) {
                     limit.forEach(temp -> limitMap.put(temp.get("itemId"), temp.get("limitNum")));
                 }
@@ -302,7 +302,7 @@ public class MonitorService {
                 site.remove("content");
                 site.put("moniterTime", site.get("moniterTime").toString().replace(".0", ""));
                 //分项类别水质
-                Map<String, String> subCategoryMap = new HashMap<>();
+                Map<String, String> subCategoryMap = new HashMap<>(32);
                 for (Map<String, String> monitorItem : monitorItemList) {
                     String itemName = monitorItem.get("itemName");
                     if (collect.contains(itemName)) {
@@ -589,7 +589,7 @@ public class MonitorService {
 
                 TREND_LIST = mapList;
                 //key 为 itemName或siteName或trend ，  value 为其对应key条件的集合
-                Map<String, List<Map<String, Object>>> mapTemp = new HashMap<>();
+                Map<String, List<Map<String, Object>>> mapTemp = new HashMap<>(8);
                 for (Map<String, Object> map : mapList) {
                     String itemNameTemp = map.get("itemName") + "";
                     String siteNameTemp = map.get("siteName") + "";
@@ -609,14 +609,13 @@ public class MonitorService {
         }
     }
 
-
     private static List<Map<String, Object>> TREND_LIST = new ArrayList<>();
     //key 为 itemName或siteName或trend ，  value 为其对应key条件的集合
     private static Map<String, List<Map<String, Object>>> TREND_MAP = new HashMap<>();
     private static long TREND_TIME = 0;
 
     //key 为站点名称  value 为对应的每天测试数集合
-    private static Map<Integer, Map<String, Integer>> name_number_map = new HashMap<>();
+    private static Map<Integer, Map<String, Integer>> name_number_map = new HashMap<>(16);
     private static long name_number_map_time = 0;
 
     private Map<String, Integer> getitemNameAndNumbersMap(Integer siteId) {
@@ -624,7 +623,7 @@ public class MonitorService {
         if (itemNameAndNumbersMap == null || System.currentTimeMillis() - name_number_map_time > 30_000) {
             //获取站点siteId对应的有效的监测指标
             List<Map<String, String>> itemNameAndNumbers = baseSiteitemMapper.selectBySiteId(siteId);
-            itemNameAndNumbersMap = new HashMap<>();
+            itemNameAndNumbersMap = new HashMap<>(32);
             for (Map<String, String> en : itemNameAndNumbers) {
                 itemNameAndNumbersMap.put(en.get("itemName"), Integer.valueOf((Object)en.get("number") + ""));
             }
@@ -1502,7 +1501,6 @@ public class MonitorService {
                 String value = contentItem.get("value").replace(",", "").trim();
                 String itemId = contentItem.get("itemId");
 
-
                 if (value.length() > 0) {
                     String scale = rds.scale(itemName, value);
                     if (StringUtils.isNotBlank(troubleCode) && !"N".equals(troubleCode) && !" N".equals(troubleCode)) {
@@ -1526,10 +1524,12 @@ public class MonitorService {
             }
         }
         returnData.add(tempMap);
-        if (MonthData != null)
+        if (MonthData != null) {
             MonthData.add(tempMap);
-        if (yearData != null)
+        }
+        if (yearData != null) {
             yearData.add(tempMap);
+        }
     }
 
     public List<Map<String, Object>> initData(Integer siteId, String startTime, String endTime) {
@@ -1551,11 +1551,11 @@ public class MonitorService {
     //一个月的水质统计
     public Map<String, Object> monthQuality(Integer siteId, Integer year, Integer month, Boolean isPercent) {
         //返回子集1---水质分类
-        List<String> types = new ArrayList<>();
+        List<String> types = new ArrayList<>(3);
         //返回子集2---日期
         //List<String> dates = new ArrayList<String>();
         //返回子集3---数据
-        List<Map<String, String>> datas = new ArrayList<>();
+        List<Map<String, String>> datas = new ArrayList<>(1);
 
         //数据处理主过程
         List<Map<String, String>> monthList = realMonth(siteId, year, month, null, false);
@@ -1564,19 +1564,19 @@ public class MonitorService {
         //标准水质
         Integer standard = getSlevel(siteId + "");
         //质量类别转换为键值对形式
-        Map<String, List<EnvQualityConf>> eqMap = new HashMap<>();
+        Map<String, List<EnvQualityConf>> eqMap = new HashMap<>(16);
         for (EnvQualityConf envQualityConf : commonService.getEnvQualityConfList()) {
             String kpiName = envQualityConf.getKpiName();
-            eqMap.computeIfAbsent(kpiName, k -> new ArrayList<>()).add(envQualityConf);
+            eqMap.computeIfAbsent(kpiName, k -> new ArrayList<>(6)).add(envQualityConf);
         }
 
-        List<Future<Boolean>> tt = new ArrayList<>();
+        List<Future<Boolean>> tt = new ArrayList<>(monthList.size());
         for (Map<String, String> dayList : monthList) {
             Future<Boolean> submit = PoolExecutor.submit(new Callable<Boolean>() {
                 @Override
                 public Boolean call() throws Exception {
                     //等级统计
-                    Map<String, String> tempMap = new LinkedHashMap<>();
+                    Map<String, String> tempMap = new LinkedHashMap<>(8);
                     tempMap.put("D", "0");
                     tempMap.put("N", "0");
                     tempMap.put("UN", "0");
@@ -1638,7 +1638,7 @@ public class MonitorService {
             });
             tt.add(submit);
         }
-        Map<String, Object> map = new LinkedHashMap<>();//返回对象
+        Map<String, Object> map = new LinkedHashMap<>(8);//返回对象
         //将三个子集添加进去返回对象中
         map.put("types", types);
         //map.put("dates", dates);
@@ -1667,11 +1667,11 @@ public class MonitorService {
 
     public Map<String, Object> monthOnline(Integer siteId, Integer year, Integer month, Boolean isPercent) {
         //返回子集1---联网分类
-        List<String> types = new ArrayList<>();
+        List<String> types = new ArrayList<>(2);
         //返回子集2---日期
         //List<String> dates = new ArrayList<String>();
         //返回子集3---数据
-        List<Map<String, String>> datas = new ArrayList<>();
+        List<Map<String, String>> datas = new ArrayList<>(1);
 
         //将月份转换为开始时间与结束时间
         StringBuilder endSb = getStringBuilder(year, month);
@@ -1681,7 +1681,7 @@ public class MonitorService {
         //查询数据
         List<NetWork> netWorks = netWorkService.findNetWorksBySiteId(start, end, siteId);
 
-        List<Future<Boolean>> tt = new ArrayList<>();
+        List<Future<Boolean>> tt = new ArrayList<>(netWorks.size());
         //分日处理数据
         for (NetWork netWork : netWorks) {
             Future<Boolean> submit = PoolExecutor.submit(new Callable<Boolean>() {
@@ -1700,7 +1700,7 @@ public class MonitorService {
                     String date = DateFormat.formatSome(netWork.getDate());
                     //dates.add(date);
 
-                    Map<String, String> tempMap = new LinkedHashMap<>();
+                    Map<String, String> tempMap = new LinkedHashMap<>(8);
                     tempMap.put("on", onLine + "");
                     tempMap.put("off", offLine + "");
                     tempMap.put("time", date);
@@ -1722,7 +1722,7 @@ public class MonitorService {
             tt.add(submit);
         }
 
-        Map<String, Object> map = new LinkedHashMap<>();//返回对象
+        Map<String, Object> map = new LinkedHashMap<>(8);//返回对象
         //将三个子集添加进去返回对象中
         map.put("types", types);
         //map.put("dates", dates);
@@ -1752,11 +1752,11 @@ public class MonitorService {
 
     public Map<String, Object> monthEfficiency(Integer siteId, Integer year, Integer month, Boolean isPercent) {
         //返回子集1---有效无效分类分类
-        List<String> types = new ArrayList<>();
+        List<String> types = new ArrayList<>(2);
         //返回子集2---日期
         //List<String> dates = new ArrayList<String>();
         //返回子集3---数据
-        List<Map<String, String>> datas = new ArrayList<>();
+        List<Map<String, String>> datas = new ArrayList<>(1);
 
         //数据处理主过程
         List<Map<String, String>> monthList = realMonth(siteId, year, month, null, false);
@@ -1765,19 +1765,19 @@ public class MonitorService {
         //标准水质
         Integer standard = getSlevel(siteId + "");
         //质量类别转换为键值对形式
-        Map<String, List<EnvQualityConf>> eqMap = new HashMap<>();
+        Map<String, List<EnvQualityConf>> eqMap = new HashMap<>(16);
         for (EnvQualityConf envQualityConf : commonService.getEnvQualityConfList()) {
             String kpiName = envQualityConf.getKpiName();
             eqMap.computeIfAbsent(kpiName, k -> new ArrayList<>()).add(envQualityConf);
         }
 
-        List<Future<Boolean>> tt = new ArrayList<>();
+        List<Future<Boolean>> tt = new ArrayList<>(monthList.size());
         for (Map<String, String> dayList : monthList) {
             Future<Boolean> submit = PoolExecutor.submit(new Callable<Boolean>() {
                 @Override
                 public Boolean call() throws Exception {
                     //等级统计
-                    Map<String, String> tempMap = new LinkedHashMap<>();
+                    Map<String, String> tempMap = new LinkedHashMap<>(8);
                     tempMap.put("N", "0");
                     tempMap.put("UN", "0");
 
@@ -1832,7 +1832,7 @@ public class MonitorService {
             });
             tt.add(submit);
         }
-        Map<String, Object> map = new LinkedHashMap<>();//返回对象
+        Map<String, Object> map = new LinkedHashMap<>(8);//返回对象
         //将三个子集添加进去返回对象中
         map.put("types", types);
         //map.put("dates", dates);
@@ -1860,11 +1860,11 @@ public class MonitorService {
 
     public Map<String, Object> monthCaptureRate(Integer siteId, Integer year, Integer month, Boolean isPercent) {
         //返回子集1---有效无效分类分类
-        List<String> types = new ArrayList<>();
+        List<String> types = new ArrayList<>(2);
         //返回子集3---数据
-        List<Map<String, String>> datas = new ArrayList<>();
+        List<Map<String, String>> datas = new ArrayList<>(1);
 
-        List<Integer> statistics = new ArrayList<>();
+        List<Integer> statistics = new ArrayList<>(1);
         statistics.add(6);//平均捕捉率
         //获取月份最后一天
         StringBuilder endSb = getStringBuilder(year, month);
@@ -1877,7 +1877,7 @@ public class MonitorService {
             List<Map<String, String>> dayList = realDay(siteId, day, statistics, false);
             if (dayList.size() > 0) {
 
-                Map<String, String> tempMap = new LinkedHashMap<>();
+                Map<String, String> tempMap = new LinkedHashMap<>(8);
                 Map<String, String> map = dayList.get(dayList.size() - 1);
                 map.remove("moniterTime");
                 String next = map.values().iterator().next();
@@ -1891,7 +1891,7 @@ public class MonitorService {
         }
         types.add("捕捉率");
         types.add("其它");
-        Map<String, Object> map = new LinkedHashMap<>();//返回对象
+        Map<String, Object> map = new LinkedHashMap<>(8);//返回对象
         //将三个子集添加进去返回对象中
         map.put("types", types);
         map.put("datas", datas);

@@ -2,6 +2,8 @@ package com.xmmems.task.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.xmmems.common.exception.ExceptionEnum;
+import com.xmmems.common.exception.XMException;
 import com.xmmems.domain.OperationPerson;
 import com.xmmems.dto.PageResult;
 import com.xmmems.mapper.SendnoticeMapper;
@@ -40,10 +42,7 @@ public class SendnoticeService {
         return sendnotice.getNoticeId();
     }
 
-    public PageResult<Sendnotice> findTask(Integer limit, Integer page, String createTimeStart, String createTimeEnd,
-                                           String sendTimeStart, String sendTimeEnd,
-                                           String receiptTimeStart, String receiptTimeEnd,
-                                           Boolean isReceipt, String readType) {
+    public PageResult<Sendnotice> findTask(Integer limit, Integer page, String createTimeStart, String createTimeEnd, String sendTimeStart, String sendTimeEnd, String receiptTimeStart, String receiptTimeEnd, Boolean isReceipt, String readType) {
         String end = " 23:59:59";
         //封装分页信息
         PageHelper.startPage(page, limit);
@@ -79,8 +78,7 @@ public class SendnoticeService {
         }
         List<Sendnotice> sendnotices = sendnoticeMapper.selectByExample(example);
         PageInfo<Sendnotice> pageInfo = new PageInfo<>(sendnotices);
-        PageResult<Sendnotice> pageResult = new PageResult<>(pageInfo.getPageSize(), page, pageInfo.getTotal(), pageInfo.getPages(), pageInfo.getList());
-        return pageResult;
+        return new PageResult<>(pageInfo.getPageSize(), page, pageInfo.getTotal(), pageInfo.getPages(), pageInfo.getList());
     }
 
     public Integer sendTask(Sendnotice sendnotice, List<Integer> receiveAccountIds) {
@@ -129,7 +127,11 @@ public class SendnoticeService {
         sendnotice.setReceiptTime(new Date());
         sendnotice.setReadType("已回执");
         //更新通知状态
-        return sendnoticeMapper.updateByPrimaryKeySelective(sendnotice);
+        try {
+            return sendnoticeMapper.updateByPrimaryKeySelective(sendnotice);
+        } catch (Exception e) {
+            throw new XMException(ExceptionEnum.UPDATE_ERROR);
+        }
     }
 
     public Integer updateOpinion(String Opinion, Integer noticeId) {
@@ -138,6 +140,18 @@ public class SendnoticeService {
         sendnotice.setNoticeId(noticeId);
         sendnotice.setOpinion(Opinion);
         //更新通知状态
-        return sendnoticeMapper.updateByPrimaryKeySelective(sendnotice);
+        try {
+            return sendnoticeMapper.updateByPrimaryKeySelective(sendnotice);
+        } catch (Exception e) {
+            throw new XMException(ExceptionEnum.UPDATE_ERROR);
+        }
+    }
+
+    public Integer delTask(Integer noticeId) {
+        try {
+           return sendnoticeMapper.deleteByPrimaryKey(noticeId);
+        } catch (Exception e) {
+            throw new XMException(ExceptionEnum.DELETE_ERROR);
+        }
     }
 }

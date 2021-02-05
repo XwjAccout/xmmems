@@ -45,12 +45,12 @@ public enum ExceptionEnum {
     UPDATE_PASSWORD(500, "修改密码失败！"),
     DELETE_OPERATION_FAIL(500, "删除操作失败！"),
     FILE_UPLOAD_ERROR(500, "文件上传失败！"),
-    DIRECTORY_WRITER_ERROR(500, "目录写入失败！"),
     FILE_WRITER_ERROR(500, "文件写入失败！"),
-    SEND_MESSAGE_ERROR(500, "短信发送失败！"),
-    INVALID_ORDER_STATUS(500, "订单状态不正确！"),
-    STOCK_NOT_ENOUGH_ERROR(500, "库存不足！"),
-    UNAUTHORIZED(401, "登录失效或未登录！");
+    UNAUTHORIZED(401, "登录失效或未登录！"),
+    INSERT_ERROR(500, "数据库添加操作失败！"),
+    UPDATE_ERROR(500, "数据库更新操作失败！"),
+    SELECT_ERROR(500, "数据库查询操作失败！"),
+    DELETE_ERROR(500, "数据库删除操作失败！");
 
     private int status;
     private String message;
