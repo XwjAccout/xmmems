@@ -7,6 +7,8 @@
     <result column="tel" property="tel" jdbcType="VARCHAR" />
     <result column="post" property="post" jdbcType="VARCHAR" />
     <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="siteId" property="siteId" jdbcType="INTEGER"/>
+    <result column="siteName" property="siteName" jdbcType="VARCHAR"/>
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >
@@ -38,7 +40,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    id, name, tel, post, email
+    id, name, tel, post, email,siteId,siteName
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.xmmems.domain.env.EnvAddressBookExample" >
     select
@@ -66,9 +68,11 @@
   </delete>
   <insert id="insert" parameterType="com.xmmems.domain.env.EnvAddressBook" >
     insert into env_address_book (id, name, tel, 
-      post, email)
+      post, email,siteId,
+      siteName)
     values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{tel,jdbcType=VARCHAR}, 
-      #{post,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR})
+      #{post,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{siteId,jdbcType=INTEGER},
+      #{siteName,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.xmmems.domain.env.EnvAddressBook" >
     insert into env_address_book
@@ -88,6 +92,12 @@
       <if test="email != null" >
         email,
       </if>
+      <if test="siteId != null">
+        siteId,
+      </if>
+      <if test="siteName != null">
+        siteName,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -104,6 +114,12 @@
       </if>
       <if test="email != null" >
         #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="siteId != null">
+        #{siteId,jdbcType=INTEGER},
+      </if>
+      <if test="siteName != null">
+        #{siteName,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -122,6 +138,12 @@
       <if test="email != null" >
         email = #{email,jdbcType=VARCHAR},
       </if>
+      <if test="siteId != null">
+        siteId = #{siteId,jdbcType=INTEGER},
+      </if>
+      <if test="siteName != null">
+        siteName = #{siteName,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -130,7 +152,9 @@
     set name = #{name,jdbcType=VARCHAR},
       tel = #{tel,jdbcType=VARCHAR},
       post = #{post,jdbcType=VARCHAR},
-      email = #{email,jdbcType=VARCHAR}
+      email = #{email,jdbcType=VARCHAR},
+       siteId = #{siteId,jdbcType=INTEGER},
+      siteName = #{siteName,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

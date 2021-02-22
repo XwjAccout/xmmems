@@ -21,7 +21,7 @@ public class AddressBookController {
      * @return
      */
     @GetMapping("/paginate")
-    @SystemControllerLog(descrption = "分页查询通讯录", actionType = "4")
+//    @SystemControllerLog(descrption = "分页查询通讯录", actionType = "4")
     public ResponseEntity<PageResult<EnvAddressBook>> sitePageQuery(@RequestParam(value = "limit", defaultValue = "100000000") Integer limit,
                                                                     @RequestParam(value = "page", defaultValue = "1") Integer page,
                                                                     @RequestParam(value = "name", required = false) String name){

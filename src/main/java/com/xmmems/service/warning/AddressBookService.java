@@ -24,7 +24,7 @@ public class AddressBookService {
 
 
     public PageResult<EnvAddressBook> pageQuery(Integer limit, Integer page, String name) {
-        try {
+//        try {
             //封装分页信息
             PageHelper.startPage(page, limit);
             //封装查询条件
@@ -44,9 +44,9 @@ public class AddressBookService {
                     new PageResult<>(pageInfo.getPageSize(), page, pageInfo.getTotal(), pageInfo.getPages(), pageInfo.getList());
 
             return pageResult;
-        } catch (Exception e) {
-            throw new XMException(ExceptionEnum.ROLE_NOT_FOUND);
-        }
+//        } catch (Exception e) {
+//            throw new XMException(ExceptionEnum.DATA_NOT_FOUND);
+//        }
     }
 
     public EnvAddressBook findById(Integer id) {

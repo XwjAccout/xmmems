@@ -57,7 +57,6 @@ public class AuthFilter extends HttpFilter {
                 //获取Cookie中的token
 //                String token = CookieUtils.getCookieValue(request, jwtProp.getUser().getCookieName());
                  String token = request.getHeader(jwtProp.getUser().getCookieName());
-//                String token = "eyJhbGciOiJSUzI1NiJ9.eyJ1c2VyIjoie1wiaWRcIjoxLFwidXNlcm5hbWVcIjpcInRoYW5rdW5nXCIsXCJyb2xlc1wiOltcIui2hee6p-euoeeQhuWRmFwiXSxcIm5pY2tOYW1lXCI6XCLlsJrlub_njq_kv51cIn0iLCJqdGkiOiJNRE0zT0RNNFptRXRZemc1WkMwME4yRmlMVGcwWldZdE9UWTFOVFpqTURNd1lXWXgiLCJleHAiOjE2NDU2NDMxNzh9.s0-n0QLPCoUk0Hy7372llmc4c8-ZIiWecZqUYHdzL8OamZ3HzGaM5ER-HzvjS1RkOmpf2uULQUB9Gtv5MPjXDYo76mJ5tLaymNV7z9hkNF7O35pSEIej1GVBONfqOdqAnJCtF85geVbmt3gtFAdoBOvef-fUBW7lv8VtN5yU_skypDDSJHjB1FMos9W7899fhWYutY29bFOvFhINXt83ZIbbyoA8-K6MnnQvwRITQEdxSfkUnMy057qDFOoXPXmqzgfJ94DDdQ5c8zDNbbPJarFyLk5eASlhaRljFONG7qMmK4iyiED4b6muF7FfuZZEsvvdIGDvzHOmjBvRXI8MLg";
                 //判断token是否存在
                 if (StringUtils.isBlank(token)) {
                     //阻止继续访问

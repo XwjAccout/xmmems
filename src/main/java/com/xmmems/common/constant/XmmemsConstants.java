@@ -13,12 +13,12 @@ public class XmmemsConstants {
     /**
      * 上传文件的路径
      */
-    public static final String UPLOAD_FILE_PATH = "D:\\transData\\nginx\\nginx-1.15.5\\html\\";
+    public static final String UPLOAD_FILE_PATH = "D:\\soft\\nginx-1.15.3\\html\\file";
     /**
-     * 文件访问的urlD:\transData\nginx\nginx-1.15.5\html
+     * 文件访问的url
      */
     //public static final String UPLOAD_FILE_URL = "http://0.0.1:8087/file/";
-    public static final String UPLOAD_FILE_URL = "http://112.94.22.48:8088/";
+    public static final String UPLOAD_FILE_URL = "http://59.39.56.6:6690/file/";
 
     /**
      * 注册时，短信验证码在redis中的key的前缀

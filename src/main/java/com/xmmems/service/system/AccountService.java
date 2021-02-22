@@ -9,6 +9,7 @@ import com.xmmems.common.utils.BeanHelper;
 import com.xmmems.common.utils.CustomUtils;
 import com.xmmems.domain.account.Account;
 import com.xmmems.domain.account.AccountExample;
+import com.xmmems.domain.base.BaseSite;
 import com.xmmems.dto.AccountDTO;
 import com.xmmems.dto.PageResult;
 import com.xmmems.dto.RoleDTO;
@@ -62,7 +63,11 @@ public class AccountService {
 
         return userDTO;
     }
-
+    //
+    public BaseSite findBycenterSiteId() {
+        BaseSite baseSite = accountMapper.findBycenterSiteId(UserHolder.loginId());
+        return baseSite;
+    }
 
     public PageResult<AccountDTO> pageQuery(Integer limit, Integer page, String userName) {
         try {
@@ -103,7 +108,7 @@ public class AccountService {
         List<RoleDTO> roleDTOS = roleService.findRoleByAccountId(id);
         accountDTO.setRoleDTOS(roleDTOS);
         //添加站点信息
-        List<Map<String, Object>> mapList = baseService.findBaseSiteByAccountId();
+        List<Map<String, Object>> mapList = baseService.findAccountId(id);
         accountDTO.setSites(mapList);
 
 

@@ -54,4 +54,16 @@ public class WarningDataLossService {
             throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
         }
     }
+    public void delete( Integer id) {
+        int i = envWarningDataLossMapper.deleteByPrimaryKey(id);
+        if (i != 1) {
+            throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
+        }
+    }
+    public void save( EnvWarningDataLoss envWarningDataLoss) {
+        int i = envWarningDataLossMapper.insertSelective(envWarningDataLoss);
+        if (i != 1) {
+            throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
+        }
+    }
 }

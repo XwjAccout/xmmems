@@ -1,6 +1,7 @@
 package com.xmmems.controller.system;
 
 import com.xmmems.domain.account.Account;
+import com.xmmems.domain.base.BaseSite;
 import com.xmmems.dto.AccountDTO;
 import com.xmmems.dto.PageResult;
 import com.xmmems.operationlog.annotation.SystemControllerLog;
@@ -47,6 +48,11 @@ public class AccountController {
         return ResponseEntity.ok(account);
     }
 
+    @GetMapping("/centerSiteId")
+    public ResponseEntity<BaseSite> findById() {
+            BaseSite baseSite = accountService.findBycenterSiteId();
+        return ResponseEntity.ok(baseSite);
+    }
 
     /**
      * 添加账户用户
