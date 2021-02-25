@@ -224,11 +224,19 @@
     </select>
 
     <select id="site" resultType="java.util.Map">
-        SELECT siteId, siteName, GROUP_CONCAT(item) AS item
+--         SELECT siteId, siteName, GROUP_CONCAT(item) AS item
+--         FROM (
+--             SELECT siteId, siteName
+--                 , CONCAT(itemName, '=', itemId) AS item
+--             FROM zero_check WHERE itemName != '总氮'
+--             GROUP BY siteId, siteName, itemId, itemName
+--         ) a
+--         GROUP BY siteId, siteName
+  SELECT siteId, siteName, GROUP_CONCAT(item) AS item
         FROM (
-            SELECT siteId, siteName
-                , CONCAT(itemName, '=', itemId) AS item
-            FROM zero_check WHERE itemName != '总氮'
+            SELECT z.siteId, z.siteName
+                , CONCAT(z.itemName, '=', z.itemId) AS item
+            FROM zero_check as z,account_site as a WHERE z.itemName != '总氮' and z.siteId=a.siteId and a.accountId=#{accountId}
             GROUP BY siteId, siteName, itemId, itemName
         ) a
         GROUP BY siteId, siteName
