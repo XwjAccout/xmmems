@@ -207,4 +207,32 @@
   <select id="selectAll" resultType="com.xmmems.domain.role.Menu">
     SELECT <include refid="Base_Column_List" /> FROM menu ORDER BY rank ASC
   </select>
+    <select id="roleById" resultType="com.xmmems.domain.role.Menu">
+        SELECT m.* FROM role_menu r,menu m WHERE r.menuId=m.id AND r.roleId=#{roleId} and pcode='0' ORDER BY m.sort asc
+    </select>
+  <select id="selectMenusByRoleIds" resultType="com.xmmems.domain.role.Menu">
+    SELECT DISTINCT m.id,m.name,m.code,m.pcode,m.url,m.level,m.icon,m.rank
+    FROM role_menu r,menu m
+      WHERE r.menuId=m.id
+      AND pcode='0'
+      AND r.roleId IN
+      <foreach collection="roleIds" separator="," open="(" close=")" item="roleId">
+        #{roleId}
+      </foreach>
+      ORDER BY m.sort ASC
+  </select>
+  <select id="roleByAccoutId" resultType="java.util.Map">
+    select * from account_role where accountId=#{accountId}
+  </select>
+  <select id="findByPidRoleids" resultType="com.xmmems.domain.role.Menu">
+    SELECT distinct m.* FROM role_menu r,menu m
+      WHERE r.menuId = m.id
+      AND isvalid = 1
+      AND pcode = #{pcode}
+      AND r.roleId IN
+      <foreach collection="roleIds" separator="," open="(" close=")" item="roleId">
+        #{roleId}
+      </foreach>
+    ORDER BY m.sort ASC
+  </select>
 </mapper>

@@ -37,17 +37,17 @@ public class CommonService {
     private BaseSiteitemMapper baseSiteitemMapper;
 
     private static List<BaseSite> BASE_SITE_LIST = new ArrayList<>();
-    private static Map<String, BaseSite> ALL_SITE_MAP = new HashMap<>();
+    private static Map<String, BaseSite> ALL_SITE_MAP = new HashMap<>(16);
     private static long BASE_SITE_LIST_Effective_Time = 0;
 
     private static List<EnvQualityConf> ENV_QUALITY_CONF_LIST = new ArrayList<>();
     private static long ENV_QUALITY_CONF_LIST_Effective_Time = 0;
 
     private static List<BaseItem> BASE_ITEM_LIST = new ArrayList<>();
-    private static Map<String, BaseItem> BASE_ITEM_MAP = new HashMap<>();
+    private static Map<String, BaseItem> BASE_ITEM_MAP = new HashMap<>(200);
     private static long BASE_ITEM_MAP_Effective_Time = 0;
 
-    private static Map<Integer, List<BaseSiteitemDTO>> BASE_SITE_ITEM_MAP = new HashMap<>();
+    private static Map<Integer, List<BaseSiteitemDTO>> BASE_SITE_ITEM_MAP = new HashMap<>(16);
     private static long BASE_SITE_ITEM_MAP_Effective_Time = 0;
 
     private void initSite() {

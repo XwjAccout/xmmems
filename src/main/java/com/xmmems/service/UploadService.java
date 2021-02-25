@@ -42,7 +42,9 @@ public class UploadService {
      */
     private boolean isUploadImg(MultipartFile file, String contentType) {
         //判断当前文件的mine类型是否属于允许的类型
-        if (!ALLOW_IMAGE.contains(contentType)) return false;
+        if (!ALLOW_IMAGE.contains(contentType)) {
+            return false;
+        }
 
         //解析文件流，查看是否是真的图片
         BufferedImage read = null;
@@ -51,8 +53,7 @@ public class UploadService {
         } catch (IOException e) {
             return false;
         }
-        if (read == null) return false;
-        return true;
+        return read != null;
     }
 
     /**
@@ -60,18 +61,7 @@ public class UploadService {
      */
     private boolean isUploadFile(MultipartFile file, String contentType) {
         //判断当前文件的mine类型是否属于允许的类型
-        if (!ALLOW_FILE.contains(contentType)) return false;
-
-        //解析文件流，查看是否是真的图片
-        /*BufferedImage read = null;
-        try {
-            read = ImageIO.read(file.getInputStream());
-        } catch (IOException e) {
-            return false;
-        }
-        if (read == null)
-            return false;*/
-        return true;
+        return ALLOW_FILE.contains(contentType);
     }
 
     /**
@@ -106,18 +96,21 @@ public class UploadService {
         String contentType = file.getContentType();
         //是否允许上传
         boolean upload = isUploadImg(file, contentType);
-        if (!upload)
+        if (!upload) {
             throw new XMException(ExceptionEnum.INVALID_FILE_TYPE);
+        }
 
         double size = file.getSize() / 1024d; //kb
-        if (size > 2048 || size < 10)  //判断图片大小 单位Kb
+        if (size > 2048 || size < 10) {  //判断图片大小 单位Kb
             throw new XMException(500, "图片尺寸不合适.范围10kb - 2048kb");
+        }
 
         //指定文件上传的文件夹
         String fileName = uploadToLocal(file, XmmemsConstants.UPLOAD_IMG_PATH);
         //文件上传失误
-        if (fileName == null)
+        if (fileName == null) {
             throw new XMException(ExceptionEnum.FILE_UPLOAD_ERROR);
+        }
 
         String url = XmmemsConstants.UPLOAD_IMG_URL + fileName;
 
@@ -131,7 +124,9 @@ public class UploadService {
         record.setName(file.getOriginalFilename());
 
         int i = uploadMapper.insertSelective(record);
-        if (i < 1) throw new XMException(ExceptionEnum.FILE_UPLOAD_ERROR);
+        if (i < 1) {
+            throw new XMException(ExceptionEnum.FILE_UPLOAD_ERROR);
+        }
         return url;
     }
 
@@ -176,8 +171,7 @@ public class UploadService {
         if (fileName == null) {
             throw new XMException(ExceptionEnum.FILE_UPLOAD_ERROR);
         }
-        String url = XmmemsConstants.UPLOAD_FILE_URL + fileName;
-        return url;
+        return XmmemsConstants.UPLOAD_FILE_URL + fileName;
     }
 
     public List<Upload> findFiles() {

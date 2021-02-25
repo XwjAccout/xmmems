@@ -1,6 +1,5 @@
 package com.xmmems.mapper;
 
-import com.xmmems.domain.account.AccountRoleKey;
 import com.xmmems.domain.role.Menu;
 import com.xmmems.domain.role.MenuExample;
 import org.apache.ibatis.annotations.Param;
@@ -37,10 +36,13 @@ public interface MenuMapper {
     List<Menu> selectByRoleId(Integer roleId);
 
     @Select("select * from role_menu r,menu m where r.menuId=m.id and r.roleId=#{roleId} and pcode = #{pcode} and isvalid=1 ORDER BY m.sort asc")
-    List<Menu> findByPid(String pcode,Integer roleId);
+    List<Menu> findByPid(@Param("pcode") String pcode,@Param("roleId") Integer roleId);
 
-    @Select("select m.* from role_menu r,menu m where r.menuId=m.id and r.roleId=#{roleId} and pcode='0' ORDER BY m.sort asc")
     List<Menu> roleById(@Param("roleId") Integer roleId);
-    @Select("select * from account_role where accountId=#{accountId}")
-    AccountRoleKey roleByAccoutId(@Param("accountId") Integer accountId);
+
+    List<Map<Integer,Integer>> roleByAccoutId(@Param("accountId") Integer accountId);
+
+    List<Menu> selectMenusByRoleIds(@Param("roleIds") List<Integer> roleIds);
+
+    List<Menu> findByPidRoleids(@Param("pcode") String pcode,@Param("roleIds") List<Integer> roleIds);
 }
