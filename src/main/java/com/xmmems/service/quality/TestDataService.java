@@ -1,5 +1,6 @@
 package com.xmmems.service.quality;
 
+import com.xmmems.common.auth.domain.UserHolder;
 import com.xmmems.common.exception.XMException;
 import com.xmmems.common.utils.BeanHelper;
 import com.xmmems.common.utils.DateFormat;
@@ -729,7 +730,7 @@ public class TestDataService {
     }
 
     public List<Map<String, Object>> site() {
-        List<Map<String, Object>> site = zeroCheckMapper.site();
+        List<Map<String, Object>> site = zeroCheckMapper.site(UserHolder.loginId());
         site.forEach(t -> {
             Map<String, String> map = new HashMap<>();
             for (String item : (t.get("item") + "").split(",")) {

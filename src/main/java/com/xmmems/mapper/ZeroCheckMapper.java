@@ -36,5 +36,5 @@ public interface ZeroCheckMapper {
     List<Map<String, String>> blankTest(@Param("start") String start, @Param("end") String end, @Param("siteId") Integer siteId,@Param("itemId")Integer itemId);
 
     //获取有零点核查跨度核查数据的站点信息
-    List<Map<String, Object>> site();
+    List<Map<String, Object>> site(@Param("accountId") Integer accountId);
 }
