@@ -12,7 +12,6 @@ spring:
     multipart:
       max-file-size: 5MB # 限制一次上次文件的总大小
   datasource:
-
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/thankung?useSSL=false&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
     username: root
