@@ -1,7 +1,7 @@
 server:
   port: 6689
-#  servlet:
-#    context-path: /thankung
+  servlet:
+    context-path: /thankung
 
 spring:
   profiles:
@@ -14,9 +14,9 @@ spring:
   datasource:
 
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://59.39.56.6:3306/sdmems?useSSL=false&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&autoReconnect=true
+    url: jdbc:mysql://127.0.0.1:3306/thankung?useSSL=false&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
     username: root
-    password: sg12345
+    password: 123456
   pid:
     file: D:/java/pid.txt
     fail-on-write-error: true
