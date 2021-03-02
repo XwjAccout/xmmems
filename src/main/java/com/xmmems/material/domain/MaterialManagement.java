@@ -1,5 +1,6 @@
 package com.xmmems.material.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -19,6 +20,7 @@ public class MaterialManagement {
     @Id
     @Column(name = "id")
     private Integer id;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @Column(name = "createTime")
     private Date createTime;
     @Column(name = "name")
