@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmmems.mapper.EvaluateMapper" >
+  <resultMap id="BaseResultMap" type="com.xmmems.domain.Evaluate" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="uName" property="uName" jdbcType="VARCHAR" />
+    <result column="uId" property="uId" jdbcType="INTEGER" />
+    <result column="role" property="role" jdbcType="VARCHAR" />
+    <result column="grade" property="grade" jdbcType="VARCHAR" />
+    <result column="sore" property="sore" jdbcType="INTEGER" />
+    <result column="auditTime" property="auditTime" jdbcType="VARCHAR" />
+    <result column="opinion" property="opinion" jdbcType="VARCHAR" />
+</resultMap>
+  <insert id="add" parameterType="com.xmmems.domain.Evaluate" >
+    insert into evaluate (uName, uId,
+      role, grade, sore,
+      auditTime, opinion)
+    values ( #{uName,jdbcType=VARCHAR},
+      #{uId,jdbcType=INTEGER}, #{role,jdbcType=VARCHAR}, #{grade,jdbcType=VARCHAR},
+      #{sore,jdbcType=INTEGER}, #{auditTime,jdbcType=VARCHAR}, #{opinion,jdbcType=VARCHAR})
+  </insert>
+</mapper>

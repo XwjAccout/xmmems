@@ -10,6 +10,7 @@
     <result column="testOption" jdbcType="VARCHAR" property="testOption" />
     <result column="reagent" jdbcType="VARCHAR" property="reagent" />
     <result column="detection" jdbcType="VARCHAR" property="detection" />
+    <result column="price" jdbcType="DECIMAL" property="price" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -41,7 +42,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, unitID, equipmentName, equipmentModel, analysisWay, testOption, reagent, detection
+    id, unitID, equipmentName, equipmentModel, analysisWay, testOption, reagent, detection,price
   </sql>
   <select id="selectByExample" parameterType="com.xmmems.domain.MonitoringFacilityExample" resultMap="BaseResultMap">
     select
@@ -70,10 +71,10 @@
   <insert id="insert" parameterType="com.xmmems.domain.MonitoringFacility">
     insert into monitoring_facility (id, unitID, equipmentName, 
       equipmentModel, analysisWay, testOption, 
-      reagent, detection)
+      reagent, detection,price)
     values (#{id,jdbcType=INTEGER}, #{unitID,jdbcType=INTEGER}, #{equipmentName,jdbcType=VARCHAR}, 
       #{equipmentModel,jdbcType=VARCHAR}, #{analysisWay,jdbcType=VARCHAR}, #{testOption,jdbcType=VARCHAR}, 
-      #{reagent,jdbcType=VARCHAR}, #{detection,jdbcType=VARCHAR})
+      #{reagent,jdbcType=VARCHAR}, #{detection,jdbcType=VARCHAR},#{price,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.xmmems.domain.MonitoringFacility">
     insert into monitoring_facility
@@ -102,6 +103,9 @@
       <if test="detection != null">
         detection,
       </if>
+      <if test="price != null">
+        price,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -126,7 +130,10 @@
         #{reagent,jdbcType=VARCHAR},
       </if>
       <if test="detection != null">
-        #{detection,jdbcType=VARCHAR},
+      #{detection,jdbcType=VARCHAR},
+    </if>
+      <if test="price != null">
+        #{price,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -154,6 +161,9 @@
       <if test="detection != null">
         detection = #{detection,jdbcType=VARCHAR},
       </if>
+      <if test="price != null">
+        price =  #{price,jdbcType=DECIMAL},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -165,7 +175,8 @@
       analysisWay = #{analysisWay,jdbcType=VARCHAR},
       testOption = #{testOption,jdbcType=VARCHAR},
       reagent = #{reagent,jdbcType=VARCHAR},
-      detection = #{detection,jdbcType=VARCHAR}
+      detection = #{detection,jdbcType=VARCHAR},
+       price =  #{price,jdbcType=DECIMAL}
     where id = #{id,jdbcType=INTEGER}
   </update>
 

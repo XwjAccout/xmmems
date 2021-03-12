@@ -2,13 +2,19 @@ package com.xmmems.task.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.xmmems.common.auth.domain.UserHolder;
 import com.xmmems.common.exception.ExceptionEnum;
 import com.xmmems.common.exception.XMException;
 import com.xmmems.domain.OperationPerson;
+import com.xmmems.dto.AccountDTO;
 import com.xmmems.dto.PageResult;
+import com.xmmems.mapper.AccountMapper;
+import com.xmmems.mapper.CostMapper;
 import com.xmmems.mapper.SendnoticeMapper;
+import com.xmmems.material.domain.Cost;
 import com.xmmems.service.UploadService;
 import com.xmmems.service.maintenance.OperationPersonSerice;
+import com.xmmems.service.system.AccountService;
 import com.xmmems.task.domain.Sendnotice;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +40,10 @@ public class SendnoticeService {
     @Autowired
     private UploadService uploadService;
     @Autowired
-    private OperationPersonSerice operationPersonSerice;
+    private AccountService accountService;
+
+    @Autowired
+    private CostMapper costMapper;
 
     public Integer save(Sendnotice sendnotice) {
         sendnotice.setCreateTime(new Date());
@@ -48,6 +57,9 @@ public class SendnoticeService {
         PageHelper.startPage(page, limit);
         Example example = new Example(Sendnotice.class);
         Example.Criteria criteria = example.createCriteria();
+        System.out.println(UserHolder.loginId());
+        criteria.andEqualTo("receiveAccountId", UserHolder.loginId());
+        criteria.andEqualTo("sendAccountId", UserHolder.loginId());
         if (StringUtils.isNotBlank(createTimeStart)) {
             criteria.andGreaterThanOrEqualTo("createTime", createTimeStart);
         }
@@ -82,10 +94,11 @@ public class SendnoticeService {
     }
 
     public Integer sendTask(Sendnotice sendnotice, List<Integer> receiveAccountIds) {
-        List<OperationPerson> OperationPersons = operationPersonSerice.findAll();
+        PageResult<AccountDTO> accountDTO = accountService.pageQuery(30,1,null);
+
         Date createTime = new Date();
-        for (OperationPerson row : OperationPersons) {
-            if (row.getName().equals(sendnotice.getSendAccountName())) {
+        for (AccountDTO row : accountDTO.getRows()) {
+            if (row.getNickName().equals(sendnotice.getSendAccountName())) {
                 sendnotice.setSendAccountId(row.getId());
                 break;
             }
@@ -96,9 +109,9 @@ public class SendnoticeService {
         int count = 0;
         for (Integer accountId : receiveAccountIds) {
             sendnotice.setReceiveAccountId(accountId);
-            for (OperationPerson row : OperationPersons) {
+            for (AccountDTO row : accountDTO.getRows()) {
                 if (row.getId().equals(accountId)) {
-                    sendnotice.setReceiveAccountName(row.getName());
+                    sendnotice.setReceiveAccountName(row.getNickName());
                     break;
                 }
             }
@@ -118,7 +131,7 @@ public class SendnoticeService {
         return sendnoticeMapper.updateByPrimaryKeySelective(sendnotice);
     }
 
-    public Integer updateUrl(Integer noticeId, MultipartFile file) {
+    public Integer updateUrl(Integer noticeId, MultipartFile file,String opinion) {
 
         Sendnotice sendnotice = new Sendnotice();
         sendnotice.setNoticeId(noticeId);
@@ -126,12 +139,42 @@ public class SendnoticeService {
         sendnotice.setAnnexUrl(url);
         sendnotice.setReceiptTime(new Date());
         sendnotice.setReadType("已回执");
-        //更新通知状态
+        sendnotice.setOpinion(opinion);
+        int result=sendnoticeMapper.updateByPrimaryKeySelective(sendnotice);
+//        Sendnotice newsendnotice=  sendnoticeMapper.findBynoticeId(noticeId);
+        List<Cost> costList=costMapper.findCost();
+        List<Cost> costListAll= costMapper.findCostAll();
+        double one=500;
+        double two=100;
+        costList.forEach(temp -> {
+            Cost cost=new Cost();
+            costListAll.forEach(tempAll -> {
+                if(!temp.getNoticeId().equals(tempAll.getNoticeId())){
+                    cost.setNoticeId(temp.getNoticeId());
+                    cost.setReceiveAccountId(temp.getReceiveAccountId());
+                    cost.setReceiveAccountName(temp.getReceiveAccountName());
+                    cost.setReceiptTime(temp.getReceiptTime());
+                    cost.setCounts(temp.getCounts());
+                    for(int i=1;i<=temp.getCounts();i++) {
+                        if (i == 1) {
+                            cost.setPrice(one);
+                        } else{
+                            cost.setPrice(cost.getPrice() + two);
+                        }
+                    }
+                }
+
+            });
+            //添加到成本分析表里面
+            costMapper.insertSelective(cost);
+        });
+
         try {
-            return sendnoticeMapper.updateByPrimaryKeySelective(sendnotice);
+            return result;
         } catch (Exception e) {
             throw new XMException(ExceptionEnum.UPDATE_ERROR);
         }
+
     }
 
     public Integer updateOpinion(String Opinion, Integer noticeId) {

@@ -1,5 +1,6 @@
 package com.xmmems.task.controller;
 
+import com.xmmems.common.auth.domain.UserHolder;
 import com.xmmems.dto.PageResult;
 import com.xmmems.service.RepositoryService;
 import com.xmmems.task.domain.Sendnotice;
@@ -88,12 +89,11 @@ public class SendnoticeController {
             @RequestParam("siteName") String siteName,
             @RequestParam("title") String title,
             @RequestParam("content") String content,
-            @RequestParam("sendAccountName") String sendAccountName,
             @RequestParam("receiveAccountIds") List<Integer> receiveAccountIds) {
 
         Sendnotice sendnotice = new Sendnotice();
         sendnotice.setSiteId(siteId);
-        sendnotice.setSendAccountName(sendAccountName);
+        sendnotice.setSendAccountName(UserHolder.getNickName());
         sendnotice.setTitle(title);
         sendnotice.setContent(content);
         sendnotice.setSiteName(siteName);
@@ -154,10 +154,11 @@ public class SendnoticeController {
     @PostMapping("task/updateUrl")
     public Integer updateUrl(
             @RequestParam(value = "noticeId", required = false) Integer noticeId,
+            @RequestParam(value = "opinion") String opinion,
             @RequestParam("file") MultipartFile file, @RequestParam(value = "id", required = false) Integer id) {
 
         if (noticeId != null) {
-            return sendnoticeService.updateUrl(noticeId, file);
+            return sendnoticeService.updateUrl(noticeId, file,opinion);
         }
         if (id != null) {
             return repositoryService.updateUrl(id, file);

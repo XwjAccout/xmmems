@@ -7,14 +7,19 @@ import com.xmmems.common.exception.XMException;
 import com.xmmems.common.utils.CustomUtils;
 import com.xmmems.domain.OperationPerson;
 import com.xmmems.domain.OperationPersonExample;
+import com.xmmems.domain.OperationUnit;
 import com.xmmems.dto.PageResult;
 import com.xmmems.mapper.OperationPersonMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -77,5 +82,45 @@ public class OperationPersonSerice {
 
     public List<OperationPerson> findAll() {
         return operationPersonMapper.selectByExample(new OperationPersonExample());
+    }
+
+
+    public  List<Map<String, Object>> treeformUnit(){
+        List<Map<String, Object>> list0 = new ArrayList<>();
+        OperationPersonExample example = new OperationPersonExample();
+        List<OperationPerson> operationUnit = operationPersonMapper.selectByExample(example);
+        int num=0;
+        //不为空
+        if (!CollectionUtils.isEmpty(operationUnit)) {
+            Map<String, Object> map0 = new HashMap<>();
+            List<Map<String, Object>> list1 = new ArrayList<>();
+            for (OperationPerson menu1 : operationUnit) {
+                if (num==0) {
+                    num++;
+                    Map<String, Object> map1 = new HashMap<>();
+                    map1.put("name","员工名称");
+                    List<Map<String, Object>> list2 = new ArrayList<>();
+                    for (OperationPerson menu2 : operationUnit) {
+                        if (menu1.getId().equals(menu1.getId())) {
+                            Map<String, Object> map2 = new HashMap<>();
+                            map2.put("id", menu2.getId());
+                            map2.put("name", menu2.getName());
+                            map2.put("account", menu2.getAccount());
+                            map2.put("unitID  ", menu2.getUnitID());
+                            map2.put("role", menu2.getRole());
+                            list2.add(map2);
+                        }
+                    }
+                    map1.put("menu", list2);
+                    list1.add(map1);
+                }
+            }
+            map0.put("menu", list1);
+            //封装数据
+            list0.add(map0);
+
+        }
+
+        return list0;
     }
 }

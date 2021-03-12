@@ -17,6 +17,9 @@ public class MonitoringFacility {
 
     private String detection;
 
+    private  double price;
+
+
     public Integer getId() {
         return id;
     }
@@ -79,5 +82,13 @@ public class MonitoringFacility {
 
     public void setDetection(String detection) {
         this.detection = detection;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 }

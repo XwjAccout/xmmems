@@ -20,13 +20,9 @@ public class MaterialManagement {
     @Id
     @Column(name = "id")
     private Integer id;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @Column(name = "createTime")
-    private Date createTime;
+
     @Column(name = "name")
     private String name;
-    @Column(name = "count")
-    private Integer count;
     @Column(name = "warnCount")
     private Integer warnCount;
     @Column(name = "unit")
@@ -38,9 +34,21 @@ public class MaterialManagement {
     @Column(name = "remarks")
     private String remarks;
 
-
     //    保存未预警、预警状态)
     @Transient
     private String warnType;
+    @Transient
+    private Integer num;
+
+//类型
+    @Column(name = "type")
+    private String type;
+    @Column(name = "fId")
+    private Integer fId;
+    @Column(name = "rId")
+    private Integer rId;
+
+
+
 
 }

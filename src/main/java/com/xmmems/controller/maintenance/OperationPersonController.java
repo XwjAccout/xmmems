@@ -9,6 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("operationPerson")
 public class OperationPersonController {
@@ -68,5 +71,12 @@ public class OperationPersonController {
     public ResponseEntity<Void> delete(@RequestParam(value = "id") Integer id) {
         operationPersonSerice.delete(id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/treeformUnit")
+    @SystemControllerLog(descrption = "运维公司树形结构", actionType = "5")
+    public  ResponseEntity<List> treeformunit(){
+        List<Map<String, Object>> list= operationPersonSerice.treeformUnit();
+        return ResponseEntity.ok(list);
     }
 }

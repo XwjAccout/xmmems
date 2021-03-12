@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmmems.mapper.MaterialManagementMapper">
+    <select id="num" resultType="com.xmmems.material.domain.MaterialManagement">
+        SELECT m.* ,SUM(i.num)as num FROM material_management as m LEFT JOIN inventorydetails as i on m.id=i.mid
+        <where>
+        <if test="siteId !=null and siteId !=''">
+           and  m.siteId=#{siteId}
+        </if>
+        <if test="name !=null and name !=''">
+            and m.name LIKE CONCAT(CONCAT('%', #{name}), '%')
+        </if>
+        <if test="type !=null and type !=''">
+            and m.type=#{type}
+        </if>
+        </where>
+        group
+        by m.id
+    </select>
+</mapper>

@@ -70,7 +70,7 @@ public class AccountService {
     }
 
     public PageResult<AccountDTO> pageQuery(Integer limit, Integer page, String userName) {
-        try {
+//        try {
             //封装分页信息
             PageHelper.startPage(page, limit);
             //封装查询条件
@@ -89,9 +89,9 @@ public class AccountService {
             //封装自定义的分页对象
             //因为中间经过处理，所以分页插件总数需要重新设置
             return new PageResult<>(info.getPageSize(), page, info.getTotal(), info.getPages(), accountDTOS);
-        } catch (Exception e) {
-            throw new XMException(ExceptionEnum.ACCOUNT_NOT_FOUND);
-        }
+//        } catch (Exception e) {
+//            throw new XMException(ExceptionEnum.ACCOUNT_NOT_FOUND);
+//        }
     }
 
     @Autowired

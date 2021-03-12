@@ -5,6 +5,7 @@ import lombok.Data;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Date;
 
 /**
  * @描述
@@ -18,14 +19,21 @@ public class Cost {
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "title")
-    private String title;
+    @Column(name = "receiveAccountName")
+    String receiveAccountName;
+
+    @Column(name = "receiveAccountId")
+    Integer receiveAccountId;
+
+    @Column(name = "noticeId")
+    Integer noticeId;
+
+    @Column(name = "receiptTime")
+    Date receiptTime;
+
+    @Column(name = "counts")
+    Integer counts;
 
     @Column(name = "price")
-    private Double price;
-
-    @Column(name = "pid")
-    private Integer pid;
-
-
+    double price;
 }
