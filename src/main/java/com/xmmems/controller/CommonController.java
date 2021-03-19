@@ -80,6 +80,7 @@ public class CommonController {
         comMap.put("waterquality", waterquality);
 
         comMap.put("ditu", result);
+        System.out.println("********waterquality"+comMap);
         return ResponseEntity.ok(comMap);
 
     }
@@ -90,7 +91,9 @@ public class CommonController {
     public ResponseEntity<Object> allItems() {
 
         //获取当前用户所拥有的的站点的对应的监测项目信息，去除重复的项目
-        return ResponseEntity.ok(baseSiteitemMapper.selectByAccountId(UserHolder.loginId()));
+        List<Map<String, String>> body = baseSiteitemMapper.selectByAccountId(UserHolder.loginId());
+        System.out.println("***********allItems"+body);
+        return ResponseEntity.ok(body);
     }
 
 
@@ -116,6 +119,7 @@ public class CommonController {
         });
 
         //获取当前用户所拥有的的站点的对应的监测项目信息，去除重复的项目
+        System.out.println("*******exceed"+mapList);
         return ResponseEntity.ok(mapList);
     }
 }

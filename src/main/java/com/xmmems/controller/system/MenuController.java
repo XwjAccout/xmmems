@@ -112,6 +112,7 @@ public class MenuController {
     @SystemControllerLog(descrption = "查找所有一级菜单", actionType = "4")
     public ResponseEntity<List<MenuDTO>> findPmenu() {
         List<MenuDTO> menu = menuService.findPmenu();
+        System.out.println("**********findPmenu"+menu);
         return ResponseEntity.ok(menu);
     }
 

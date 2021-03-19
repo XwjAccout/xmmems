@@ -59,14 +59,6 @@ public class ExceedStandardService {
 
         List<ExceedStandard> list = new ArrayList<>();
         if (envHourDatas != null) {
-
-            Future<String> standardLevelFuture = PoolExecutor.submit(new Callable<String>() {
-                @Override
-                public String call() throws Exception {
-                    //1、查询站点标准水质
-                    return getSlevel(siteId);
-                }
-            });
             Future<Map<String, List<EnvQualityConf>>> allEnvQualityConfsFuture = PoolExecutor.submit(new Callable<Map<String, List<EnvQualityConf>>>() {
                 @Override
                 public Map<String, List<EnvQualityConf>> call() throws Exception {
@@ -81,7 +73,6 @@ public class ExceedStandardService {
                 }
             });
 
-
             Future<List<String>> columnsFuture = PoolExecutor.submit(new Callable<List<String>>() {
                 @Override
                 public List<String> call() throws Exception {
@@ -94,10 +85,9 @@ public class ExceedStandardService {
 
             Map<String, List<EnvQualityConf>> allEnvQualityConfs = null;
             List<String> collect = null;
-            String standardLevel = null;
+            String standardLevel = getSlevel(siteId);
             try {
                 collect = columnsFuture.get();
-                standardLevel = standardLevelFuture.get();
                 allEnvQualityConfs = allEnvQualityConfsFuture.get();
             } catch (Exception e) {
                 FileLog.error("多线程获取获取数据出错com.xmmems.service.ExceedStandardService.findByDateAndSiteName");

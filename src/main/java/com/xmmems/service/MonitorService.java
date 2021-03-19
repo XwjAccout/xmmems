@@ -1338,14 +1338,6 @@ public class MonitorService {
     }
 
     public String itemWaterQualityCategory(Integer siteId, Map<String, String> subCategoryMap) {
-        Future<Integer> submit = PoolExecutor.submit(new Callable<Integer>() {
-            @Override
-            public Integer call() throws Exception {
-                return getSlevel(siteId + "");
-            }
-        });
-
-
         int max = -1;
         for (String level : subCategoryMap.values()) {
             int of = level.indexOf("$$");
@@ -1356,15 +1348,10 @@ public class MonitorService {
             max = max > i ? max : i;
         }
 
-
         //从分项水质类别中取出最大的级别
         String maxLevel = WaterLevelTransformUtil.levelIntToLevelString(max);
-        Integer standard = 3;
-        try {
-            standard = submit.get();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Integer standard = getSlevel(siteId + "");
+
         if (max > standard) {
             //比标准水质大，就是有问题的水质，需要加$$标识
             return maxLevel + "$$";

@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -30,7 +29,7 @@ public class MaterialManagementController {
             @RequestParam(value = "warnType", required = false) String warnType,
             @RequestParam(value = "type", required = false) String type) {
         PageResult<MaterialManagement> pageResult = materialManagementService.findPage(limit, page, name, siteId, type,warnType);
-
+        System.out.println("*********findPage"+pageResult);
         return ResponseEntity.ok(pageResult);
     }
 

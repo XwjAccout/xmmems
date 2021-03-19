@@ -33,7 +33,10 @@ public class ExceedStandardController {
     @GetMapping("/realtime")
     @SystemControllerLog(descrption = "实时达标情况", actionType = "4")
     public ResponseEntity<List<Map<String,Object>>> realtime(){
-        return ResponseEntity.ok(exceedStandardService.realtime());
+
+        List<Map<String, Object>> realtime = exceedStandardService.realtime();
+        System.out.println("*******realtime"+realtime);
+        return ResponseEntity.ok(realtime);
     }
 
     @GetMapping("/qualityEvaluation")

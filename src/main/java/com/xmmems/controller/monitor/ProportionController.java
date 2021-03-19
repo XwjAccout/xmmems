@@ -32,6 +32,7 @@ public class ProportionController {
                 result.add(level);
             }
         });
+        System.out.println("********Proportion"+result);
         return result;
     }
 

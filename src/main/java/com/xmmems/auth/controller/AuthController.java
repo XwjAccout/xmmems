@@ -24,6 +24,7 @@ public class AuthController {
     @SystemControllerLog(descrption = "验证用户信息",actionType = "4")
     public ResponseEntity<SysUserToken> verifyUser(HttpServletRequest request, HttpServletResponse response){
         SysUserToken userToken = authService.verifyUser(request, response);
+        System.out.println("***************"+userToken);
         return ResponseEntity.ok(userToken);
     }
 
