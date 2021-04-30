@@ -4,7 +4,6 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.xmmems.common.exception.ExceptionEnum;
 import com.xmmems.common.exception.XMException;
-import com.xmmems.common.utils.BeanHelper;
 import com.xmmems.common.utils.CustomUtils;
 import com.xmmems.domain.env.EnvAddressBook;
 import com.xmmems.domain.env.EnvAddressBookExample;
@@ -17,21 +16,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class AddressBookService {
     @Autowired
    private EnvAddressBookMapper envAddressBookMapper;
 
 
     public PageResult<EnvAddressBook> pageQuery(Integer limit, Integer page, String name) {
-//        try {
             //封装分页信息
             PageHelper.startPage(page, limit);
             //封装查询条件
             EnvAddressBookExample example = new EnvAddressBookExample();
-            // example.setOrderByClause("id desc");
             EnvAddressBookExample.Criteria criteria = example.createCriteria();
-            // criteria.andIsvalidEqualTo("1");
             if (StringUtils.isNotBlank(name)) {
                 criteria.andNameLike(CustomUtils.likeValue(name));
             }
@@ -44,9 +40,6 @@ public class AddressBookService {
                     new PageResult<>(pageInfo.getPageSize(), page, pageInfo.getTotal(), pageInfo.getPages(), pageInfo.getList());
 
             return pageResult;
-//        } catch (Exception e) {
-//            throw new XMException(ExceptionEnum.DATA_NOT_FOUND);
-//        }
     }
 
     public EnvAddressBook findById(Integer id) {

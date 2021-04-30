@@ -15,20 +15,11 @@ public class FormatNumberKit {
      * @return
      */
     public static String format(String value, String digitStr) {
-        //String result = value;
-        //String troubleCode = "";
-        //if (result.contains("$$")) {
-        //    troubleCode = StrUtil.subAfter(result, "$$", true);
-        //}
 
-        if (StringUtils.isNotBlank(digitStr)) {
-            if (StringUtils.isNotBlank(value)) {
-                value = getValInScience(value, Integer.valueOf(digitStr));
-            }
+        if (StringUtils.isNotBlank(digitStr) && StringUtils.isNotBlank(value)) {
+            value = getValInScience(value, Integer.valueOf(digitStr));
         }
         return value;
-
-        //return result + (StringUtils.isNotBlank(troubleCode) ? "$$" + troubleCode : "");
     }
 
     /**
@@ -36,18 +27,17 @@ public class FormatNumberKit {
      *
      * @return
      */
-    public static String getValInScience(String val, int digit) {
+    private static String getValInScience(String val, int digit) {
         try {
             return new BigDecimal(val).setScale(digit, BigDecimal.ROUND_HALF_EVEN).toPlainString();
-
-        } catch (Exception e) {
-            System.out.println("数据解析异常--->" + val);
+        } catch (Exception ignore) {
+            return "";
         }
-        return "";
     }
 
     /**
      * 银行家算法
+     *
      * @param value 原始值
      * @param digit 保留小数位
      * @return 保留后的值
@@ -55,7 +45,7 @@ public class FormatNumberKit {
     public static String scale(String value, String digit) {
         try {
             //if(digit==null||digit.trim().length()==0) digit = "5";
-            return new BigDecimal(value.replace(",","").trim()).setScale(Integer.valueOf(digit), BigDecimal.ROUND_HALF_EVEN).toPlainString();
+            return new BigDecimal(value.replace(",", "").trim()).setScale(Integer.valueOf(digit), BigDecimal.ROUND_HALF_EVEN).toPlainString();
         } catch (NumberFormatException e) {
             System.out.println("数据解析异常--->" + value);
             e.printStackTrace();
@@ -63,7 +53,7 @@ public class FormatNumberKit {
         }
     }
 
-    public static String scale(BigDecimal bd , String digit) {
+    public static String scale(BigDecimal bd, String digit) {
         try {
             return bd.setScale(Integer.valueOf(digit), BigDecimal.ROUND_HALF_EVEN).toPlainString();
         } catch (NumberFormatException e) {

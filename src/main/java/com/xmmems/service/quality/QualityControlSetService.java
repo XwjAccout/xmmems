@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class QualityControlSetService {
     @Autowired
     QualityControlSetMapper qualityControlSetMapper;
@@ -25,7 +25,6 @@ public class QualityControlSetService {
             PageHelper.startPage(page, limit);
             //封装查询条件
             QualityControlSetExample example = new QualityControlSetExample();
-            // example.setOrderByClause("id desc");
             QualityControlSetExample.Criteria criteria = example.createCriteria();
              criteria.andTypeEqualTo(type);
             if(siteId!=null){

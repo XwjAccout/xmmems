@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class PermissionService {
     @Autowired
     private PermissionMapper permissionMapper;
@@ -32,8 +32,6 @@ public class PermissionService {
             //封装查询条件
             PermissionExample example = new PermissionExample();
              example.setOrderByClause("actionKey asc");
-            PermissionExample.Criteria criteria = example.createCriteria();
-            // criteria.andIsvalidEqualTo("1");
             List<Permission> baseSites = permissionMapper.selectByExample(example);
 
             //得到pageHelper的分页对象

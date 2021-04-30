@@ -4,18 +4,18 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.xmmems.common.exception.ExceptionEnum;
 import com.xmmems.common.exception.XMException;
-import com.xmmems.common.utils.CustomUtils;
-import com.xmmems.domain.env.*;
+import com.xmmems.domain.env.EnvWarningGroup;
+import com.xmmems.domain.env.EnvWarningGroupExample;
+import com.xmmems.domain.env.EnvWarningGroupWithBLOBs;
 import com.xmmems.dto.PageResult;
 import com.xmmems.mapper.EnvWarningGroupMapper;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class WarningGroupService {
     @Autowired
    private EnvWarningGroupMapper envWarningGroupMapper;
@@ -26,19 +26,13 @@ public class WarningGroupService {
             PageHelper.startPage(page, limit);
             //封装查询条件
             EnvWarningGroupExample example = new EnvWarningGroupExample();
-            // example.setOrderByClause("id desc");
-            EnvWarningGroupExample.Criteria criteria = example.createCriteria();
-            // criteria.andIsvalidEqualTo("1");
 
             List<EnvWarningGroup> baseSites = envWarningGroupMapper.selectByExample(example);
 
             //得到pageHelper的分页对象
             PageInfo<EnvWarningGroup> pageInfo = new PageInfo<>(baseSites);
             //封装自定义的分页对象
-            PageResult<EnvWarningGroup> pageResult =
-                    new PageResult<>(pageInfo.getPageSize(), page, pageInfo.getTotal(), pageInfo.getPages(), pageInfo.getList());
-
-            return pageResult;
+            return new PageResult<>(pageInfo.getPageSize(), page, pageInfo.getTotal(), pageInfo.getPages(), pageInfo.getList());
         } catch (Exception e) {
             throw new XMException(ExceptionEnum.ROLE_NOT_FOUND);
         }

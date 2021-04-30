@@ -21,7 +21,7 @@ import java.util.List;
  * @创建时间 2021.01.20 16:47
  */
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Slf4j
 public class TasktemplateService {
 

@@ -18,7 +18,7 @@ import java.util.*;
  * @创建时间 2020.09.18 09:37
  */
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class ArService {
     @Autowired
     private SimpleHourDataMapper simpleHourDataMapper;
@@ -52,10 +52,7 @@ public class ArService {
         List<Double> list = new ArrayList<>();
 
         for (Map<String, String> map : mapList) {
-            //String troubleCode = map.get("troubleCode");
-            //if ("N".equals(troubleCode.trim())) {
             list.add(Double.parseDouble(map.get("value")));
-            //}
         }
 
         Collections.reverse(list);
@@ -80,6 +77,8 @@ public class ArService {
                     break;
                 case 8:
                     subHour = 3;
+                    break;
+                default:
                     break;
             }
 

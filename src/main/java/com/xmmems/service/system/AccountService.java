@@ -29,16 +29,13 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Slf4j
 public class AccountService {
     @Autowired
     private AccountMapper accountMapper;
-
     @Autowired
     private RoleService roleService;
-
-
 
     /**
      * 根据用户名查找用户信息
@@ -65,8 +62,7 @@ public class AccountService {
     }
     //
     public BaseSite findBycenterSiteId() {
-        BaseSite baseSite = accountMapper.findBycenterSiteId(UserHolder.loginId());
-        return baseSite;
+        return accountMapper.findBycenterSiteId(UserHolder.loginId());
     }
 
     public PageResult<AccountDTO> pageQuery(Integer limit, Integer page, String userName) {
@@ -84,11 +80,11 @@ public class AccountService {
             if (CollectionUtils.isEmpty(accounts)) {
                 throw new XMException(ExceptionEnum.ACCOUNT_NOT_FOUND);
             }
-            List<AccountDTO> accountDTOS = BeanHelper.copyWithCollection(accounts, AccountDTO.class);
+            List<AccountDTO> dtos = BeanHelper.copyWithCollection(accounts, AccountDTO.class);
 
             //封装自定义的分页对象
             //因为中间经过处理，所以分页插件总数需要重新设置
-            return new PageResult<>(info.getPageSize(), page, info.getTotal(), info.getPages(), accountDTOS);
+            return new PageResult<>(info.getPageSize(), page, info.getTotal(), info.getPages(), dtos);
 //        } catch (Exception e) {
 //            throw new XMException(ExceptionEnum.ACCOUNT_NOT_FOUND);
 //        }
@@ -105,8 +101,8 @@ public class AccountService {
         AccountDTO accountDTO = BeanHelper.copyProperties(account, AccountDTO.class);
 
         //添加角色信息
-        List<RoleDTO> roleDTOS = roleService.findRoleByAccountId(id);
-        accountDTO.setRoleDTOS(roleDTOS);
+        List<RoleDTO> dtos = roleService.findRoleByAccountId(id);
+        accountDTO.setRoleDTOS(dtos);
         //添加站点信息
         List<Map<String, Object>> mapList = baseService.findAccountId(id);
         accountDTO.setSites(mapList);
@@ -116,7 +112,7 @@ public class AccountService {
     }
 
     public void save(Account account) {
-        account.setSalt("1");//现在的加密方式这个是没有效果的
+        account.setSalt("1");
         account.setCreateAt(new Date());
         account.setStatus(1);
         //密码加密
@@ -154,7 +150,7 @@ public class AccountService {
         }
     }
     public void delete(Integer id) {
-        if (UserHolder.loginId() == id) {
+        if (UserHolder.loginId().equals(id)) {
             throw new XMException(500, "不能删除自己的账号");
         }
         int i = accountMapper.deleteByPrimaryKey(id);
@@ -164,7 +160,7 @@ public class AccountService {
     }
 
     public void lock(Integer id, Integer status) {
-        if (status == -1 && UserHolder.loginId() == id) {
+        if (status == -1 && UserHolder.loginId().equals(id)) {
             throw new XMException(500, "不能锁定自己的账号");
         }
         if (id == 1) {
@@ -174,9 +170,7 @@ public class AccountService {
         Account record = new Account();
         record.setId(id);
         record.setStatus(status);
-        //if (status==-1)
-        //record.setSalt("0");
-        //else record.setSalt("1");
+
         int i = accountMapper.updateByPrimaryKeySelective(record);
         if (i < 1) {
             throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
@@ -225,7 +219,9 @@ public class AccountService {
 
     public int selectState(Integer id) {
         Account account = accountMapper.selectById(id);
-        if(account!=null) return account.getStatus();
+        if(account!=null) {
+            return account.getStatus();
+        }
         return -1;
     }
 }

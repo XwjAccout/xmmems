@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class MenuService {
 
     @Autowired
@@ -139,11 +139,10 @@ public class MenuService {
         List<Map<String, Object>> list0 = new ArrayList<>();
         //不为空
         if (menus.size() > 0) {
-            Map<String, Object> map0 = new HashMap<>();
+            Map<String, Object> map0 = new HashMap<>(4);
             List<Map<String, Object>> list = new ArrayList<>();
             for (Menu menu : menus) {
-                //                if (menu.getPcode().equals(pcode)) {
-                Map<String, Object> map = new HashMap<>();
+                Map<String, Object> map = new HashMap<>(8);
                 map.put("name", menu.getName());
                 map.put("path", menu.getNewUrl());
                 map.put("id", menu.getId());
@@ -151,19 +150,15 @@ public class MenuService {
                 List<Map<String, Object>> list2 = new ArrayList<>();
                 List<Menu> menuslist = menuMapper.findByPidRoleids(menu.getCode(), roleids);
                 for (Menu menu2 : menuslist) {
-                    //                        if (menu2.getPcode().equals(menu.getCode())) {
-                    Map<String, Object> map2 = new HashMap<>();
+                    Map<String, Object> map2 = new HashMap<>(8);
                     map2.put("name", menu2.getName());
                     map2.put("path", menu2.getNewUrl());
                     map2.put("id", menu2.getId());
                     map2.put("icon", menu2.getIcon());
                     list2.add(map2);
-                    //                        }
-
                 }
                 map.put("menu", list2);
                 list.add(map);
-                //                }
             }
             map0.put("menu", list);
             //封装数据
@@ -207,21 +202,21 @@ public class MenuService {
         if (!CollectionUtils.isEmpty(menus)) {
             for (Menu menu0 : menus) {
                 if ("0".equals(menu0.getLevel())) {
-                    Map<String, Object> map0 = new HashMap<>();
+                    Map<String, Object> map0 = new HashMap<>(8);
                     map0.put("name", menu0.getName());
                     map0.put("path", menu0.getNewUrl());
                     map0.put("id", menu0.getId());
                     List<Map<String, Object>> list1 = new ArrayList<>();
                     for (Menu menu1 : menus) {
                         if ("1".equals(menu1.getLevel()) && menu1.getPcode().equals(menu0.getCode())) {
-                            Map<String, Object> map1 = new HashMap<>();
+                            Map<String, Object> map1 = new HashMap<>(8);
                             map1.put("name", menu1.getName());
                             map1.put("path", menu1.getNewUrl());
                             map1.put("id", menu1.getId());
                             List<Map<String, Object>> list2 = new ArrayList<>();
                             for (Menu menu2 : menus) {
                                 if ("2".equals(menu2.getLevel()) && menu2.getPcode().equals(menu1.getCode())) {
-                                    Map<String, Object> map2 = new HashMap<>();
+                                    Map<String, Object> map2 = new HashMap<>(8);
                                     map2.put("name", menu2.getName());
                                     map2.put("path", menu2.getNewUrl());
                                     map2.put("id", menu2.getId());

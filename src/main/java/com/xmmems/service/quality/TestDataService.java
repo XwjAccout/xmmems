@@ -22,7 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class TestDataService {
     @Autowired
     private ZeroCheckHandledMapper zeroCheckHandledMapper;
@@ -31,13 +31,11 @@ public class TestDataService {
     @Autowired
     private ZeroCheckMapper zeroCheckMapper;
 
-    private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
     //查询零点核查数据1
     public List<Map<String, Object>> zeroData(String start, String end, Integer siteId) {
         List<ZeroCheck> list = zeroCheckMapper.selectZeroData(start, end, siteId, 1);
-        Map<String, ZeroSpan> zeroSpanMap = new LinkedHashMap<>();
-        Map<String, List<ZeroCheck>> zeroSpanMap1 = new LinkedHashMap<>();
+        Map<String, ZeroSpan> zeroSpanMap = new LinkedHashMap<>(16);
+        Map<String, List<ZeroCheck>> zeroSpanMap1 = new LinkedHashMap<>(16);
         for (ZeroCheck zeroCheck : list) {
             List<ZeroCheck> zeroChecks = zeroSpanMap1.computeIfAbsent(zeroCheck.getItemName(), k -> new ArrayList<>());
             zeroChecks.add(zeroCheck);
@@ -66,12 +64,10 @@ public class TestDataService {
                 specific.setLastResult(last);
                 double relativeStr = 0;
                 double absoluteStr = 0;
-                //if (!temp.getCheck().equals("0.0")) {
                 //计算绝对误差  绝对误差=测试结果-标液浓度(取绝对值）
                 absoluteStr = Double.parseDouble(temp.getCheck()) - Double.parseDouble(temp.getConcentration());
                 //计算相对误差  相对误差=（测试结果-前一次测量结果）*100/跨度值
                 relativeStr = (Double.parseDouble(temp.getCheck()) - Double.parseDouble(specific.getLastResult())) * 100 / Double.parseDouble(temp.getSpanvalues());
-                //}
                 String relative = null;
                 String absolute = null;
                 switch (temp.getItemName()) {
@@ -195,7 +191,8 @@ public class TestDataService {
                 specific.setLastResult(last);
                 double absoluteStr = 0.0;
                 double relativeStr = 0.0;
-                double v = Double.parseDouble(temp.getConcentration()); //标液浓度
+                double v = Double.parseDouble(temp.getConcentration());
+                //标液浓度
                 if (v != 0) {
                     //计算相对误差  （测试结果-标液浓度）/标液浓度
                     absoluteStr = (Double.parseDouble(temp.getCheck()) - v) * 100 / v;
@@ -294,7 +291,7 @@ public class TestDataService {
     private void convert(List<Map<String, Object>> list, String s) {
         Map<String, Object> map = JsonUtils.toMap(s, String.class, Object.class);
         map.put("content", JsonUtils.toBean((String) map.get("content"), List.class));
-        map.put("genTime", sdf.format(new Date((Long) map.get("genTime"))));
+        map.put("genTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date((Long) map.get("genTime"))));
         list.add(map);
     }
 
@@ -304,8 +301,8 @@ public class TestDataService {
         example.setOrderByClause("genTime desc");
         ZeroCheckHandledExample.Criteria criteria = example.createCriteria();
         try {
-            criteria.andGenTimeGreaterThanOrEqualTo(sdf.parse(start));
-            criteria.andGenTimeLessThanOrEqualTo(sdf.parse(end));
+            criteria.andGenTimeGreaterThanOrEqualTo(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(start));
+            criteria.andGenTimeLessThanOrEqualTo(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(end));
         } catch (ParseException e) {
             throw new XMException(500, "日期解析错误");
         }
@@ -328,8 +325,8 @@ public class TestDataService {
         InspectDataExample example = new InspectDataExample();
         InspectDataExample.Criteria criteria = example.createCriteria();
         try {
-            criteria.andGenTimeGreaterThanOrEqualTo(sdf.parse(start));
-            criteria.andGenTimeLessThanOrEqualTo(sdf.parse(end));
+            criteria.andGenTimeGreaterThanOrEqualTo(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(start));
+            criteria.andGenTimeLessThanOrEqualTo(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(end));
         } catch (ParseException e) {
             throw new XMException(500, "日期解析错误");
         }
@@ -339,7 +336,6 @@ public class TestDataService {
 
 
     public Map<String, Object> standardVerification(String start, String end, Integer siteId, Integer itemId) {
-        //start = DateFormat.formatSome(DateFormat.parseSome(start).getTime() - 86400000);
         end = DateFormat.formatSome(DateFormat.parseSome(end).getTime() + 86400000);
 
         List<Map<String, String>> res1 = new ArrayList<>();
@@ -353,15 +349,18 @@ public class TestDataService {
             BigDecimal bigDecimal15 = new BigDecimal("15");
             BigDecimal bigDecimal20 = new BigDecimal("20");
 
-            BigDecimal hundred = new BigDecimal("100");//用来得到百分比用的
-            Map<String, String> spanCheckCompare = ReportConfig.getSpanCheckCompare();  //跨度核查误差比较值集合
-            Map<String, String> spanDriftCompare = ReportConfig.getSpanDriftCompare();  //跨度漂移误差比较值集合
+            BigDecimal hundred = new BigDecimal("100");
+            //用来得到百分比用的
+            Map<String, String> spanCheckCompare = ReportConfig.getSpanCheckCompare();
+            //跨度核查误差比较值集合
+            Map<String, String> spanDriftCompare = ReportConfig.getSpanDriftCompare();
+            //跨度漂移误差比较值集合
             for (Map<String, String> contentItem : list) {
                 //1、下面是跨度核查的主体数据
                 String rangev = contentItem.get("spanvalues");//跨度值
                 String nowResult = contentItem.get("checkdata");//测量结果
                 String solution = contentItem.get("concentration");//标液浓度
-                if (solution.equals("0.0")) {
+                if ("0.0".equals(solution)) {
                     continue;
                 }
                 //String unit = "mg/L";//单位,高锰酸盐指数，氨氮，总氮，总磷均是
@@ -373,16 +372,18 @@ public class TestDataService {
 
                 String itemName = contentItem.get("itemName");
 
-                Map<String, String> temp = new HashMap<>();
+                Map<String, String> temp = new HashMap<>(16);
                 temp.put("genTime", contentItem.get("genTime"));
                 temp.put("itemName", itemName);
                 temp.put("solution", solution);
                 temp.put("original", nowResult);
                 temp.put("unit", "mg/L");
                 temp.put("rangev", rangev);
-                String compare = spanCheckCompare.get(itemName);//比较值
+                String compare = spanCheckCompare.get(itemName);
+                //比较值
 
-                BigDecimal percentDecimal = new BigDecimal(percent.replace("-", ""));//取得绝对值
+                BigDecimal percentDecimal = new BigDecimal(percent.replace("-", ""));
+                //取得绝对值
 
                 if (percentDecimal.compareTo(new BigDecimal(compare)) > 0) {
                     temp.put("nowResult", scale(itemName, nowResultDecimal) + "$$");
@@ -464,7 +465,7 @@ public class TestDataService {
             res3.put("qualifiedRate", new BigDecimal((numqu * 100 / all) + "").setScale(2, BigDecimal.ROUND_HALF_EVEN).toPlainString() + "%");
         }
 
-        Map<String, Object> res = new HashMap<>();
+        Map<String, Object> res = new HashMap<>(4);
         res.put("res1", res1);
         res.put("res2", res2);
         res.put("res3", res3);
@@ -472,7 +473,7 @@ public class TestDataService {
     }
 
     private Map<String, Object> getStringObjectMap(int num, String proportion, String range) {
-        Map<String, Object> m10 = new HashMap<>();
+        Map<String, Object> m10 = new HashMap<>(4);
         m10.put("range", range);
         m10.put("num", num);
         m10.put("proportion", proportion);
@@ -518,7 +519,7 @@ public class TestDataService {
                     title = "合格范围：≤±0.002";
                 }
             }
-            Map<String, String> map = new HashMap<>();
+            Map<String, String> map = new HashMap<>(4);
             map.put(qualified, title);
             return map;
         }
@@ -575,7 +576,7 @@ public class TestDataService {
                     title = "合格范围：≤±5%";
                 }
             }
-            Map<String, String> map = new HashMap<>();
+            Map<String, String> map = new HashMap<>(4);
             map.put(qualified, title);
             return map;
         }
@@ -592,7 +593,7 @@ public class TestDataService {
             qualified = "不合格";
             title = "合格范围：≤±10%";
         }
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>(4);
         map.put(qualified, title);
         return map;
 
@@ -613,17 +614,18 @@ public class TestDataService {
             BigDecimal bigDecimal20 = new BigDecimal("20");
 
             BigDecimal hundred = new BigDecimal("100");//用来得到百分比用的
-            Map<String, String> spanCheckCompare = ReportConfig.getZeroCheckCompare();  //空白核查误差比较值集合
-            Map<String, String> spanDriftCompare = ReportConfig.getZeroDriftCompare();  //空白漂移误差比较值集合
+            Map<String, String> spanCheckCompare = ReportConfig.getZeroCheckCompare();
+            //空白核查误差比较值集合
+            Map<String, String> spanDriftCompare = ReportConfig.getZeroDriftCompare();
+            //空白漂移误差比较值集合
             for (Map<String, String> contentItem : list) {
-                //1、下面是跨度核查的主体数据
-                String rangev = contentItem.get("spanvalues");//跨度值
-                String nowResult = contentItem.get("checkdata");//测量结果
-                String solution = contentItem.get("concentration");//标液浓度
-                /*if (solution.equals("0.0")) {
-                    continue;
-                }*/
-                //String unit = "mg/L";//单位,高锰酸盐指数，氨氮，总氮，总磷均是
+                //1、下面是空白核查的主体数据
+                String rangev = contentItem.get("spanvalues");
+                //跨度值
+                String nowResult = contentItem.get("checkdata");
+                //测量结果
+                String solution = contentItem.get("concentration");
+                //标液浓度
 
                 BigDecimal nowResultDecimal = new BigDecimal(nowResult);
                 BigDecimal solutionDecimal = new BigDecimal(solution);
@@ -631,16 +633,18 @@ public class TestDataService {
                 //零点核查绝对误差 ：测试结果-标液浓度（取绝对值）
                 String percent = scale(itemName, nowResultDecimal.subtract(solutionDecimal));
 
-                Map<String, String> temp = new HashMap<>();
+                Map<String, String> temp = new HashMap<>(16);
                 temp.put("genTime", contentItem.get("genTime"));
                 temp.put("itemName", itemName);
                 temp.put("solution", solution);
                 temp.put("original", nowResult);
                 temp.put("unit", "mg/L");
                 temp.put("rangev", rangev);
-                String compare = spanCheckCompare.get(itemName);//比较值
+                String compare = spanCheckCompare.get(itemName);
+                //比较值
 
-                BigDecimal percentDecimal = new BigDecimal(percent.replace("-", ""));//取得绝对值
+                BigDecimal percentDecimal = new BigDecimal(percent.replace("-", ""));
+                //取得绝对值
 
                 if (percentDecimal.compareTo(new BigDecimal(compare)) > 0) {
                     temp.put("nowResult", scale(itemName, nowResultDecimal) + "$$");
@@ -722,7 +726,7 @@ public class TestDataService {
             res3.put("qualifiedRate", new BigDecimal((numqu * 100 / all) + "").setScale(2, BigDecimal.ROUND_HALF_EVEN).toPlainString() + "%");
         }
 
-        Map<String, Object> res = new HashMap<>();
+        Map<String, Object> res = new HashMap<>(4);
         res.put("res1", res1);
         res.put("res2", res2);
         res.put("res3", res3);
@@ -732,7 +736,7 @@ public class TestDataService {
     public List<Map<String, Object>> site() {
         List<Map<String, Object>> site = zeroCheckMapper.site(UserHolder.loginId());
         site.forEach(t -> {
-            Map<String, String> map = new HashMap<>();
+            Map<String, String> map = new HashMap<>(16);
             for (String item : (t.get("item") + "").split(",")) {
                 String[] split = item.split("=");
                 map.put(split[0], split[1]);

@@ -6,17 +6,13 @@ import com.xmmems.common.exception.ExceptionEnum;
 import com.xmmems.common.exception.XMException;
 import com.xmmems.dto.PageResult;
 import com.xmmems.mapper.InventorydetailsMapper;
-import com.xmmems.material.domain.Inventorydetails;
-import com.xmmems.material.domain.MaterialManagement;
 import com.xmmems.mapper.MaterialManagementMapper;
-import org.apache.commons.lang3.StringUtils;
+import com.xmmems.material.domain.MaterialManagement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tk.mybatis.mapper.entity.Example;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,7 +20,7 @@ import java.util.List;
  * @创建人 ithxw
  * @创建时间 2021.02.23 09:56
  */
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class MaterialManagementService {
     @Autowired
@@ -54,13 +50,13 @@ public class MaterialManagementService {
             }else{
                 temp.setWarnType("未预警");
             }
-            if(temp.getWarnType().equals("预警")){
+            if("预警".equals(temp.getWarnType())){
                 materialManagements1.add(temp);
             }
 
         });
         PageResult<MaterialManagement> result=null;
-        if(warnType.equals("预警")){
+        if("预警".equals(warnType)){
             result   = new PageResult<>(info.getPageSize(), page, info.getTotal(), info.getPages(), materialManagements1);
         }else{
             result   = new PageResult<>(info.getPageSize(), page, info.getTotal(), info.getPages(), materialManagements);
@@ -93,7 +89,6 @@ public class MaterialManagementService {
 
            if (select != null) {
                //已经有物资，修改物资数量数据即可
-//               select.setCount(list.get(i).getCount() + select.getCount());
                select.setSiteName(list.get(i).getSiteName());
                select.setWarnCount(list.get(i).getWarnCount());
                select.setUnit(list.get(i).getUnit());
@@ -106,13 +101,6 @@ public class MaterialManagementService {
 
            } else {
                //数据库还未有该物资，新增数据
-//               materialManagement.setSiteName(siteName);
-//               materialManagement.setCount(count);
-//               materialManagement.setWarnCount(warnCount);
-//               materialManagement.setUnit(unit);
-//               materialManagement.setRemarks(remarks);
-
-//               materialManagement.setCount(list.get(i).getCount());
                materialManagement.setSiteName(list.get(i).getSiteName());
                materialManagement.setWarnCount(list.get(i).getWarnCount());
                materialManagement.setUnit(list.get(i).getUnit());

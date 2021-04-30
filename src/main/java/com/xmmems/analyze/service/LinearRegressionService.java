@@ -20,7 +20,7 @@ import java.util.Map;
  * @创建时间 2020.09.24 11:34
  */
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class LinearRegressionService {
 
     @Autowired
@@ -32,7 +32,7 @@ public class LinearRegressionService {
     public Object linearRegression(Integer siteId, String start, String end, Integer itemId) {
 
         String itemIdStr = itemId + "";
-        Map<String, List<double[]>> itemIdandList = new HashMap<>();
+        Map<String, List<double[]>> itemIdandList = new HashMap<>(16);
 //  key   relation 关系   value   x=y  如：温度=ph代表温度作为x轴，ph作为y轴
 //  key   data 对应数据   value    List<double[]>  如：[[0.067732, 3.176513],[0.42781, 3.816464]]
         TypeReference<List<Map<String, String>>> type = new TypeReference<List<Map<String, String>>>() {
@@ -70,7 +70,7 @@ public class LinearRegressionService {
             if (itemId != itemId1) {
 
                 String itemName = column.getItemName();
-                Map<String, Object> map = new HashMap<>();
+                Map<String, Object> map = new HashMap<>(4);
                 map.put("relation", itemName);
                 map.put("data", itemIdandList.get(itemId1 + ""));
                 listmap.add(map);

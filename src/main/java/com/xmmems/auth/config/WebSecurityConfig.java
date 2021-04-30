@@ -1,7 +1,7 @@
 package com.xmmems.auth.config;
 
 import com.xmmems.auth.filter.JwtLoginFilter;
-import com.xmmems.auth.service.AuthService;
+import com.xmmems.auth.service.AuthServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private AuthService authService;
+    private AuthServiceImpl authServiceImpl;
 
     @Autowired
     private JwtProperties jwtProp;
@@ -30,19 +30,24 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     //指定认证对象的来源
+    @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(authService).passwordEncoder(passwordEncoder());
+        auth.userDetailsService(authServiceImpl).passwordEncoder(passwordEncoder());
     }
 
     //SpringSecurity配置信息
+    @Override
     public void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .anyRequest()//所有的请求
-                .permitAll()//都可以匿名访问，不登录就能访问，类似于之前网关中的白名单
+                //所有的请求
+                .anyRequest()
+                //都可以匿名访问，不登录就能访问，类似于之前网关中的白名单
+                .permitAll()
                 .and()
                 .addFilter(new JwtLoginFilter(super.authenticationManager(), jwtProp))
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)//关闭session
+                //关闭session
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .csrf()
                 .disable();

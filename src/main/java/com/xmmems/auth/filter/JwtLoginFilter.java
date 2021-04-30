@@ -31,6 +31,7 @@ public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
         this.prop = prop;
     }
 
+    @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response){
         // 跨域支持
         try {
@@ -58,6 +59,7 @@ public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
         }
     }
 
+    @Override
     public void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult)
            {
         //封装创建token的用户对象
@@ -71,12 +73,12 @@ public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
         //生成token并写到浏览器的响应头中
         String token = JwtUtils.generateTokenExpireInMinutes(userToken, prop.getPrivateKey(), prop.getUser().getExpire());
 
-        //response.setHeader("");
         response.setHeader(prop.getUser().getCookieName(), token);
         response.addHeader("Access-Control-Allow-Origin", "*");
         response.addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         response.setHeader("Access-Control-Allow-Headers", "*");
-        response.addHeader("Access-Control-Max-Age", "1800");//30 min
+        response.addHeader("Access-Control-Max-Age", "1800");
+        //30 min
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.addHeader("Access-Control-Expose-Headers", prop.getUser().getCookieName());
 
@@ -84,7 +86,7 @@ public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
             response.setContentType("application/json;charset=utf-8");
             response.setStatus(HttpServletResponse.SC_OK);
             PrintWriter out = response.getWriter();
-            Map resultMap = new HashMap();
+            Map<String,Object> resultMap = new HashMap<>(4);
             resultMap.put("code", HttpServletResponse.SC_OK);
             resultMap.put("msg", "认证通过！");
             out.write(new ObjectMapper().writeValueAsString(resultMap));

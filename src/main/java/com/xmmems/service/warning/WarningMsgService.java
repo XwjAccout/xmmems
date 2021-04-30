@@ -7,7 +7,6 @@ import com.xmmems.common.exception.XMException;
 import com.xmmems.common.utils.CustomUtils;
 import com.xmmems.domain.EnvWarningMsg;
 import com.xmmems.domain.EnvWarningMsgExample;
-import com.xmmems.domain.env.EnvWarningGroupWithBLOBs;
 import com.xmmems.dto.PageResult;
 import com.xmmems.mapper.EnvWarningMsgMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -17,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class WarningMsgService {
 
     @Autowired
@@ -29,9 +28,7 @@ public class WarningMsgService {
             PageHelper.startPage(page, limit);
             //封装查询条件
             EnvWarningMsgExample example = new EnvWarningMsgExample();
-            // example.setOrderByClause("id desc");
             EnvWarningMsgExample.Criteria criteria = example.createCriteria();
-            // criteria.andIsvalidEqualTo("1");
             if (StringUtils.isNotBlank(phoneNum)) {
                 criteria.andPhoneNumLike(CustomUtils.likeValue(phoneNum));
             }

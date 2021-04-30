@@ -9,7 +9,8 @@ import java.math.BigDecimal;
 public class EnvQualityConfDTO {
     private Integer itemId;
 
-    private String itemName;  //就是 kpiName
+    private String itemName;
+    //就是 kpiName
 
     private String level;
 
@@ -45,12 +46,18 @@ public class EnvQualityConfDTO {
      * @return true or false
      */
     public boolean compareTo(BigDecimal bigDecimal) {
-        boolean b = bigDecimal.compareTo(new BigDecimal(this.minVal)) > 0 && bigDecimal.compareTo(new BigDecimal(this.maxVal)) <= 0;
+        int b0 = bigDecimal.compareTo(new BigDecimal(this.maxVal));
+        int b1 = bigDecimal.compareTo(new BigDecimal(this.minVal));
+        boolean b = b1 > 0 && b0 <= 0;
         if (!b) {
-            if (this.level.equals("I") && !this.itemName.equals("溶解氧") && !this.itemName.equals("pH") && bigDecimal.compareTo(new BigDecimal(this.minVal)) == 0) {
+            boolean b2 = "pH".equals(this.itemName);
+            boolean b3 = "溶解氧".equals(this.itemName);
+            if ("I".equals(this.level) && !b3 && !b2 && b1 == 0) {
                 return true;
-            } else if (this.level.equals("劣V") && (this.itemName.equals("溶解氧") || this.itemName.equals("pH")) && bigDecimal.compareTo(new BigDecimal(this.minVal)) == 0) {
-                return true;
+            } else {
+                if ("劣V".equals(this.level) && (b3 || b2) && b1 == 0) {
+                    return true;
+                }
             }
         }
         return b;

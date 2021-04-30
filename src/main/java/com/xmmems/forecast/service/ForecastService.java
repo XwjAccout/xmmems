@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Slf4j
 public class ForecastService {
     @Autowired
@@ -41,6 +41,8 @@ public class ForecastService {
                 case 8:
                     subHour = 3;
                     break;
+                default:
+                    break;
             }
 
             for (int i = 2; i <= type; i++) {
@@ -63,10 +65,12 @@ public class ForecastService {
             list.add(Double.parseDouble(value));
         }
         String pre = ArService.getWeightedArithmeticMean(list);
-        if (size) pre = ArService.getArithmeticMean(list);
+        if (size) {
+            pre = ArService.getArithmeticMean(list);
+        }
         String timeStr = mapList.get(mapList.size() - 1).get("timeStr");
         Date date = new Date(DateFormat.parseAll(timeStr).getTime() + subHour * 3600000);
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>(8);
         map.put("timeStr", DateFormat.formatAll(date));
         map.put("preValue", pre);
         mapList.add(map);

@@ -33,7 +33,7 @@ public class PageResult<T> {
         } else {
             this.firstPage = false;
         }
-        if (pageNumber == totalPage) {
+        if (pageNumber.equals(totalPage)) {
             this.lastPage = true;
         } else {
             this.lastPage = false;

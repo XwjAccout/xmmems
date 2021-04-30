@@ -87,6 +87,8 @@ public class PoiController {
             case 12:
                 nowseasons = yyyyStr + "-4";
                 break;
+            default:
+                break;
         }
 
         String type = "seasons" + (isDayAvg ? "日均值" : "月均值");
@@ -616,7 +618,6 @@ public class PoiController {
             //第3-10列
             Cell cell = row.createCell(i + 1);
             cell.setCellValue(itemNames.get(i) + (units.get(i) == null ? "" : ("(" + units.get(i) + ")")));
-            // cell.setCellStyle(this.title(workbook));
         }
         PageResult<Map<String, Object>> pageResult = monitorService.getHistoryData(Integer.MAX_VALUE, 1, siteId, startTime, endTime, "ASC", false);
         List<Map<String, Object>> mapList = pageResult.getRows();
@@ -649,28 +650,20 @@ public class PoiController {
             //设置标题
             cell = row.createCell(0);
             cell.setCellValue("");
-            //cell.setCellStyle(title(workbook));
             cell = row.createCell(1);
             cell.setCellValue("监测时间");
-            //cell.setCellStyle(title(workbook));
             cell = row.createCell(2);
             cell.setCellValue("站点名称");
-            //cell.setCellStyle(title(workbook));
             cell = row.createCell(3);
             cell.setCellValue("监测因子");
-            //cell.setCellStyle(title(workbook));
             cell = row.createCell(4);
             cell.setCellValue("监测值");
-            //cell.setCellStyle(title(workbook));
             cell = row.createCell(5);
             cell.setCellValue("单位");
-            //cell.setCellStyle(title(workbook));
             cell = row.createCell(6);
             cell.setCellValue("标准限值");
-            //cell.setCellStyle(title(workbook));
             cell = row.createCell(7);
             cell.setCellValue("水质类别(超标倍数)");
-            //cell.setCellStyle(title(workbook));
 
             //设置主体内容数据
             for (int i = 0; i < exceedStandards.size(); i++) {

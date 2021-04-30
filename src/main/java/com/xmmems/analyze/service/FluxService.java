@@ -15,7 +15,7 @@ import java.util.*;
  * @创建时间 2020.09.22 13:19
  */
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class FluxService {
     @Autowired
     private SimpleHourDataMapper simpleHourDataMapper;
@@ -33,7 +33,7 @@ public class FluxService {
      */
     public Object fluxKdiagram(Integer siteId, Integer itemId, String start, String end, Integer type) {
         List<Map<String, String>> totalFlow = simpleHourDataMapper.selectValue(siteId, 34, start, end);
-        Map<String, String> flowMap = new HashMap<>();
+        Map<String, String> flowMap = new HashMap<>(16);
         if (totalFlow.size() > 0) {
 
             //按天分组
@@ -41,7 +41,8 @@ public class FluxService {
 
             for (Map<String, String> map : totalFlow) {
                 String timeStr = getHandlerTimeStr(type, map);
-                double value = new BigDecimal(map.get("value")).doubleValue(); //获取这个小时的值
+                double value = new BigDecimal(map.get("value")).doubleValue();
+                //获取这个小时的值
                 List<Double> ds = totalFlowGroupByDay.computeIfAbsent(timeStr, k -> new ArrayList<>());
                 ds.add(value);
             }
@@ -49,7 +50,8 @@ public class FluxService {
             for (Map.Entry<String, List<Double>> entry : totalFlowGroupByDay.entrySet()) {
                 String key = entry.getKey();
                 List<Double> value = entry.getValue();
-                double flow = value.get(value.size() - 1) - value.get(0);//流量=最后累计流量减去最初累计流量
+                double flow = value.get(value.size() - 1) - value.get(0);
+                //流量=最后累计流量减去最初累计流量
                 flowMap.put(key, new BigDecimal(flow + "").toPlainString());
             }
         }
@@ -64,17 +66,23 @@ public class FluxService {
 
         for (Map<String, String> map : list) {
             String timeStr = getHandlerTimeStr(type, map);
-            double value = new BigDecimal(map.get("value")).doubleValue(); //获取这个小时的值
+            double value = new BigDecimal(map.get("value")).doubleValue();
+            //获取这个小时的值
             List<Double> ds = mapGroupByDay.computeIfAbsent(timeStr, k -> new ArrayList<>());
             ds.add(value);
         }
 
         //封装值 1，最大值，2最小值，平均值，初始值，结束值
-        List<List<Object>> finalListdatas = new ArrayList<>();    //100*需要临时引用的集合
-        List<String> finalListTimes = new ArrayList<>();   //100*需要临时引用的集合
-        List<Object> finalListFlows = new ArrayList<>();   //100*需要临时引用的集合
-        Map<String, Object> finalMap = new HashMap<>();   //100*需要临时引用的最终返回数据集合
-        List<Map<String, Object>> mapList = new ArrayList<>();  // 200*需要临时引用的最终返回数据集合
+        //100*需要临时引用的集合
+        List<List<Object>> finalListdatas = new ArrayList<>();
+        //100*需要临时引用的集合
+        List<String> finalListTimes = new ArrayList<>();
+        //100*需要临时引用的集合
+        List<Object> finalListFlows = new ArrayList<>();
+        //100*需要临时引用的最终返回数据集合
+        Map<String, Object> finalMap = new HashMap<>(16);
+        // 200*需要临时引用的最终返回数据集合
+        List<Map<String, Object>> mapList = new ArrayList<>();
         for (Map.Entry<String, List<Double>> entry : mapGroupByDay.entrySet()) {
             String key = entry.getKey();
             List<Double> v = entry.getValue();
@@ -137,21 +145,26 @@ public class FluxService {
         switch (type) {
             case 1002:
             case 2002:
-                timeStr = map.get("timeStr").substring(0, 10); //获取日期，精确到日
+                timeStr = map.get("timeStr").substring(0, 10);
+                //获取日期，精确到日
                 break;
             case 1003:
             case 2003:
-                timeStr = map.get("timeStr").substring(0, 7); //获取时间，精确到月
+                timeStr = map.get("timeStr").substring(0, 7);
+                //获取时间，精确到月
                 break;
             case 1004:
             case 2004:
-                timeStr = map.get("timeStr").substring(0, 4); //获取时间，精确到年
+                timeStr = map.get("timeStr").substring(0, 4);
+                //获取时间，精确到年
                 break;
             case 1006:
             case 2006:
-                timeStr = currentWeek(map.get("timeStr")); //获取时间，精确到周
+                timeStr = currentWeek(map.get("timeStr"));
+                //获取时间，精确到周
                 break;
-            case 1007: //获取时间，精确到季度
+            //获取时间，精确到季度
+            case 1007:
             case 2007:
                 String year = map.get("timeStr").substring(0, 4);
                 String month = map.get("timeStr").substring(5, 7);
@@ -159,7 +172,8 @@ public class FluxService {
                     case "01":
                     case "02":
                     case "03":
-                        timeStr = year + "年第1季度"; //获取时间，精确到季度
+                        timeStr = year + "年第1季度";
+                        //获取时间，精确到季度
                         break;
                     case "04":
                     case "05":
@@ -176,7 +190,11 @@ public class FluxService {
                     case "12":
                         timeStr = year + "年第4季度";
                         break;
+                    default:
+                        break;
                 }
+                break;
+            default:
                 break;
         }
         return timeStr;
@@ -187,10 +205,13 @@ public class FluxService {
 
         Date date = DateFormat.parseSome(dateStr);
         Calendar calendar = Calendar.getInstance();
-        calendar.setFirstDayOfWeek(Calendar.MONDAY); //设置星期一为每周第一天
+        calendar.setFirstDayOfWeek(Calendar.MONDAY);
+        //设置星期一为每周第一天
         calendar.setTime(date);
-        int week = calendar.get(Calendar.WEEK_OF_YEAR); //获得第几周
-        int year = calendar.get(Calendar.YEAR);  //获取年份
+        int week = calendar.get(Calendar.WEEK_OF_YEAR);
+        //获得第几周
+        int year = calendar.get(Calendar.YEAR);
+        //获取年份
         if (week == 1) {
             String substring = dateStr.substring(5, 7);
             if ("12".equals(substring)) {
@@ -198,9 +219,12 @@ public class FluxService {
             }
 
         }
-        calendar.setWeekDate(year, week, Calendar.MONDAY);//获得指定年的第几周的开始日期
-        Date monday = calendar.getTime();//创建日期的时间该周的第一天，
-        calendar.setWeekDate(year, week, Calendar.SUNDAY);//获得指定年的第几周的结束日期
+        calendar.setWeekDate(year, week, Calendar.MONDAY);
+        //获得指定年的第几周的开始日期
+        Date monday = calendar.getTime();
+        //创建日期的时间该周的第一天，
+        calendar.setWeekDate(year, week, Calendar.SUNDAY);
+        //获得指定年的第几周的结束日期
         Date sunday = calendar.getTime();
         String s = DateFormat.formatSome(monday);
         String e = DateFormat.formatSome(sunday);

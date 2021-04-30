@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class MonitoringFacilitySerice {
     @Autowired
     private MonitoringFacilityMapper monitoringFacilityMapper;
@@ -40,11 +40,7 @@ public class MonitoringFacilitySerice {
             PageHelper.startPage(page, limit);
             //封装查询条件
             MonitoringFacilityExample example = new MonitoringFacilityExample();
-            // example.setOrderByClause("id desc");
-            MonitoringFacilityExample.Criteria criteria = example.createCriteria();
-            // criteria.andIsvalidEqualTo("1");
             List<MonitoringFacility> baseSites = monitoringFacilityMapper.selectByExample(example);
-
 
             //得到pageHelper的分页对象
             PageInfo<MonitoringFacility> pageInfo = new PageInfo<MonitoringFacility>(baseSites);
@@ -93,18 +89,18 @@ public class MonitoringFacilitySerice {
 
         //不为空
         if (!CollectionUtils.isEmpty(operationUnit)) {
-            Map<String, Object> map0 = new HashMap<>();
+            Map<String, Object> map0 = new HashMap<>(4);
             List<Map<String, Object>> list1 = new ArrayList<>();
             for (OperationUnit menu1 : operationUnit) {
                 if (menu1.getId().equals(menu1.getId())) {
-                    Map<String, Object> map1 = new HashMap<>();
+                    Map<String, Object> map1 = new HashMap<>(4);
                     map1.put("name", menu1.getUnitName());
                     map1.put("id", menu1.getId());
                     List<Map<String, Object>> list2 = new ArrayList<>();
                     List<MonitoringFacility> menuslist = monitoringFacilityMapper.selectByUnitId(menu1.getId());
                     for (MonitoringFacility menu2 : menuslist) {
                         if (menu2.getUnitID().equals(menu1.getId())) {
-                            Map<String, Object> map2 = new HashMap<>();
+                            Map<String, Object> map2 = new HashMap<>(16);
                             map2.put("analysisWay", menu2.getAnalysisWay());
                             map2.put("id", menu2.getId());
                             map2.put("equipmentModel", menu2.getEquipmentModel());

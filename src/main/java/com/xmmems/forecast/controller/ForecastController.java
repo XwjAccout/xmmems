@@ -37,8 +37,12 @@ public class ForecastController {
         list.forEach(map -> {
             String value = map.get("value");
             String preValue = map.get("preValue");
-            if (value != null) map.put("value", setScale(value, scale));
-            if (preValue != null) map.put("preValue", setScale(preValue, scale));
+            if (value != null) {
+                map.put("value", setScale(value, scale));
+            }
+            if (preValue != null) {
+                map.put("preValue", setScale(preValue, scale));
+            }
         });
         return ResponseEntity.ok(list);
     }

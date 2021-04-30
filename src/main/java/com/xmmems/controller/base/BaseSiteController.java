@@ -4,7 +4,6 @@ import com.xmmems.domain.base.BaseSite;
 import com.xmmems.domain.base.BaseSiteitem;
 import com.xmmems.dto.BaseSiteitemDTO;
 import com.xmmems.dto.PageResult;
-//import com.xmmems.mapper.xmmems.BaseSiteMapper;
 import com.xmmems.operationlog.annotation.SystemControllerLog;
 import com.xmmems.service.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;

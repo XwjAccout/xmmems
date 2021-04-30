@@ -13,10 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
-import java.util.HashMap;
+
 import java.util.List;
-import java.util.Map;
-import java.util.*;
 
 /**
  * @描述
@@ -24,7 +22,7 @@ import java.util.*;
  * @创建时间 2021.03.01 16:16
  */
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class CostService {
 
     @Autowired
@@ -70,17 +68,10 @@ public class CostService {
     }
 
     public PageResult<Cost> findPage(Integer limit, Integer page) {
-//        addandfindPage();
         PageHelper.startPage(page, limit);
         Example example = new Example(Cost.class);
         example.setOrderByClause("id desc");
-        Example.Criteria criteria = example.createCriteria();
-//        if (StringUtils.isNotBlank(name)) {
-//            criteria.andEqualTo("name", name);
-//        }
-//        if (type != null) {
-//            criteria.andEqualTo("type", type);
-//        }
+
         List<Cost> costs = costMapper.selectByExample(example);
         PageInfo<Cost> info = new PageInfo<>(costs);
         return new PageResult<>(info.getPageSize(), page, info.getTotal(), info.getPages(), costs);

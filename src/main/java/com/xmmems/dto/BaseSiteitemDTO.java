@@ -19,11 +19,15 @@ public class BaseSiteitemDTO {
     private String minValue;
     private String maxValue;
     private String isAutoTag;
-    private Integer number; //一天测几次
-    private String limitNum;//检出限
+    //一天测几次
+    private Integer number;
+    //检出限
+    private String limitNum;
 
     //以上代码与BaseSiteitem属性一致，以下字段自己添加的
-    private String unit;  //监测项目标准单位
-    private String code;  //监测项目代码
+    //监测项目标准单位
+    private String unit;
+    //监测项目代码
+    private String code;
 
 }

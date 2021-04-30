@@ -34,17 +34,17 @@ public class PdfController {
      * @param isAutoPageSize true 自动设置纸张大小
      */
     @GetMapping("/report")
-    public void report(@RequestParam(value = "siteId") Integer siteId,
-                       @RequestParam(value = "siteName") String siteName,
-                       @RequestParam(value = "startTime") String startTime,
-                       @RequestParam(value = "endTime", required = false) String endTime,
-                       @RequestParam(value = "pageSize", defaultValue = "A4") String pageSize,
-                       @RequestParam(value = "type", defaultValue = "1") Integer type,
-                       @RequestParam(value = "isAutoPageSize", defaultValue = "true") Boolean isAutoPageSize,
-                       @RequestParam(value = "statistics", required = false) List<Integer> statistics,
-                       @RequestParam(value = "limit", defaultValue = "true") Boolean limit,
-                       @RequestParam(value = "isDayAvg", defaultValue = "false") Boolean isDayAvg,
-                       HttpServletResponse response){
+    public void report(
+            @RequestParam(value = "siteId") Integer siteId,
+            @RequestParam(value = "siteName") String siteName,
+            @RequestParam(value = "startTime") String startTime,
+            @RequestParam(value = "endTime", required = false) String endTime,
+            @RequestParam(value = "pageSize", defaultValue = "A4") String pageSize,
+            @RequestParam(value = "type", defaultValue = "1") Integer type,
+            @RequestParam(value = "isAutoPageSize", defaultValue = "true") Boolean isAutoPageSize,
+            @RequestParam(value = "statistics", required = false) List<Integer> statistics,
+            @RequestParam(value = "limit", defaultValue = "true") Boolean limit,
+            @RequestParam(value = "isDayAvg", defaultValue = "false") Boolean isDayAvg, HttpServletResponse response) {
 
         try {
             //数据列名,设置纸张大小
@@ -74,53 +74,17 @@ public class PdfController {
                     A = new RectangleReadOnly(595, 842);
                     break;
             }
+            List<Map<String, String>> datas = getDataList(siteId, startTime, endTime, type, statistics, limit, isDayAvg);
 
-            //获取数据
-            List<Map<String, String>> datas = null;
-            switch (type) {
-                case 1:
-                    typeName = "时段报表";
-                    datas = monitorService.day(siteId, startTime, endTime, statistics, limit);
-                    break;
-                case 2:
-                    typeName = "周报表";
-                    datas = monitorService.week(siteId, Integer.parseInt(startTime), Integer.parseInt(endTime), statistics, limit);
-                    break;
-                case 3:
-                    typeName = "日均值报表";
-                    datas = monitorService.month(siteId, startTime, endTime, statistics, limit);
-                    break;
-                case 4:
-                    typeName = "月均值报表";
-                    datas = monitorService.year(siteId, startTime, endTime, statistics, limit);
-                    break;
-                case 5:
-                    typeName = "季报表";
-                    datas = monitorService.seasons(siteId, Integer.parseInt(endTime), Integer.parseInt(startTime), statistics, limit,isDayAvg);
-                    break;
-                case 6:
-                    typeName = "日报表";
-                    datas = monitorService.realDay(siteId, startTime, statistics, limit);
-                    break;
-                case 7:
-                    typeName = "月报表";
-                    datas = monitorService.realMonth(siteId, Integer.parseInt(startTime), Integer.parseInt(endTime), statistics, limit);
-                    break;
-                case 8:
-                    typeName = "年报表";
-                    datas = monitorService.realYear(siteId, Integer.parseInt(startTime), statistics, limit);
-                    break;
-
-            }
-// 1.新建document对象
+            // 1.新建document对象
             Document document = new Document(A);// 建立一个Document对象 a3,横向
-            maxWidth = (int) document.getPageSize().getWidth() - 40;
+            maxWidth = (int)document.getPageSize().getWidth() - 40;
 
             // 2.建立一个书写器(Writer)与document对象关联
             UUID uuid = UUID.randomUUID();
             File file = new File("./" + uuid.toString() + ".pdf");
             file.createNewFile();
-            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(file));
+            PdfWriter.getInstance(document, new FileOutputStream(file));
 
             // 3.打开文档
             document.open();
@@ -135,7 +99,6 @@ public class PdfController {
             response.setContentType("application/octet-stream;charset=utf-8");
             String returnName = response.encodeURL(new String((siteName + typeName + ".pdf").getBytes(), "iso8859-1"));
             response.setHeader("Content-Disposition", "attachment;filename=" + returnName);
-            //String fullFileName=getServletContext().getRealPath("/download/"+filename);
             InputStream in = new FileInputStream(file);
             OutputStream out = response.getOutputStream();
             //创建缓冲区
@@ -152,14 +115,42 @@ public class PdfController {
             out.flush();
             out.close();
             file.delete();
-        } catch (IOException e) {
-            throw new XMException(500, e.getMessage());
-        } catch (DocumentException e) {
-            throw new XMException(500, e.getMessage());
-        } catch (ParseException e) {
+        } catch (Exception e) {
             throw new XMException(500, e.getMessage());
         }
 
+    }
+
+    private List<Map<String, String>> getDataList(Integer siteId, String startTime, String endTime, Integer type, List<Integer> statistics, Boolean limit, Boolean isDayAvg) {
+        //获取数据
+        switch (type) {
+            case 1:
+                typeName = "时段报表";
+                return monitorService.day(siteId, startTime, endTime, statistics, limit);
+            case 2:
+                typeName = "周报表";
+                return monitorService.week(siteId, Integer.parseInt(startTime), Integer.parseInt(endTime), statistics, limit);
+            case 3:
+                typeName = "日均值报表";
+                return monitorService.month(siteId, startTime, endTime, statistics, limit);
+            case 4:
+                typeName = "月均值报表";
+                return monitorService.year(siteId, startTime, endTime, statistics, limit);
+            case 5:
+                typeName = "季报表";
+                return monitorService.seasons(siteId, Integer.parseInt(endTime), Integer.parseInt(startTime), statistics, limit, isDayAvg);
+            case 6:
+                typeName = "日报表";
+                return monitorService.realDay(siteId, startTime, statistics, limit);
+            case 7:
+                typeName = "月报表";
+                return monitorService.realMonth(siteId, Integer.parseInt(startTime), Integer.parseInt(endTime), statistics, limit);
+            case 8:
+                typeName = "年报表";
+                return monitorService.realYear(siteId, Integer.parseInt(startTime), statistics, limit);
+            default:
+                return new ArrayList<>();
+        }
     }
 
     // 定义全局的字体静态变量
@@ -200,8 +191,7 @@ public class PdfController {
     }
 
     // 生成PDF文件
-    public void generatePDF(Document document, List<Map<String, String>> datas, List<BaseSiteitemDTO> columnsNames,
-                            String siteName, String startTime, String endTime, Integer type) throws ParseException, DocumentException {
+    public void generatePDF(Document document, List<Map<String, String>> datas, List<BaseSiteitemDTO> columnsNames, String siteName, String startTime, String endTime, Integer type) throws ParseException, DocumentException {
 
 
         // 大标题
@@ -244,6 +234,8 @@ public class PdfController {
                 break;
             case 8:
                 st = startTime + "年报表";
+                break;
+            default:
                 break;
 
         }
@@ -293,7 +285,9 @@ public class PdfController {
         PdfPTable table = createTable(columnNum);
 
         for (String title : titles) {
-            if ("moniterTime".equals(title)) title = "监测时间";
+            if ("moniterTime".equals(title)) {
+                title = "监测时间";
+            }
             table.addCell(createCell(title, tableTitleFont));
         }
         for (String title : titlesUnit) {
@@ -305,8 +299,7 @@ public class PdfController {
             for (String title : titles) {
                 String value = map.get(title);
                 value = value == null ? "" : value;
-                if (value.equals("水质类别") || value.equals("主要污染物") || value.equals("平均数据捕捉率(%)") || value.equals("平均有效数据获取率(%)") ||
-                        value.equals("平均故障率(%)")) {
+                if ("水质类别".equals(value) || "主要污染物".equals(value) || "平均数据捕捉率(%)".equals(value) || "平均有效数据获取率(%)".equals(value) || "平均故障率(%)".equals(value)) {
 
                     String leftTitle = map.get("moniterTime");
                     table.addCell(createCell(leftTitle == null ? "" : leftTitle, textFont));
@@ -343,7 +336,7 @@ public class PdfController {
     }
 
 
-/**------------------------创建表格单元格的方法start----------------------------*/
+    /**------------------------创建表格单元格的方法start----------------------------*/
     /**
      * 创建单元格(指定字体)
      */
@@ -394,10 +387,10 @@ public class PdfController {
         return cell;
     }
 
-/**------------------------创建表格单元格的方法end----------------------------*/
+    /**------------------------创建表格单元格的方法end----------------------------*/
 
 
-/**--------------------------创建表格的方法start------------------- ---------*/
+    /**--------------------------创建表格的方法start------------------- ---------*/
 
     /**
      * 创建指定列宽、列数的表格
@@ -415,7 +408,7 @@ public class PdfController {
         return table;
     }
 
-/**--------------------------创建表格的方法end------------------- ---------*/
+    /**--------------------------创建表格的方法end------------------- ---------*/
 
 
 }

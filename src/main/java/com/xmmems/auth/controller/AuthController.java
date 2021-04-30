@@ -1,6 +1,6 @@
 package com.xmmems.auth.controller;
 
-import com.xmmems.auth.service.AuthService;
+import com.xmmems.auth.service.AuthServiceImpl;
 import com.xmmems.common.auth.domain.SysUserToken;
 import com.xmmems.operationlog.annotation.SystemControllerLog;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,19 +18,19 @@ import javax.servlet.http.HttpServletResponse;
 public class AuthController {
 
     @Autowired
-    private AuthService authService;
+    private AuthServiceImpl authServiceImpl;
 
     @GetMapping("/verify")
     @SystemControllerLog(descrption = "验证用户信息",actionType = "4")
     public ResponseEntity<SysUserToken> verifyUser(HttpServletRequest request, HttpServletResponse response){
-        SysUserToken userToken = authService.verifyUser(request, response);
+        SysUserToken userToken = authServiceImpl.verifyUser(request, response);
         System.out.println("***************"+userToken);
         return ResponseEntity.ok(userToken);
     }
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response){
-        authService.logout(request, response);
+        authServiceImpl.logout(request, response);
         return ResponseEntity.ok().build();
     }
 

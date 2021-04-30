@@ -20,11 +20,13 @@ public class MyHeaderFooter extends PdfPageEventHelper {
     }
  
     // 打开文档时，创建一个总页数的模版
+    @Override
     public void onOpenDocument(PdfWriter writer, Document document) {
         PdfContentByte cb =writer.getDirectContent();
         totalPage = cb.createTemplate(30, 16);
     }
     // 一页加载完成触发，写入页眉和页脚
+    @Override
     public void onEndPage(PdfWriter writer, Document document) {
         PdfPTable table = new PdfPTable(3);
         try {
@@ -49,7 +51,8 @@ public class MyHeaderFooter extends PdfPageEventHelper {
     }
  
     // 全部完成后，将总页数的pdf模版写到指定位置
-    public void onCloseDocument(PdfWriter writer,Document document) {
+    @Override
+    public void onCloseDocument(PdfWriter writer, Document document) {
         String text = "总" + (writer.getPageNumber()) + "页";
         ColumnText.showTextAligned(totalPage, Element.ALIGN_LEFT, new Paragraph(text,hfFont), 2, 2, 0);
     }

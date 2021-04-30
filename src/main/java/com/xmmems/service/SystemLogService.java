@@ -31,7 +31,7 @@ import java.util.Map;
  * @创建时间 2020.03.02 11:24
  */
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Slf4j
 public class SystemLogService {
 

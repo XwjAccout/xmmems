@@ -7,7 +7,6 @@ import com.xmmems.common.exception.XMException;
 import com.xmmems.common.utils.CustomUtils;
 import com.xmmems.domain.OperationPerson;
 import com.xmmems.domain.OperationPersonExample;
-import com.xmmems.domain.OperationUnit;
 import com.xmmems.dto.PageResult;
 import com.xmmems.mapper.OperationPersonMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -22,33 +21,28 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class OperationPersonSerice {
     @Autowired
     private OperationPersonMapper operationPersonMapper;
 
-    public PageResult<OperationPerson> pageQuery(Integer limit, Integer page, String name,Integer unitID) {
-        System.out.println(name);
-        System.out.println(unitID);
+    public PageResult<OperationPerson> pageQuery(Integer limit, Integer page, String name,Integer unitid) {
         try {
             //封装分页信息
             PageHelper.startPage(page, limit);
             //封装查询条件
             OperationPersonExample example = new OperationPersonExample();
-            // example.setOrderByClause("id desc");
             OperationPersonExample.Criteria criteria = example.createCriteria();
-            // criteria.andIsvalidEqualTo("1");
             if (StringUtils.isNotBlank(name)) {
                 criteria.andNameLike(CustomUtils.likeValue(name));
             }
-            criteria.andUnitIDEqualTo(unitID);
+            criteria.andUnitIDEqualTo(unitid);
             List<OperationPerson> baseSites = operationPersonMapper.selectByExample(example);
 
             //得到pageHelper的分页对象
-            PageInfo<OperationPerson> pageInfo = new PageInfo<OperationPerson>(baseSites);
+            PageInfo<OperationPerson> pageInfo = new PageInfo<>(baseSites);
             //封装自定义的分页对象
-
-            return new PageResult<OperationPerson>(pageInfo.getPageSize(), page, pageInfo.getTotal(), pageInfo.getPages(), pageInfo.getList());
+            return new PageResult<>(pageInfo.getPageSize(), page, pageInfo.getTotal(), pageInfo.getPages(), pageInfo.getList());
         } catch (Exception e) {
             throw new XMException(ExceptionEnum.ROLE_NOT_FOUND);
         }
@@ -92,17 +86,17 @@ public class OperationPersonSerice {
         int num=0;
         //不为空
         if (!CollectionUtils.isEmpty(operationUnit)) {
-            Map<String, Object> map0 = new HashMap<>();
+            Map<String, Object> map0 = new HashMap<>(4);
             List<Map<String, Object>> list1 = new ArrayList<>();
             for (OperationPerson menu1 : operationUnit) {
                 if (num==0) {
                     num++;
-                    Map<String, Object> map1 = new HashMap<>();
+                    Map<String, Object> map1 = new HashMap<>(4);
                     map1.put("name","员工名称");
                     List<Map<String, Object>> list2 = new ArrayList<>();
                     for (OperationPerson menu2 : operationUnit) {
                         if (menu1.getId().equals(menu1.getId())) {
-                            Map<String, Object> map2 = new HashMap<>();
+                            Map<String, Object> map2 = new HashMap<>(8);
                             map2.put("id", menu2.getId());
                             map2.put("name", menu2.getName());
                             map2.put("account", menu2.getAccount());

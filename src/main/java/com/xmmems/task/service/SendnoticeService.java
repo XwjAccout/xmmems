@@ -5,15 +5,12 @@ import com.github.pagehelper.PageInfo;
 import com.xmmems.common.auth.domain.UserHolder;
 import com.xmmems.common.exception.ExceptionEnum;
 import com.xmmems.common.exception.XMException;
-import com.xmmems.domain.OperationPerson;
 import com.xmmems.dto.AccountDTO;
 import com.xmmems.dto.PageResult;
-import com.xmmems.mapper.AccountMapper;
 import com.xmmems.mapper.CostMapper;
 import com.xmmems.mapper.SendnoticeMapper;
 import com.xmmems.material.domain.Cost;
 import com.xmmems.service.UploadService;
-import com.xmmems.service.maintenance.OperationPersonSerice;
 import com.xmmems.service.system.AccountService;
 import com.xmmems.task.domain.Sendnotice;
 import org.apache.commons.lang3.StringUtils;
@@ -32,7 +29,7 @@ import java.util.List;
  * @创建时间 2021.01.20 10:58
  */
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class SendnoticeService {
 
     @Autowired
@@ -141,7 +138,6 @@ public class SendnoticeService {
         sendnotice.setReadType("已回执");
         sendnotice.setOpinion(opinion);
         int result=sendnoticeMapper.updateByPrimaryKeySelective(sendnotice);
-//        Sendnotice newsendnotice=  sendnoticeMapper.findBynoticeId(noticeId);
         List<Cost> costList=costMapper.findCost();
         List<Cost> costListAll= costMapper.findCostAll();
         double one=500;

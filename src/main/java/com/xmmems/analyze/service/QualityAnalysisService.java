@@ -22,7 +22,7 @@ import java.util.*;
  * @创建时间 2020.09.29 13:58
  */
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class QualityAnalysisService {
     @Autowired
     private SimpleHourDataMapper simpleHourDataMapper;
@@ -32,7 +32,7 @@ public class QualityAnalysisService {
     private BaseSiteMapper baseSiteMapper;
 
     public List<TempData> levelPercent(Integer year, Integer siteId, List<Integer> itemIds) {
-        Map<Integer, List<EnvQualityConfDTO>> envQualityConfMap = new HashMap<>();
+        Map<Integer, List<EnvQualityConfDTO>> envQualityConfMap = new HashMap<>(16);
         List<EnvQualityConfDTO> envQualityConfList = envQualityConfMapper.getEnvQualityConfDTOList();
         for (EnvQualityConfDTO envQualityConfDTO : envQualityConfList) {
             Integer itemId = envQualityConfDTO.getItemId();
@@ -41,7 +41,7 @@ public class QualityAnalysisService {
             }
         }
 
-        Map<String, Map<String, Integer>> temp = new HashMap<>();
+        Map<String, Map<String, Integer>> temp = new HashMap<>(16);
         ArrayList<Integer> newItemIds = new ArrayList<>(envQualityConfMap.keySet());
         List<ClusterHourDto> hours = simpleHourDataMapper.selectCluster(year + "-01-01 00:00:00.000", year + "-12-31 23:59:59.999", siteId, newItemIds);
         for (ClusterHourDto hour : hours) {
@@ -61,7 +61,9 @@ public class QualityAnalysisService {
                     }));
                     String level = confDTO.getLevel();
                     Integer integer = map.get(level);
-                    if (integer == null) integer = 0;
+                    if (integer == null) {
+                        integer = 0;
+                    }
                     map.put(level, integer + 1);
                     break;
                 }
@@ -77,15 +79,13 @@ public class QualityAnalysisService {
             Map<String, Integer> value0 = entry0.getValue();
             //每个指标的总条数
             int sum = value0.values().stream().mapToInt(v -> v).sum();
-            //System.out.println(itemName0 + "  :  " + sum);
             TempData tempData = new TempData(sum, itemName0, new ArrayList<>());
             //计算各个级别所占百分比
             for (Map.Entry<String, Integer> entry1 : value0.entrySet()) {
                 String level = entry1.getKey();
                 Integer count = entry1.getValue();
                 String percent = new BigDecimal(count * 100d / sum).setScale(3, 6).toPlainString() + "%";
-                //System.out.println(level + "  :  " + count + "  :  " + percent);
-                Map<String, String> map = new HashMap<>();
+                Map<String, String> map = new HashMap<>(4);
                 map.put("level", level);
                 map.put("count", count + "");
                 map.put("percent", percent);
@@ -99,11 +99,11 @@ public class QualityAnalysisService {
     }
 
     public Object mainTroubleList(Integer year, Integer siteId, List<Integer> itemIds) {
-        Map<String, Object> finalMap = new HashMap<>();
+        Map<String, Object> finalMap = new HashMap<>(4);
 
         List<Map<String, String>> data = new ArrayList<>();
-        Map<String, Double> temp = new HashMap<>();
-        Map<String, String> statistics = new HashMap<>();
+        Map<String, Double> temp = new HashMap<>(16);
+        Map<String, String> statistics = new HashMap<>(16);
 
         List<TempData> tempDataList = levelPercent(year, siteId, itemIds);
         if (tempDataList.size() > 0) {

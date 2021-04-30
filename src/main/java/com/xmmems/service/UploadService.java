@@ -27,7 +27,7 @@ import java.util.UUID;
  * @创建时间 2020.03.19 16:54
  */
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Slf4j
 public class UploadService {
 
@@ -100,8 +100,10 @@ public class UploadService {
             throw new XMException(ExceptionEnum.INVALID_FILE_TYPE);
         }
 
-        double size = file.getSize() / 1024d; //kb
-        if (size > 2048 || size < 10) {  //判断图片大小 单位Kb
+        double size = file.getSize() / 1024d;
+        //kb
+        if (size > 2048 || size < 10) {
+            //判断图片大小 单位Kb
             throw new XMException(500, "图片尺寸不合适.范围10kb - 2048kb");
         }
 

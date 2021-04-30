@@ -14,7 +14,6 @@ import com.xmmems.domain.env.EnvQualityConfExample;
 import com.xmmems.dto.BaseSiteitemDTO;
 import com.xmmems.dto.PageResult;
 import com.xmmems.mapper.*;
-//import com.xmmems.mapper.xmmems.BaseSiteMapper1;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class BaseService {
 
     @Autowired
@@ -50,14 +49,6 @@ public class BaseService {
         try {
             //封装分页信息
             PageHelper.startPage(page, limit);
-//            //封装查询条件
-//            BaseSiteExample example = new BaseSiteExample();
-//            example.setOrderByClause("id desc");
-//            BaseSiteExample.Criteria criteria = example.createCriteria();
-//            criteria.andIsvalidEqualTo("1");
-//            if (StringUtils.isNotBlank(siteName)) {
-//                criteria.andSiteNameLike(CustomUtils.likeValue(siteName));
-//            }
             List<BaseSite> baseSites = baseSiteMapper.selectByExampleByAccountId(UserHolder.loginId(),siteName);
 
             //得到pageHelper的分页对象
@@ -163,22 +154,30 @@ public class BaseService {
     public void siteSave(BaseSite baseSite) {
         baseSite.setIsvalid("1");
         int i = baseSiteMapper.insertSelective(baseSite);
-        if (i < 1) throw new XMException(ExceptionEnum.INSERT_OPERATION_FAIL);
+        if (i < 1) {
+            throw new XMException(ExceptionEnum.INSERT_OPERATION_FAIL);
+        }
     }
 
     public void baseKpitypeSave(EnvKpiType envKpiType) {
         int i = envKpiTypeMapper.insertSelective(envKpiType);
-        if (i < 1) throw new XMException(ExceptionEnum.INSERT_OPERATION_FAIL);
+        if (i < 1) {
+            throw new XMException(ExceptionEnum.INSERT_OPERATION_FAIL);
+        }
     }
 
     public void baseItemSave(BaseItem baseItem) {
         int i = baseItemMapper.insertSelective(baseItem);
-        if (i < 1) throw new XMException(ExceptionEnum.INSERT_OPERATION_FAIL);
+        if (i < 1) {
+            throw new XMException(ExceptionEnum.INSERT_OPERATION_FAIL);
+        }
     }
 
     public void baseQualityconfSave(EnvQualityConf envQualityConf) {
         int i = envQualityConfMapper.insertSelective(envQualityConf);
-        if (i < 1) throw new XMException(ExceptionEnum.INSERT_OPERATION_FAIL);
+        if (i < 1) {
+            throw new XMException(ExceptionEnum.INSERT_OPERATION_FAIL);
+        }
     }
 
     //根据id查询数据
@@ -221,53 +220,73 @@ public class BaseService {
     //根据id更新数据
     public void siteUpdate(BaseSite baseSite) {
         int i = baseSiteMapper.updateByPrimaryKeySelective(baseSite);
-        if (i < 1) throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
+        if (i < 1) {
+            throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
+        }
     }
 
     public void baseAreaUpdate(BaseArea baseSite) {
         int i = baseAreaMapper.updateByPrimaryKeySelective(baseSite);
-        if (i < 1) throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
+        if (i < 1) {
+            throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
+        }
     }
 
     public void baseItemUpdate(BaseItem baseSite) {
         int i = baseItemMapper.updateByPrimaryKeySelective(baseSite);
-        if (i < 1) throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
+        if (i < 1) {
+            throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
+        }
     }
 
     public void baseKpitypeUpdate(EnvKpiType envKpiType) {
         int i = envKpiTypeMapper.updateByPrimaryKeySelective(envKpiType);
-        if (i < 1) throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
+        if (i < 1) {
+            throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
+        }
     }
 
     public void baseQualityconfUpdate(EnvQualityConf envQualityConf) {
         int i = envQualityConfMapper.updateByPrimaryKeySelective(envQualityConf);
-        if (i < 1) throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
+        if (i < 1) {
+            throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
+        }
     }
 
     //根据id删除数据
     public void siteDelete(Integer id) {
         int i = baseSiteMapper.deleteByPrimaryKey(id);
-        if (i < 1) throw new XMException(ExceptionEnum.DELETE_OPERATION_FAIL);
+        if (i < 1) {
+            throw new XMException(ExceptionEnum.DELETE_OPERATION_FAIL);
+        }
     }
 
     public void baseAreaDelete(Integer id) {
         int i = baseAreaMapper.deleteByPrimaryKey(Long.valueOf(id));
-        if (i < 1) throw new XMException(ExceptionEnum.DELETE_OPERATION_FAIL);
+        if (i < 1) {
+            throw new XMException(ExceptionEnum.DELETE_OPERATION_FAIL);
+        }
     }
 
     public void baseItemDelete(Integer id) {
         int i = baseItemMapper.deleteByPrimaryKey(id);
-        if (i < 1) throw new XMException(ExceptionEnum.DELETE_OPERATION_FAIL);
+        if (i < 1) {
+            throw new XMException(ExceptionEnum.DELETE_OPERATION_FAIL);
+        }
     }
 
     public void baseKpitypeDelete(Integer id) {
         int i = envKpiTypeMapper.deleteByPrimaryKey(id);
-        if (i < 1) throw new XMException(ExceptionEnum.DELETE_OPERATION_FAIL);
+        if (i < 1) {
+            throw new XMException(ExceptionEnum.DELETE_OPERATION_FAIL);
+        }
     }
 
     public void baseQualityconfDelete(Integer id) {
         int i = envQualityConfMapper.deleteByPrimaryKey(id);
-        if (i < 1) throw new XMException(ExceptionEnum.DELETE_OPERATION_FAIL);
+        if (i < 1) {
+            throw new XMException(ExceptionEnum.DELETE_OPERATION_FAIL);
+        }
     }
 
     //查询站点site 与 监测项目item 的中间表数据
@@ -283,7 +302,7 @@ public class BaseService {
         List<Map<String, String>> mapList = new ArrayList<>();
         //转换为map减少数据传输量
         baseSites.forEach(baseSite -> {
-            Map<String, String> map = new HashMap<>();
+            Map<String, String> map = new HashMap<>(8);
             map.put("id", baseSite.getId()+"");
             map.put("siteName", baseSite.getSiteName());
             map.put("mn", baseSite.getMN());
@@ -305,10 +324,9 @@ public class BaseService {
     public Integer updateBybaseSiteitem(Integer upAndDown,Integer siteId, Integer id) {
 
         int result=0;
-//      List< BaseSiteitem> list= baseSiteitemMapper.selectByExample(example);
         //查询当前
         BaseSiteitem baseSiteitem= baseSiteitemMapper.selectByPrimaryKey(id);
-        if(upAndDown==0){//向上
+        if(upAndDown==0){
             //获取上一个
             BaseSiteitem baseSit=null;
             if(baseSiteitem.getSort().intValue()==1){

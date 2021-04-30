@@ -12,11 +12,16 @@ import java.math.BigDecimal;
 @Data
 @ToString
 public class ClusterHourDto implements Comparable<ClusterHourDto> {
-    private String timeStr;   //时间字符串  yyyy-MM-dd HH:mm:ss
-    private Integer itemId;  //指标id
-    private String itemName;  //指标名称
-    private String value;     //值
-    private String troubleCode;   //异常标识   N 正常
+    private String timeStr;
+    //时间字符串  yyyy-MM-dd HH:mm:ss
+    private Integer itemId;
+    //指标id
+    private String itemName;
+    //指标名称
+    private String value;
+    //值
+    private String troubleCode;
+    //异常标识   N 正常
 
     @Override
     public int compareTo(ClusterHourDto o) {

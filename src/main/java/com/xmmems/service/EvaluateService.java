@@ -4,7 +4,6 @@ import com.xmmems.domain.Evaluate;
 import com.xmmems.mapper.EvaluateMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -14,7 +13,7 @@ import java.util.List;
 public class EvaluateService {
     @Autowired
     EvaluateMapper evaluateMapper;
-    private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     public int add(String uName, Integer uId, String role, List<Integer> checkedCities, String opinion) {
 
         Evaluate evaluate = new Evaluate();
@@ -39,7 +38,7 @@ public class EvaluateService {
         }
         evaluate.setGrade(grade);
 
-        evaluate.setAuditTime(sdf.format(new Date()));
+        evaluate.setAuditTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         return evaluateMapper.add(evaluate);
     }
 

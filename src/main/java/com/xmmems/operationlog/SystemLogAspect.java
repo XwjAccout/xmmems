@@ -52,12 +52,13 @@ public class SystemLogAspect {
 
     /**
      * 初始化系统日志对象
+     *
      * @param joinPoint
      * @author: ithxw
      * @Date: 2020/3/4
      * @return: com.xmmems.domain.SystemLog
      */
-    private SystemLog initSystemLog(JoinPoint joinPoint){
+    private SystemLog initSystemLog(JoinPoint joinPoint) {
         SystemLog systemLog = new SystemLog();
         //获取正在访问的用户id
         systemLog.setUserid(UserHolder.loginId() + "");
@@ -80,7 +81,7 @@ public class SystemLogAspect {
      * @throws Throwable
      */
     @Around("controllerAspect()")
-    public Object controllerLog(ProceedingJoinPoint joinPoint){
+    public Object controllerLog(ProceedingJoinPoint joinPoint) {
         Object proceed = null;
         SystemLog systemLog = initSystemLog(joinPoint);
         //成功的两步操作
@@ -110,6 +111,7 @@ public class SystemLogAspect {
 
     /**
      * 获取请求参数
+     *
      * @param joinPoint
      * @author: ithxw
      * @Date: 2020/3/4
@@ -130,17 +132,18 @@ public class SystemLogAspect {
 
     /**
      * 拦截控制层的异常处理操作日志
+     *
      * @param joinPoint
      * @param e
      * @throws Throwable
      */
     @AfterThrowing(pointcut = "controllerAspect()", throwing = "e")
-    public void doAfterThrowing2(JoinPoint joinPoint, Throwable e){
+    public void doAfterThrowing2(JoinPoint joinPoint, Throwable e) {
         SystemLog systemLog = initSystemLog(joinPoint);
 
         //失败的四步操作
         systemLog.setType("2");
-        systemLog.setDescription(getControllerMethodDescription(joinPoint)+ "失败");
+        systemLog.setDescription(getControllerMethodDescription(joinPoint) + "失败");
         systemLog.setExceptiondetail(e.getMessage());
         systemLog.setExceptioncode(e.getClass().getSimpleName());
 
@@ -157,13 +160,13 @@ public class SystemLogAspect {
      * @param point
      * @return
      */
-    public String getControllerMethodDescription(JoinPoint point){
+    public String getControllerMethodDescription(JoinPoint point) {
         //获取连接点目标类名
-        String targetName = point.getTarget().getClass().getName() ;
+        String targetName = point.getTarget().getClass().getName();
         //获取连接点签名的方法名
-        String methodName = point.getSignature().getName() ;
+        String methodName = point.getSignature().getName();
         //获取连接点参数
-        Object[] args = point.getArgs() ;
+        Object[] args = point.getArgs();
         //根据连接点类的名字获取指定类
         Class targetClass = null;
         try {
@@ -172,41 +175,41 @@ public class SystemLogAspect {
             throw new XMException(500, e.getMessage());
         }
         //获取类里面的方法
-        Method[] methods = targetClass.getMethods() ;
-        String description="" ;
+        Method[] methods = targetClass.getMethods();
+        StringBuilder sb = new StringBuilder();
         for (Method method : methods) {
-            if (method.getName().equals(methodName)){
+            if (method.getName().equals(methodName)) {
                 Class[] clazzs = method.getParameterTypes();
-                if (clazzs.length == args.length){
+                if (clazzs.length == args.length) {
                     SystemControllerLog annotation = method.getAnnotation(SystemControllerLog.class);
-                    description = annotation.descrption();
+                    sb.append(annotation.descrption());
                     switch (annotation.actionType()) {
                         ////操作的类型，1、添加 2、修改 3、删除 4、查询 5、登陆认证
                         case "1":
-                            description = description + "：添加";
+                            sb.append("：添加");
                             break;
                         case "2":
-                            description = description + "：修改";
+                            sb.append("：修改");
                             break;
                         case "3":
-                            description = description + "：删除";
+                            sb.append("：删除");
                             break;
                         case "4":
-                            description = description + "：查询";
+                            sb.append("：查询");
                             break;
                         case "5":
-                            description = description + "：登录认证";
+                            sb.append("：登录认证");
                             break;
                         case "6":
-                            description = description + "：下载excel";
+                            sb.append("：下载excel");
                             break;
-                        default :
-                            description = description + "：其他未知错误";
+                        default:
+                            sb.append("：其他未知错误");
                             break;
                     }
                 }
             }
         }
-        return description ;
+        return sb.toString();
     }
 }

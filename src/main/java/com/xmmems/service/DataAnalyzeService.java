@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Slf4j
 public class DataAnalyzeService {
     @Autowired
@@ -39,7 +39,7 @@ public class DataAnalyzeService {
             levelStandard = "3";
         }
         //标准水质
-        Integer standard = Integer.valueOf(levelStandard);
+        int standard = Integer.parseInt(levelStandard);
 
         //正常水质
         List<String> nomalWater = new ArrayList<>();
@@ -88,12 +88,12 @@ public class DataAnalyzeService {
                 list.add(map);
             }
             if (moniterTime.contains("分项类别")) {
-                Map<String, String> newmap = new HashMap<>();
-                Map<String, String> newmap2 = new HashMap<>();
+                Map<String, String> newmap = new HashMap<>(8);
+                Map<String, String> newmap2 = new HashMap<>(8);
                 for (Map.Entry<String, String> entry : map.entrySet()) {
                     String key = entry.getKey();
                     String value = entry.getValue();
-                    if (value.equals("") || nomalWater.contains(value)) {
+                    if ("".equals(value) || nomalWater.contains(value)) {
                         newmap.put(key, "达标");
                         newmap2.put(key, "");
                     } else {

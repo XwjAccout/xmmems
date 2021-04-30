@@ -17,31 +17,28 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class OperationVehicleSerice {
     @Autowired
     private OperationVehicleMapper operationVehicleMapper;
 
-    public PageResult<OperationVehicle> pageQuery(Integer limit, Integer page, String licence,Integer unitID) {
+    public PageResult<OperationVehicle> pageQuery(Integer limit, Integer page, String licence,Integer unitid) {
         try {
             //封装分页信息
             PageHelper.startPage(page, limit);
             //封装查询条件
             OperationVehicleExample example = new OperationVehicleExample();
-            // example.setOrderByClause("id desc");
             OperationVehicleExample.Criteria criteria = example.createCriteria();
-            // criteria.andIsvalidEqualTo("1");
             if (StringUtils.isNotBlank(licence)) {
                 criteria.andLicenceLike(CustomUtils.likeValue(licence));
             }
-            criteria.andUnitIDEqualTo(unitID);
+            criteria.andUnitIDEqualTo(unitid);
             List<OperationVehicle> baseSites = operationVehicleMapper.selectByExample(example);
 
             //得到pageHelper的分页对象
-            PageInfo<OperationVehicle> pageInfo = new PageInfo<OperationVehicle>(baseSites);
+            PageInfo<OperationVehicle> pageInfo = new PageInfo<>(baseSites);
             //封装自定义的分页对象
-
-            return new PageResult<OperationVehicle>(pageInfo.getPageSize(), page, pageInfo.getTotal(), pageInfo.getPages(), pageInfo.getList());
+            return new PageResult<>(pageInfo.getPageSize(), page, pageInfo.getTotal(), pageInfo.getPages(), pageInfo.getList());
         } catch (Exception e) {
             throw new XMException(ExceptionEnum.ROLE_NOT_FOUND);
         }

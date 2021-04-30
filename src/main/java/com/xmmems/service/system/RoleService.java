@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Slf4j
 public class RoleService {
   
@@ -41,9 +41,6 @@ public class RoleService {
             PageHelper.startPage(page, limit);
             //封装查询条件
             RoleExample example = new RoleExample();
-           // example.setOrderByClause("id desc");
-            RoleExample.Criteria criteria = example.createCriteria();
-            // criteria.andIsvalidEqualTo("1");
             List<Role> baseSites = roleMapper.selectByExample(example);
 
             //得到pageHelper的分页对象

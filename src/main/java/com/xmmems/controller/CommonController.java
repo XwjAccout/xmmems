@@ -52,7 +52,7 @@ public class CommonController {
         realTimeData.forEach(temp -> {
             String level = temp.get("level") + "";
             if (!level.contains("-")) {
-                Map<String, Object> map = new HashMap<>();
+                Map<String, Object> map = new HashMap<>(16);
                 map.put("siteName", temp.get("siteName"));
                 map.put("level", level);
                 FileLog.info("com.xmmems.controller.CommonController  map.put(\"level\", level);  55行"+level);
@@ -76,11 +76,10 @@ public class CommonController {
             waterquality.add(map.get("level"));
         }
 
-        Map<String, Object> comMap = new HashMap<>();
+        Map<String, Object> comMap = new HashMap<>(4);
         comMap.put("waterquality", waterquality);
 
         comMap.put("ditu", result);
-        System.out.println("********waterquality"+comMap);
         return ResponseEntity.ok(comMap);
 
     }

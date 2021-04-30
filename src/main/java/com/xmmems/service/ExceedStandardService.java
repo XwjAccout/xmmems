@@ -12,7 +12,6 @@ import com.xmmems.domain.env.EnvHourDataExample;
 import com.xmmems.domain.env.EnvQualityConf;
 import com.xmmems.dto.BaseSiteitemDTO;
 import com.xmmems.mapper.BaseItemMapper;
-import com.xmmems.mapper.BaseSiteMapper;
 import com.xmmems.mapper.EnvHourDataMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,10 +29,8 @@ import java.util.stream.Collectors;
  * @创建时间 2020.03.13 09:55
  */
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class ExceedStandardService {
-    @Autowired
-    private BaseSiteMapper baseSiteMapper;
 
     @Autowired
     private EnvHourDataMapper envHourDataMapper;
@@ -63,7 +60,7 @@ public class ExceedStandardService {
                 @Override
                 public Map<String, List<EnvQualityConf>> call() throws Exception {
                     //2、查询所有指标的质量类别集合,查询全部 一次性查询，在根据项目名进行处理
-                    Map<String, List<EnvQualityConf>> allEnvQualityConfs = new HashMap<>();
+                    Map<String, List<EnvQualityConf>> allEnvQualityConfs = new HashMap<>(16);
                     List<EnvQualityConf> envQualityConfList = commonService.getEnvQualityConfList();
                     for (EnvQualityConf envQualityConf : envQualityConfList) {
                         String kpiName = envQualityConf.getKpiName();
@@ -140,7 +137,8 @@ public class ExceedStandardService {
             }
         }
 
-        return list;  //获取全部数据
+        return list;
+        //获取全部数据
     }
 
     //获取标准水质
@@ -166,9 +164,11 @@ public class ExceedStandardService {
             if (bigDecimal1.compareTo(new BigDecimal(envQualityConf2.getMinVal())) > 0 && bigDecimal1.compareTo(new BigDecimal(envQualityConf2.getMaxVal())) < 0) {
                 //超标情况
                 ExceedStandard e = new ExceedStandard();
-                e.setDate(envHourData.getGenTime());  //监测时间
+                e.setDate(envHourData.getGenTime());
+                //监测时间
                 //e.setMnId();   站点MN号
-                e.setSiteId(envHourData.getSiteId() + "");   //站点id
+                e.setSiteId(envHourData.getSiteId() + "");
+                //站点id
                 e.setSiteName(envHourData.getSiteName());
                 //e.setItemCode();  监测因子对应代码
                 e.setItemId(item.get("itemId"));
@@ -209,7 +209,7 @@ public class ExceedStandardService {
             @Override
             public Map<String, List<EnvQualityConf>> call() throws Exception {
                 //2、查询所有指标的质量类别集合,查询全部 一次性查询，在根据项目名进行处理
-                Map<String, List<EnvQualityConf>> allEnvQualityConfs = new HashMap<>();
+                Map<String, List<EnvQualityConf>> allEnvQualityConfs = new HashMap<>(16);
                 List<EnvQualityConf> envQualityConfList = commonService.getEnvQualityConfList();
                 for (EnvQualityConf envQualityConf : envQualityConfList) {
                     String kpiName = envQualityConf.getKpiName();
@@ -242,8 +242,14 @@ public class ExceedStandardService {
             throw new XMException(500, err);
         }
 
+        handlerRealExceed(list, allEnvQualityConfs, realTimeData);
+
+        return list;
+    }
+
+    private void handlerRealExceed(List<Map<String, Object>> list, Map<String, List<EnvQualityConf>> allEnvQualityConfs, List<Map<String, Object>> realTimeData) {
         for (Map<String, Object> map : realTimeData) {
-            Map<String, Object> temp = new HashMap<>();
+            Map<String, Object> temp = new HashMap<>(16);
             temp.put("siteName", map.get("siteName"));
             String level = map.get("level") + "";
             temp.put("level", level);
@@ -271,7 +277,7 @@ public class ExceedStandardService {
                                 double v = Double.parseDouble(tempValue);
                                 for (EnvQualityConf envQualityConf : envQualityConfs) {
                                     String kpiName = envQualityConf.getKpiName();
-                                    if (!kpiName.equals("溶解氧")) {
+                                    if (!"溶解氧".equals(kpiName)) {
                                         if (envQualityConf.getLevel().equals(levelStandard)) {
                                             double v1 = Double.parseDouble(envQualityConf.getMaxVal());
                                             double v2 = (v - v1) / v1;
@@ -300,14 +306,11 @@ public class ExceedStandardService {
             }
             list.add(temp);
         }
-
-
-        return list;
     }
 
     //查找主要污染源
     private String getMainByItemName(List<ExceedStandard> exceedStandards) {
-        Map<String, Integer> map = new HashMap<>();
+        Map<String, Integer> map = new HashMap<>(4);
 
         exceedStandards.forEach(exceed -> {
             String itemName = exceed.getItemName();
@@ -330,11 +333,6 @@ public class ExceedStandardService {
     }
 
     public Object qualityEvaluation(String siteId) {
-       /* if (StringUtils.isNotBlank(siteId )) {
-            String now = DateFormat.formatSome(System.currentTimeMillis());
-            List<ExceedStandard> list = findByDateAndSiteName(now+" 00:00:00", now+" 23:59:59", siteId,null ,false);
-            System.out.println();
-        }*/
         return null;
     }
 }

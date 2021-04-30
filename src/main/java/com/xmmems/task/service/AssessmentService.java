@@ -23,7 +23,7 @@ import java.util.List;
  * @创建时间 2021.01.21 14:48
  */
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class AssessmentService {
     @Autowired
     private AssessmentMapper assessmentMapper;

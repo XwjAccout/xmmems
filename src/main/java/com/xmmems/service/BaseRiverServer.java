@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class BaseRiverServer {
     @Autowired
     private BaseRiverMapper baseRiverMapper;

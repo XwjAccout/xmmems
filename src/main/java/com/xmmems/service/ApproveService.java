@@ -23,7 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Slf4j
 public class ApproveService {
     @Autowired
@@ -89,23 +89,26 @@ public class ApproveService {
             Map item = null;
             List<Map<String, String>> monitorItems = JsonUtils.nativeRead(hourData.get("content") + "", new TypeReference<List<Map<String, String>>>() {});
 
+            String troubleNameKey = "troubleName";
+            String troubleCodeKey = "troubleCode";
             for (Map<String, String> map : monitorItems) {
                 item = map;
                 if (StrUtil.equals("3", adjust)) {
                     if (adjustKey.equals(map.get("itemName"))) {
-                        map.put("troubleCode", troubleCode); //"N"
-                        map.put("troubleName", troubleName); //正常
+                        //"N"//正常
+                        map.put(troubleCodeKey, troubleCode);
+                        map.put(troubleNameKey, troubleName);
                     }
                 } else {
                     if ("true".equals(multipleAdjust) && "true".equals(multipleParam)) {
-                        map.put("troubleCode", troubleCode);
-                        map.put("troubleName", troubleName);
+                        map.put(troubleCodeKey, troubleCode);
+                        map.put(troubleNameKey, troubleName);
                         if (!StringUtils.isBlank(adjustValue)) {
                             map.put("value", adjustValue);
                         }
                     } else if (adjustKey.equals(map.get("itemName"))) {
-                        map.put("troubleCode", troubleCode);
-                        map.put("troubleName", troubleName);
+                        map.put(troubleCodeKey, troubleCode);
+                        map.put(troubleNameKey, troubleName);
                         if (!StringUtils.isBlank(adjustValue)) {
                             map.put("value", adjustValue);
                         }
@@ -213,7 +216,7 @@ public class ApproveService {
         if (envHourData != null) {
             List<Map<String, String>> monitorItemList = JsonUtils.nativeRead(envHourData.getContent(), new TypeReference<List<Map<String, String>>>() {});
             for (Map<String, String> monitorItem : monitorItemList) {
-                Map<String, String> param = new HashMap<>();
+                Map<String, String> param = new HashMap<>(8);
                 String genTime = new SimpleDateFormat("yyyy-MM-dd").format(envHourData.getGenTime());
 
                 if (!StringUtils.isBlank(monitorItem.get("itemName"))) {
@@ -239,7 +242,7 @@ public class ApproveService {
 
     //根据id查询数据
     public Map<String, Object> findDate(Integer id, Integer siteId, String siteName) {
-        Map<String, Object> ret = new HashMap<>();
+        Map<String, Object> ret = new HashMap<>(8);
         List<Map<String, String>> columns = getColumns(id);
 
         String genTime = columns.get(0).get("genTime");

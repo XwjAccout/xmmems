@@ -25,7 +25,7 @@ import java.util.Map;
  * @创建时间 2020.07.01 16:30
  */
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class CommonService {
     @Autowired
     private BaseSiteMapper baseSiteMapper;
@@ -104,9 +104,9 @@ public class CommonService {
         return ENV_QUALITY_CONF_LIST;
     }
 
-    public BaseItem getBaseItemByItemNameOrItemId(String ItemNameOrItemId) {
+    public BaseItem getBaseItemByItemNameOrItemId(String itemNameOrItemId) {
         initBaseItem();
-        return BASE_ITEM_MAP.get(ItemNameOrItemId);
+        return BASE_ITEM_MAP.get(itemNameOrItemId);
     }
 
     public List<BaseItem> getBaseItemList() {

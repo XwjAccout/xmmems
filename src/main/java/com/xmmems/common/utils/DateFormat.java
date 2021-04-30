@@ -125,7 +125,7 @@ public class DateFormat {
         String[] s = format.split(" ");
         String[] date = s[0].split("-");
         String[] time = s[1].split(":");
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>(16);
         map.put("year", date[0]);
         map.put("month", date[1]);
         map.put("day", date[2]);

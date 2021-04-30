@@ -14,7 +14,7 @@ import java.util.*;
  * @创建时间 2020.09.10 11:06
  */
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class TrendService {
 
     @Autowired
@@ -112,7 +112,6 @@ public class TrendService {
                 sum += aDouble;
             }
             double p = 1 - (6 * sum) / ((Math.pow(X1.length, 3)) - X1.length);
-            //System.out.println(p);
             return new BigDecimal(p + "").setScale(4, BigDecimal.ROUND_HALF_EVEN).toPlainString();
         }
         return "";
@@ -132,7 +131,7 @@ public class TrendService {
         Arrays.sort(a);
         List<Map<Double, Double>> list = new ArrayList<>();
         for (int i = 0; i < a.length; i++) {
-            Map<Double, Double> map = new HashMap<>();
+            Map<Double, Double> map = new HashMap<>(16);
             map.put(a[i], i + 1d);
             list.add(map);
         }

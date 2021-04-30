@@ -14,19 +14,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
-import java.util.Date;
 import java.util.List;
 
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class InventorydetailsService {
   @Autowired
   private   InventorydetailsMapper inventorydetailsMapper;
     @Autowired
     private MaterialManagementMapper materialManagementMapper;
     //添加库存
-    public  Integer addnumber( Inventorydetails inventorydetails){
-        return  inventorydetailsMapper.insertSelective(inventorydetails);
+    public void addnumber(Inventorydetails inventorydetails){
+        inventorydetailsMapper.insertSelective(inventorydetails);
     }
 
     //消耗

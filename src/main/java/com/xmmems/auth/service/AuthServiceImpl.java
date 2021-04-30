@@ -29,9 +29,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 @Slf4j
-public class AuthService implements UserDetailsService {
+public class AuthServiceImpl implements UserDetailsService {
 
     @Autowired
     private AccountService accountService;
@@ -43,12 +43,6 @@ public class AuthService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) {
         //得到自定义用户对象
         UserDTO userDTO = accountService.findAccountByUsername(username);
-
-//        List<SimpleGrantedAuthority> list = new ArrayList<>();
-//        userDTO.getRoles().forEach(role->{
-//            SimpleGrantedAuthority grantedAuthority = new SimpleGrantedAuthority(role.getRoleName());
-//            list.add(grantedAuthority);
-//        });
 
         //通过自定义的角色集合获取springSecurity的角色对象的集合
         List<RoleDTO> roles = userDTO.getRoles();
@@ -67,35 +61,7 @@ public class AuthService implements UserDetailsService {
     }
 
     public SysUserToken verifyUser(HttpServletRequest request, HttpServletResponse response) {
-        ////获取cookie中的token
-        //String header = prop.getUser().getCookieName();
-        //String token = request.getHeader(header);
-        //if(StringUtils.isBlank(token)){
-        //    log.error("验证用户token失败，用户未登陆");
-        //    throw new XMException(ExceptionEnum.UNAUTHORIZED);
-        //}
-        ////验证token是否合法
-        //Payload<SysUserToken> payload = null;
-        //try {
-        //    payload = JwtUtils.getInfoFromToken(token, prop.getPublicKey(), SysUserToken.class);
-        //    log.info("验证用户token有效");
-        //}catch (Exception e){
-        //    log.error("验证用户token失败，用户未登陆");
-        //    throw new XMException(ExceptionEnum.UNAUTHORIZED);
-        //}
-        ////得到载荷中的用户信息
-        //SysUserToken userToken = payload.getUserInfo();
-        ////得到token的失效时间
-        //Date expDate = payload.getExpiration();
-        ////得到刷新点时间
-        //DateTime refreshTime = new DateTime(expDate).minusMinutes(prop.getUser().getRefreshTime());
-        ////如果刷新时间在当前时间之前，就刷新token
-        //if(refreshTime.isBefore(System.currentTimeMillis())){
-        //    //重新生成token并写入到cookie中
-        //    createTokenToCookie(response, userToken);
-        //}//   开始时间    刷新点时间    *    失效时间
-        SysUserToken loginUser = UserHolder.getLoginUser();
-        return loginUser;
+        return UserHolder.getLoginUser();
     }
 
     /**
@@ -117,7 +83,6 @@ public class AuthService implements UserDetailsService {
     public void logout(HttpServletRequest request, HttpServletResponse response) {
         //获取token
         String cookieName = prop.getUser().getCookieName();
-        //String token = CookieUtils.getCookieValue(request, cookieName);
         String token = request.getHeader(cookieName);
         if(StringUtils.isBlank(token)){
             //如果当前请求没有token，就无需再做退出操作
@@ -135,9 +100,6 @@ public class AuthService implements UserDetailsService {
         //获取当前token的剩余过期时间,单位是毫秒
         long remainTime = payload.getExpiration().getTime() - System.currentTimeMillis();
         //将当前token加入到黑名单
-        if(remainTime>1000){
-          //  redisTemplate.opsForValue().set(tokenId, "1", remainTime, TimeUnit.MILLISECONDS);
-        }
         //删除token
         CookieUtils.deleteCookie(prop.getUser().getCookieName(),
                 prop.getUser().getCookieDomain(),

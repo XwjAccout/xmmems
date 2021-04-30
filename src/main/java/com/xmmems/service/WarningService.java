@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class WarningService {
     @Autowired
     private EnvWarnRecordMapper envWarnRecordMapper;

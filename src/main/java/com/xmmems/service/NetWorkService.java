@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * @创建时间 2020.03.06 14:53
  */
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class NetWorkService {
     @Autowired
     private NetWorkMapper netWorkMapper;
@@ -40,7 +40,7 @@ public class NetWorkService {
 
 
     public Map<String, Integer> findNetWorksNumber() {
-        Map<String, Integer> map = new HashMap<>();
+        Map<String, Integer> map = new HashMap<>(8);
         //今天的联网情况
         String format = DateFormat.formatSome(new Date());
         List<NetWork> netWorks = findNetWorks(null, format, format, null);

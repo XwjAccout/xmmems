@@ -49,13 +49,11 @@ public class AuthFilter extends HttpFilter {
         log.info("【过滤器】请求进入过滤器！"+request.getMethod() + "  " + request.getRequestURI()+"  "+remoteHost);
         if (HttpMethod.OPTIONS.toString().equals(method)) {
             response.setStatus(HttpStatus.NO_CONTENT.value());
-            //log.info("预检请求执行完毕！");
         } else {
             if (isWhite(request.getRequestURI())) {
                 log.info("【过滤器】当前用户是白名单，无需认证，继续微服务访问！");
             } else {
                 //获取Cookie中的token
-//                String token = CookieUtils.getCookieValue(request, jwtProp.getUser().getCookieName());
                  String token = request.getHeader(jwtProp.getUser().getCookieName());
                 //判断token是否存在
                 if (StringUtils.isBlank(token)) {
@@ -122,17 +120,16 @@ public class AuthFilter extends HttpFilter {
     /**
      * 判断当前请求是否是白名单
      */
-    private boolean isWhite(String requestURI) {
-        //log.error("aaa"+(filterProp==null));
+    private boolean isWhite(String requesturi) {
         //遍历所有白名单地址前缀
         for (String allowPath : filterProp.getAllowPaths()) {
             //判断
             //判断如果当前请求路径，包含了其中一个白名单前缀
-            if (requestURI.startsWith(allowPath)) {
+            if (requesturi.startsWith(allowPath)) {
                 //表示当前路径是白名单
                 return true;
             }
-            if (requestURI.equals("/")) {
+            if ("/".equals(requesturi)) {
                 return true;
             }
         }

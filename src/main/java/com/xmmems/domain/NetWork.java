@@ -29,7 +29,8 @@ public class NetWork {
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date loginTime;
 
-    private String state;  //联网状态
+    private String state;
+    //联网状态
 
     public Integer getId() {
         return id;

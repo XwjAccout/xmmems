@@ -16,35 +16,35 @@ public class ReportThreadLocal {
     private static ThreadLocal<ReportTempParams> TL = new ThreadLocal<>();
 
     public static String getType() {
-        return getTL().getType();
+        return gettl().getType();
     }
 
     public static double getAll() {
-        return getTL().getAll();
+        return gettl().getAll();
     }
 
-    public static Boolean getLimit(){
-        return getTL().getLimit();
+    public static boolean getLimit(){
+        return gettl().isLimit();
     }
 
-    public static void setTL(String type, double all,Boolean limit) {
+    public static void settl(String type, double all, boolean limit) {
         TL.set(new ReportTempParams(type, all,limit));
     }
 
-    public static ReportTempParams getTL() {
+    public static ReportTempParams gettl() {
         return TL.get();
     }
 
     public static void setAll(double all) {
-        getTL().setAll(all);
+        gettl().setAll(all);
     }
 
     public static void setType(String type) {
-        getTL().setType(type);
+        gettl().setType(type);
     }
 
-    public static void setLimit(Boolean limit) {
-        getTL().setLimit(limit);
+    public static void setLimit(boolean limit) {
+        gettl().setLimit(limit);
     }
 
 
@@ -56,7 +56,7 @@ public class ReportThreadLocal {
 class ReportTempParams {
     private String type;
     private double all;
-    private Boolean limit;
+    private boolean limit;
 
     public void setType(String type) {
         this.type = type;
@@ -66,7 +66,7 @@ class ReportTempParams {
         this.all = all;
     }
 
-    public void setLimit(Boolean limit) {
+    public void setLimit(boolean limit) {
         this.limit = limit;
     }
 }
