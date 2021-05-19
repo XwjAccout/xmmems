@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -178,10 +179,13 @@ public class ApproveService {
                             map.put("troubleCode", "");
                             map.put("troubleName", "");
                             map.put("value", map.get("originValue"));
+                            break;
                         }
                     }
                 }
-                EnvHourData envHourData = EnvHourData.builder().id((Integer)hourData.get("id")).content(JsonUtils.toString(monitorItems)).build();
+                EnvHourData envHourData = new EnvHourData();
+                envHourData.setId((Integer)hourData.get("id"));
+                envHourData.setContent(JsonUtils.toString(monitorItems));
                 envHourDataMapper.updateByPrimaryKeySelective(envHourData);
             }
         }
@@ -253,23 +257,64 @@ public class ApproveService {
         return ret;
     }
 
+    // 判断一个字符是否是中文
+    private static boolean isChinese(char c) {
+        return c >= 0x4E00 && c <= 0x9FA5;// 根据字节码判断
+    }
+
+    // 判断一个字符串是否含有中文
+    private static boolean isChinese(String str) {
+        if (str == null) {
+            return false;
+        }
+        for (char c : str.toCharArray()) {
+            // 有一个中文字符就返回
+            if (isChinese(c)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void addDataSave(Integer siteId, String siteName, String monitorTime, String itemData, String[] times) {
 
+        List<BaseItem> baseItems = envHourDataMapper.selectAllBaseItem();
+        Map<String, Integer> collect = baseItems.stream().collect(Collectors.toMap(BaseItem::getName, BaseItem::getId));
+        List<Map<String, String>> mapList = JsonUtils.nativeRead(itemData, new TypeReference<List<Map<String, String>>>() {});
+        Iterator<Map<String, String>> iterator = mapList.iterator();
+        while (iterator.hasNext()) {
+            Map<String, String> map = iterator.next();
+
+
+            String value = map.get("value");
+            if (value == null) {
+                iterator.remove();
+                continue;
+            }
+            String itemName = map.get("itemName");
+            if (!isChinese(itemName) && !"pH".equalsIgnoreCase(itemName)) {
+                iterator.remove();
+                continue;
+            }
+            Integer itemId = collect.get(itemName);
+            if (itemId == null) {
+                iterator.remove();
+                continue;
+            }
+            map.put("itemId", itemId + "");
+            map.put("troubleCode", "");
+            map.put("troubleName", "");
+            map.put("originValue", map.get("value"));
+        }
         for (String m : times) {
             String mtime = monitorTime + " " + m + ":00:00";
-
-            EnvHourData envHourData = envHourDataMapper.selectBySiteIdAndGenTime(siteId, mtime);
-            if (envHourData == null) {
-                envHourData = new EnvHourData();
-                envHourData.setSiteId(siteId);
-                envHourData.setSiteName(siteName);
-                envHourData.setGenTime(DateFormat.parseAll(mtime));
-                envHourData.setContent(itemData);
-                envHourDataMapper.insertSelective(envHourData);
-            } else {
-                envHourData.setContent(itemData);
-                envHourDataMapper.updateByPrimaryKeyWithBLOBs(envHourData);
-            }
+            envHourDataMapper.deleteByTime(siteId, mtime);
+            EnvHourData envHourData = new EnvHourData();
+            envHourData.setSiteId(siteId);
+            envHourData.setSiteName(siteName);
+            envHourData.setGenTime(DateFormat.parseAll(mtime));
+            envHourData.setContent(JsonUtils.toString(mapList));
+            envHourDataMapper.insertSelective(envHourData);
         }
     }
 

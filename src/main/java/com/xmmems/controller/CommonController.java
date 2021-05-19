@@ -3,7 +3,6 @@ package com.xmmems.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.xmmems.common.auth.domain.UserHolder;
 import com.xmmems.common.utils.DateFormat;
-import com.xmmems.common.utils.FileLog;
 import com.xmmems.common.utils.JsonUtils;
 import com.xmmems.domain.ExceedStandard;
 import com.xmmems.dto.BaseSiteDTO;
@@ -15,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -40,26 +40,23 @@ public class CommonController {
     private BaseSiteitemMapper baseSiteitemMapper;
 
     @GetMapping("/waterquality")
-    public ResponseEntity<Object> waterquality() {
+    public ResponseEntity<Object> waterquality(@RequestParam(value = "siteType", required = false) String siteType) {
         List<BaseSiteDTO> sites = monitorService.getSites();
 
         List<Map<String, Object>> result = new ArrayList<>();
-        List<Map<String, Object>> realTimeData = monitorService.getRealTimeData();
-        FileLog.info("com.xmmems.controller.CommonController   48行"+JsonUtils.toString(realTimeData));
-        for (Map<String, Object> realTimeDatum : realTimeData) {
-            FileLog.info("com.xmmems.controller.CommonController   50行"+JsonUtils.toString(realTimeDatum));
-        }
-        realTimeData.forEach(temp -> {
+        List<Map<String, Object>> realTimeData = monitorService.getRealTimeData(siteType);
+
+        for (Map<String, Object> temp : realTimeData) {
             String level = temp.get("level") + "";
             if (!level.contains("-")) {
                 Map<String, Object> map = new HashMap<>(16);
                 map.put("siteName", temp.get("siteName"));
                 map.put("level", level);
-                FileLog.info("com.xmmems.controller.CommonController  map.put(\"level\", level);  55行"+level);
-                int siteId = Integer.parseInt(temp.get("siteId")+"");
+
+                int siteId = Integer.parseInt(temp.get("siteId") + "");
                 map.put("siteId", siteId);
                 for (BaseSiteDTO site : sites) {
-                    if (site.getId()==siteId) {
+                    if (site.getId() == siteId) {
                         map.put("latitude", site.getLatitude());
                         map.put("longitude", site.getLongitude());
                         sites.remove(site);
@@ -68,7 +65,7 @@ public class CommonController {
                 }
                 result.add(map);
             }
-        });
+        }
 
         //水质比重
         List<Object> waterquality = new ArrayList<>();
@@ -91,21 +88,19 @@ public class CommonController {
 
         //获取当前用户所拥有的的站点的对应的监测项目信息，去除重复的项目
         List<Map<String, String>> body = baseSiteitemMapper.selectByAccountId(UserHolder.loginId());
-        System.out.println("***********allItems"+body);
         return ResponseEntity.ok(body);
     }
 
 
     //获取超标统计数据
     @GetMapping("/exceed")
-    public ResponseEntity<Object> exceed() {
+    public ResponseEntity<Object> exceed(@RequestParam(value = "siteType", required = false) String siteType) {
         //根据账户id查找站点名称集合
-        List<Map<String, Object>> baseSite = baseService.findBaseSiteByAccountId();
+        List<Map<String, Object>> baseSite = baseService.findBaseSiteByAccountId(siteType);
         String day = DateFormat.formatSome(System.currentTimeMillis());
         List<ExceedStandard> list = new ArrayList<>();
         baseSite.parallelStream().map(map -> map.get("id") + "").map(id -> exceedStandardService.findByDateAndSiteName(day + " 00:00:00", day + " 23:59:59", id, true)).forEach(list::addAll);
-        List<Map<String, String>> mapList = JsonUtils.nativeRead(JsonUtils.toString(list), new TypeReference<List<Map<String, String>>>() {
-        });
+        List<Map<String, String>> mapList = JsonUtils.nativeRead(JsonUtils.toString(list), new TypeReference<List<Map<String, String>>>() {});
         mapList.parallelStream().forEach(mm -> {
             mm.remove("id");
             mm.remove("mnId");
@@ -118,7 +113,6 @@ public class CommonController {
         });
 
         //获取当前用户所拥有的的站点的对应的监测项目信息，去除重复的项目
-        System.out.println("*******exceed"+mapList);
         return ResponseEntity.ok(mapList);
     }
 }

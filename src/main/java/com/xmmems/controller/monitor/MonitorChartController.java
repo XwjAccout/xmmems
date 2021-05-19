@@ -40,9 +40,9 @@ public class MonitorChartController {
      */
     @GetMapping("/dayData")
     @SystemControllerLog(descrption = "获取时段曲线数据", actionType = "4")
-    public ResponseEntity<List<Map<String, String>>> dayData(@RequestParam("siteId") Integer siteId,
-                                                             @RequestParam("startTime") String startTime,
-                                                             @RequestParam("endTime") String endTime) {
+    public ResponseEntity<List<Map<String, String>>> dayData(
+            @RequestParam("siteId") Integer siteId,
+            @RequestParam("startTime") String startTime, @RequestParam("endTime") String endTime) {
         List<Map<String, String>> list = monitorService.day(siteId, startTime, endTime, null, false);
         if ("平均值".equals(list.get(list.size() - 1).get("moniterTime"))) {
             list.remove(list.size() - 1);
@@ -55,9 +55,9 @@ public class MonitorChartController {
      */
     @GetMapping("/monthData")
     @SystemControllerLog(descrption = "获取日均值曲线数据", actionType = "4")
-    public ResponseEntity<List<Map<String, String>>> monthData(@RequestParam("siteId") Integer siteId,
-                                                               @RequestParam("startTime") String startTime,
-                                                               @RequestParam("endTime") String endTime) {
+    public ResponseEntity<List<Map<String, String>>> monthData(
+            @RequestParam("siteId") Integer siteId,
+            @RequestParam("startTime") String startTime, @RequestParam("endTime") String endTime) {
         List<Map<String, String>> list = monitorService.month(siteId, startTime, endTime, null, false);
         if ("平均值".equals(list.get(list.size() - 1).get("moniterTime"))) {
             list.remove(list.size() - 1);
@@ -69,9 +69,9 @@ public class MonitorChartController {
      * 获取月均值曲线数据
      */
     @GetMapping("/yearData")
-    public ResponseEntity<List<Map<String, String>>> yearData(@RequestParam("siteId") Integer siteId,
-                                                              @RequestParam("startTime") String startTime,
-                                                              @RequestParam("endTime") String endTime) {
+    public ResponseEntity<List<Map<String, String>>> yearData(
+            @RequestParam("siteId") Integer siteId,
+            @RequestParam("startTime") String startTime, @RequestParam("endTime") String endTime) {
         List<Map<String, String>> list = monitorService.year(siteId, startTime, endTime, null, false);
         if ("平均值".equals(list.get(list.size() - 1).get("moniterTime"))) {
             list.remove(list.size() - 1);
@@ -85,8 +85,8 @@ public class MonitorChartController {
      */
     @GetMapping("/realDay")
     @SystemControllerLog(descrption = "获取日曲线数据", actionType = "4")
-    public ResponseEntity<List<Map<String, String>>> realDay(@RequestParam("siteId") Integer siteId,
-                                                             @RequestParam("day") String day) {
+    public ResponseEntity<List<Map<String, String>>> realDay(
+            @RequestParam("siteId") Integer siteId, @RequestParam("day") String day) {
         List<Map<String, String>> list = monitorService.realDay(siteId, day, null, false);
         if ("平均值".equals(list.get(list.size() - 1).get("moniterTime"))) {
             list.remove(list.size() - 1);
@@ -99,9 +99,9 @@ public class MonitorChartController {
      */
     @GetMapping("/realMonth")
     @SystemControllerLog(descrption = "获取月曲线数据", actionType = "4")
-    public ResponseEntity<List<Map<String, String>>> realMonth(@RequestParam("siteId") Integer siteId,
-                                                               @RequestParam("year") Integer year,
-                                                               @RequestParam("month") Integer month) {
+    public ResponseEntity<List<Map<String, String>>> realMonth(
+            @RequestParam("siteId") Integer siteId,
+            @RequestParam("year") Integer year, @RequestParam("month") Integer month) {
         List<Map<String, String>> list = monitorService.realMonth(siteId, year, month, null, false);
         if ("平均值".equals(list.get(list.size() - 1).get("moniterTime"))) {
             list.remove(list.size() - 1);
@@ -113,8 +113,8 @@ public class MonitorChartController {
      * 获取年曲线数据
      */
     @GetMapping("/realYear")
-    public ResponseEntity<List<Map<String, String>>> realYear(@RequestParam("siteId") Integer siteId,
-                                                              @RequestParam("year") Integer year) {
+    public ResponseEntity<List<Map<String, String>>> realYear(
+            @RequestParam("siteId") Integer siteId, @RequestParam("year") Integer year) {
         List<Map<String, String>> list = monitorService.realYear(siteId, year, null, false);
         if ("平均值".equals(list.get(list.size() - 1).get("moniterTime"))) {
             list.remove(list.size() - 1);
@@ -126,10 +126,11 @@ public class MonitorChartController {
      * 获取季曲线数据
      */
     @GetMapping("/realSeasons")
-    public ResponseEntity<List<Map<String, String>>> seasons(@RequestParam("siteId") Integer siteId,
-                                                             @RequestParam("year") Integer year,
-                                                             @RequestParam(value = "isDayAvg", defaultValue = "false") Boolean isDayAvg,
-                                                             @RequestParam("seasons") Integer seasons) {
+    public ResponseEntity<List<Map<String, String>>> seasons(
+            @RequestParam("siteId") Integer siteId,
+            @RequestParam("year") Integer year,
+            @RequestParam(value = "isDayAvg", defaultValue = "false") Boolean isDayAvg,
+            @RequestParam("seasons") Integer seasons) {
         List<Map<String, String>> list = monitorService.seasons(siteId, seasons, year, null, false, isDayAvg);
         if ("平均值".equals(list.get(list.size() - 1).get("moniterTime"))) {
             list.remove(list.size() - 1);
@@ -141,9 +142,9 @@ public class MonitorChartController {
      * 获取原始曲线（异常数据不除去）
      */
     @GetMapping("/initData")
-    public ResponseEntity<List<Map<String, Object>>> initData(@RequestParam("siteId") Integer siteId,
-                                                              @RequestParam("startTime") String startTime,
-                                                              @RequestParam("endTime") String endTime) {
+    public ResponseEntity<List<Map<String, Object>>> initData(
+            @RequestParam("siteId") Integer siteId,
+            @RequestParam("startTime") String startTime, @RequestParam("endTime") String endTime) {
         List<Map<String, Object>> list = monitorService.initData(siteId, startTime, endTime);
         return ResponseEntity.ok(list);
     }
@@ -152,9 +153,9 @@ public class MonitorChartController {
      * 获取周曲线
      */
     @GetMapping("/weekData")
-    public ResponseEntity<List<Map<String, String>>> weekData(@RequestParam("siteId") Integer siteId,
-                                                              @RequestParam("year") Integer year,
-                                                              @RequestParam("week") Integer week) {
+    public ResponseEntity<List<Map<String, String>>> weekData(
+            @RequestParam("siteId") Integer siteId,
+            @RequestParam("year") Integer year, @RequestParam("week") Integer week) {
         List<Map<String, String>> list = monitorService.week(siteId, year, week, null, false);
         if ("平均值".equals(list.get(list.size() - 1).get("moniterTime"))) {
             list.remove(list.size() - 1);
@@ -169,11 +170,13 @@ public class MonitorChartController {
      * @return
      */
     @GetMapping("/singleComparison")
-    public ResponseEntity<Object> singleComparison(@RequestParam("startTime") String startTime,
-                                                   @RequestParam("endTime") String endTime,
-                                                   @RequestParam("type") Integer type,
-                                                   @RequestParam(value = "itemName", required = false) String itemName) {
-        List<Map<String, String>> body = monitorService.singleComparison(startTime, endTime, type);
+    public ResponseEntity<Object> singleComparison(
+            @RequestParam("startTime") String startTime,
+            @RequestParam("endTime") String endTime,
+            @RequestParam("type") Integer type,
+            @RequestParam(value = "itemName", required = false) String itemName,
+            @RequestParam(value = "siteType", required = false) String siteType) {
+        List<Map<String, String>> body = monitorService.singleComparison(startTime, endTime, type,siteType);
         if (StringUtils.isBlank(itemName)) {
             return ResponseEntity.ok(body);
         } else {
@@ -187,6 +190,5 @@ public class MonitorChartController {
         }
         return ResponseEntity.ok(null);
     }
-
 
 }

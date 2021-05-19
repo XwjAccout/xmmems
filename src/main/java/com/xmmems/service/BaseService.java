@@ -44,12 +44,12 @@ public class BaseService {
     @Autowired
     private CommonService commonService;
     //分页查询
-    public PageResult<BaseSite> sitePageQuery(Integer limit, Integer page, String siteName) {
+    public PageResult<BaseSite> sitePageQuery(Integer limit, Integer page, String siteName,String siteType) {
 
         try {
             //封装分页信息
             PageHelper.startPage(page, limit);
-            List<BaseSite> baseSites = baseSiteMapper.selectByExampleByAccountId(UserHolder.loginId(),siteName);
+            List<BaseSite> baseSites = baseSiteMapper.selectByExampleByAccountId(UserHolder.loginId(),siteName,siteType);
 
             //得到pageHelper的分页对象
             PageInfo<BaseSite> pageInfo = new PageInfo<>(baseSites);
@@ -294,29 +294,34 @@ public class BaseService {
         return baseSiteitemMapper.siteItemGetItemsBySiteId(siteId);
     }
 
-    public List<Map<String, String>> findAll() {
+    public List<Map<String, String>> findAll(String siteType) {
         List<BaseSite> baseSites = commonService.getBaseSiteList();
         if (CollectionUtils.isEmpty(baseSites)) {
-            return null;
+            return new ArrayList<>();
         }
         List<Map<String, String>> mapList = new ArrayList<>();
         //转换为map减少数据传输量
-        baseSites.forEach(baseSite -> {
+        for (BaseSite baseSite : baseSites) {
+            if (siteType!=null && !siteType.equals(baseSite.getSiteType())) {
+                continue;
+            }
             Map<String, String> map = new HashMap<>(8);
-            map.put("id", baseSite.getId()+"");
+            map.put("id", baseSite.getId() + "");
             map.put("siteName", baseSite.getSiteName());
             map.put("mn", baseSite.getMN());
             mapList.add(map);
-        });
+        }
         return mapList;
     }
 
-    public List<Map<String, Object>> findBaseSiteByAccountId() {
-        return baseSiteMapper.getSiteIdAndNameByAccountId(UserHolder.loginId());
+    public List<Map<String, Object>> findBaseSiteByAccountId(String siteType) {
+        return baseSiteMapper.getSiteIdAndNameByAccountId(UserHolder.loginId(),siteType);
     }
-    public List<Map<String, Object>> findAccountId(Integer id) {
-        return baseSiteMapper.getSiteIdAndNameByAccountId(id);
+
+    public List<Map<String, Object>> findAccountId(Integer id,String siteType) {
+        return baseSiteMapper.getSiteIdAndNameByAccountId(id, siteType);
     }
+
     public List<BaseSiteitem> getSiteItem(Integer siteId) {
         return baseSiteitemMapper.getSiteItem(siteId);
     }

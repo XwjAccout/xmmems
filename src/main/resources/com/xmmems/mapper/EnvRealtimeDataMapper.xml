@@ -83,7 +83,18 @@
     from env_realtime_data
     where id = #{id,jdbcType=INTEGER}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    <select id="getRealTimeData" resultType="java.util.Map">
+      SELECT r.siteId,b.siteName,b.levelStandard,moniterTime,content
+        FROM account_site a,base_site b,env_realtime_data r
+      WHERE a.accountId = #{accountId}
+        AND a.siteId=b.id
+        AND r.siteId = a.siteId
+        AND b.isvalid = 1
+      <if test="siteType != null" >
+        AND b.siteType = #{siteType}
+      </if>
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from env_realtime_data
     where id = #{id,jdbcType=INTEGER}
   </delete>

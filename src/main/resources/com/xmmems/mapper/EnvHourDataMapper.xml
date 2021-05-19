@@ -88,6 +88,10 @@
     delete from env_hour_data
     where id = #{id,jdbcType=INTEGER}
   </delete>
+  <delete id="deleteByTime">
+        delete from env_hour_data
+        where genTime = #{genTime} and siteId = #{siteId}
+  </delete>
   <insert id="insert" parameterType="com.xmmems.domain.env.EnvHourData" >
     insert into env_hour_data (id, siteId, siteName,
       genTime, handle, content
@@ -223,5 +227,8 @@
   </select>
   <select id="selectContent" resultType="java.lang.String">
     SELECT content FROM `env_hour_data` WHERE siteId = #{siteId} AND genTime >=#{start} AND genTime &lt;=#{end}
+  </select>
+  <select id="selectAllBaseItem" resultType="com.xmmems.domain.base.BaseItem">
+        SELECT id,`name`,unit FROM `base_item` WHERE isvalid = 1
   </select>
 </mapper>

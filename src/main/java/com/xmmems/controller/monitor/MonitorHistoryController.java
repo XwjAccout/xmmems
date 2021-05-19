@@ -43,8 +43,8 @@ public class MonitorHistoryController {
      */
     @GetMapping("/getColumnsAll")
     @SystemControllerLog(descrption = "根据站点id获取表头数据，也就是站点项目信息所有的", actionType = "4")
-    public ResponseEntity<List<BaseSiteitemDTO>> getColumnsAll() {
-        List<BaseSiteitemDTO> list = monitorService.getColumnsAll();
+    public ResponseEntity<List<BaseSiteitemDTO>> getColumnsAll(@RequestParam(value = "siteType", required = false) String siteType) {
+        List<BaseSiteitemDTO> list = monitorService.getColumnsAll(siteType);
         return ResponseEntity.ok(list);
     }
 

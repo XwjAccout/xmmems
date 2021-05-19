@@ -19,13 +19,16 @@ public class BaseSiteController {
 
     @Autowired
     private BaseService baseService;
+
     //查询站点列表
     @GetMapping("/site/paginate")
     @SystemControllerLog(descrption = "分页查询站点列表", actionType = "4")
-    public ResponseEntity<PageResult<BaseSite>> sitePageQuery(@RequestParam(value = "limit", defaultValue = "100000000") Integer limit,
-                                                              @RequestParam(value = "page", defaultValue = "1") Integer page,
-                                                              @RequestParam(value = "siteName", required = false) String siteName) {
-        PageResult<BaseSite> pageResult = baseService.sitePageQuery(limit, page, siteName);
+    public ResponseEntity<PageResult<BaseSite>> sitePageQuery(
+            @RequestParam(value = "limit", defaultValue = "100000000") Integer limit,
+            @RequestParam(value = "page", defaultValue = "1") Integer page,
+            @RequestParam(value = "siteName", required = false) String siteName,
+            @RequestParam(value = "siteType", required = false) String siteType) {
+        PageResult<BaseSite> pageResult = baseService.sitePageQuery(limit, page, siteName, siteType);
         return ResponseEntity.ok(pageResult);
     }
 
@@ -64,7 +67,8 @@ public class BaseSiteController {
     //根据站点id查询监测项目
     @GetMapping("/site/item/getItems")
     @SystemControllerLog(descrption = "根据站点id查询监测项目", actionType = "4")
-    public ResponseEntity<List<BaseSiteitemDTO>> siteItemGetItemsBySiteId(@RequestParam(value = "siteId") Integer siteId) {
+    public ResponseEntity<List<BaseSiteitemDTO>> siteItemGetItemsBySiteId(
+            @RequestParam(value = "siteId") Integer siteId) {
         List<BaseSiteitemDTO> list = baseService.siteItemGetItemsBySiteId(siteId);
         return ResponseEntity.ok(list);
     }
@@ -74,13 +78,16 @@ public class BaseSiteController {
      */
     @GetMapping("/site/findAll")
     @SystemControllerLog(descrption = "获取所有有效的站点信息（id，名称）", actionType = "4")
-    public ResponseEntity<List<Map<String, String>>> findAll() {
-        return ResponseEntity.ok(baseService.findAll());
+    public ResponseEntity<List<Map<String, String>>> findAll(
+            @RequestParam(value = "siteType", required = false) String siteType) {
+        return ResponseEntity.ok(baseService.findAll(siteType));
     }
 
     //根据站点id查询监测项目
     @GetMapping("/site/item/updateBysort")
-    public ResponseEntity<Void> updateBybaseSiteitem(@RequestParam(value = "upAndDown") Integer upAndDown, @RequestParam(value = "siteId") Integer siteId, @RequestParam(value = "id") Integer id) {
+    public ResponseEntity<Void> updateBybaseSiteitem(
+            @RequestParam(value = "upAndDown") Integer upAndDown,
+            @RequestParam(value = "siteId") Integer siteId, @RequestParam(value = "id") Integer id) {
         baseService.updateBybaseSiteitem(upAndDown, siteId, id);
         return ResponseEntity.ok().build();
     }
@@ -88,7 +95,10 @@ public class BaseSiteController {
     //添加监测项目
     @PostMapping("/site/item/addItem")
     @SystemControllerLog(descrption = "添加站点监测项目", actionType = "1")
-    public ResponseEntity<Void> addItem(@RequestParam(value = "siteId") Integer siteId, @RequestParam(value = "siteName") String siteName, @RequestParam(value = "itemId") Integer itemId, @RequestParam(value = "itemName") String itemName) {
+    public ResponseEntity<Void> addItem(
+            @RequestParam(value = "siteId") Integer siteId,
+            @RequestParam(value = "siteName") String siteName,
+            @RequestParam(value = "itemId") Integer itemId, @RequestParam(value = "itemName") String itemName) {
         baseService.addItem(siteId, siteName, itemId, itemName);
         return ResponseEntity.ok().build();
     }
@@ -96,7 +106,8 @@ public class BaseSiteController {
     //添加监测项目
     @PostMapping("/site/item/delItem")
     @SystemControllerLog(descrption = "删除站点监测项目", actionType = "3")
-    public ResponseEntity<Void> delItem(@RequestParam(value = "siteId") Integer siteId, @RequestParam(value = "itemId") Integer itemId) {
+    public ResponseEntity<Void> delItem(
+            @RequestParam(value = "siteId") Integer siteId, @RequestParam(value = "itemId") Integer itemId) {
         baseService.delItem(siteId, itemId);
         return ResponseEntity.ok().build();
     }
@@ -104,42 +115,51 @@ public class BaseSiteController {
     //zeroCheck 默认true   传入false时为只查询查询含有零点跨度核查数据的站点
     @GetMapping("/site/byAccountId")
     @SystemControllerLog(descrption = "根据账户id查找站点名称集合", actionType = "4")
-    public ResponseEntity<List<Map<String, Object>>> byAccountId(@RequestParam(value = "zeroCheck",defaultValue = "true") Boolean zeroCheck) {
+    public ResponseEntity<List<Map<String, Object>>> byAccountId(
+            @RequestParam(value = "zeroCheck", defaultValue = "true") Boolean zeroCheck,
+            @RequestParam(value = "siteType", required = false) String siteType) {
         if (zeroCheck) {
-            return ResponseEntity.ok(baseService.findBaseSiteByAccountId());
+            return ResponseEntity.ok(baseService.findBaseSiteByAccountId(siteType));
         } else {
             return ResponseEntity.ok(baseService.getSiteIdAndNameExcludeZeroCheck());
         }
     }
+
     //修改检出限
     @PostMapping("/site/updateDetectionLimit")
     @SystemControllerLog(descrption = "修改检出限", actionType = "2")
-    public ResponseEntity<Void> updateDetectionLimit(@RequestParam(value = "siteId") Integer siteId, @RequestParam(value = "itemId") Integer itemId, @RequestParam(value = "limit")String limit){
-        int i =  baseService.updateDetectionLimit(siteId, itemId,limit);
+    public ResponseEntity<Void> updateDetectionLimit(
+            @RequestParam(value = "siteId") Integer siteId,
+            @RequestParam(value = "itemId") Integer itemId, @RequestParam(value = "limit") String limit) {
+        int i = baseService.updateDetectionLimit(siteId, itemId, limit);
         return ResponseEntity.ok().build();
     }
 
     //修改排序
     @PostMapping("/site/updateSort")
     @SystemControllerLog(descrption = "修改排序", actionType = "2")
-    public ResponseEntity<Void> updateSort(@RequestParam(value = "siteId") Integer siteId, @RequestParam(value = "itemId") Integer itemId, @RequestParam(value = "sort")Double sort){
-        baseService.updateSort(siteId, itemId,sort);
+    public ResponseEntity<Void> updateSort(
+            @RequestParam(value = "siteId") Integer siteId,
+            @RequestParam(value = "itemId") Integer itemId, @RequestParam(value = "sort") Double sort) {
+        baseService.updateSort(siteId, itemId, sort);
         return ResponseEntity.ok().build();
     }
 
     //修改次数
     @PostMapping("/site/updateNumber")
     @SystemControllerLog(descrption = "修改次数", actionType = "2")
-    public ResponseEntity<Void> updateNumber(@RequestParam(value = "siteId") Integer siteId, @RequestParam(value = "itemId") Integer itemId, @RequestParam(value = "number")Integer number){
-        baseService.updateNumber(siteId, itemId,number);
+    public ResponseEntity<Void> updateNumber(
+            @RequestParam(value = "siteId") Integer siteId,
+            @RequestParam(value = "itemId") Integer itemId, @RequestParam(value = "number") Integer number) {
+        baseService.updateNumber(siteId, itemId, number);
         return ResponseEntity.ok().build();
     }
 
     //修改次数
     @GetMapping("/site/siteByitemId")
     @SystemControllerLog(descrption = "查询有累计流量的站点", actionType = "2")
-    public ResponseEntity< List<BaseSiteitem>> selectBysite(){
-        List<BaseSiteitem> mapList =  baseService.selectBysite();
+    public ResponseEntity<List<BaseSiteitem>> selectBysite() {
+        List<BaseSiteitem> mapList = baseService.selectBysite();
         return ResponseEntity.ok(mapList);
     }
 }

@@ -52,7 +52,7 @@ public class CommonService {
 
     private void initSite() {
         //初始化有效的站点集合(超过10秒才会更新)
-        if (System.currentTimeMillis() - BASE_SITE_LIST_Effective_Time > 15000) {
+        if (System.currentTimeMillis() - BASE_SITE_LIST_Effective_Time > 10000) {
 
             BASE_SITE_LIST = baseSiteMapper.getBaseSites();
             for (BaseSite value : BASE_SITE_LIST) {

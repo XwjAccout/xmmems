@@ -396,9 +396,22 @@
   </update>
 
   <select id="selectByExampleByAccountId" resultMap="BaseResultMap" parameterType="com.xmmems.domain.base.BaseSiteExample">
-    select * from account_site a , base_site b where a.`siteId` = b.`id` and a.accountId=#{accountId} and isvalid='1'
+    select * from account_site a , base_site b where a.`siteId` = b.`id` and a.accountId = #{accountId} and isvalid='1'
     <if test="siteName != null" >
-     and  siteName like concat('%',#{siteName},'%')
+      and  siteName like concat('%',#{siteName},'%')
+    </if>
+    <if test="siteType != null" >
+      and  siteType = #{siteType}
     </if>
   </select>
+    <select id="getSiteIdAndNameByAccountId" resultType="java.util.Map">
+      select b.id,b.`siteName`
+      from account_site a , base_site b
+      where a.`siteId` = b.`id`
+      and a.accountId=#{accountId}
+      and isvalid='1'
+      <if test="siteType != null" >
+        and  siteType = #{siteType}
+      </if>
+    </select>
 </mapper>

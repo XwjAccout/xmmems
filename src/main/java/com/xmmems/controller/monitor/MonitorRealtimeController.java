@@ -24,8 +24,9 @@ public class MonitorRealtimeController {
      */
     @GetMapping("/getRealTimeData")
     @SystemControllerLog(descrption = "实时监测数据", actionType = "4")
-    public ResponseEntity<List<Map<String, Object>>> getRealTimeData(){
-        List<Map<String, Object>> list = monitorService.getRealTimeData();
+    public ResponseEntity<List<Map<String, Object>>> getRealTimeData(
+            @RequestParam(value = "siteType", required = false) String siteType) {
+        List<Map<String, Object>> list = monitorService.getRealTimeData(siteType);
         return ResponseEntity.ok(list);
     }
 
@@ -34,7 +35,7 @@ public class MonitorRealtimeController {
      */
     @GetMapping("/getRealTimeDataBySiteId")
     @SystemControllerLog(descrption = "根据站点id查找实时数据", actionType = "4")
-    public ResponseEntity< Map<String, Object>> getRealTimeDataBySiteId(@RequestParam(value = "siteId") String siteId){
+    public ResponseEntity<Map<String, Object>> getRealTimeDataBySiteId(@RequestParam(value = "siteId") String siteId) {
         Map<String, Object> map = monitorService.getRealTimeDataBySiteId(siteId);
         return ResponseEntity.ok(map);
     }

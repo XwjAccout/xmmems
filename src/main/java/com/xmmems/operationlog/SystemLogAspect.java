@@ -35,14 +35,6 @@ public class SystemLogAspect {
     @Autowired
     private SystemLogService systemLogService;
 
-
-    ///***
-    // * 定义service切入点拦截规则，拦截SystemServiceLog注解的方法
-    // */
-    //@Pointcut("@annotation(com.xmmems.operationlog.annotation.SystemServiceLog)")
-    //public void serviceAspect() {
-    //}
-
     /***
      * 定义controller切入点拦截规则，拦截SystemControllerLog注解的方法
      */

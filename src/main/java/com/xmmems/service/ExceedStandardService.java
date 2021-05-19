@@ -1,8 +1,6 @@
 package com.xmmems.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.xmmems.common.auth.domain.SysUserToken;
-import com.xmmems.common.auth.domain.UserHolder;
 import com.xmmems.common.exception.XMException;
 import com.xmmems.common.utils.*;
 import com.xmmems.domain.ExceedStandard;
@@ -89,13 +87,12 @@ public class ExceedStandardService {
             } catch (Exception e) {
                 FileLog.error("多线程获取获取数据出错com.xmmems.service.ExceedStandardService.findByDateAndSiteName");
                 e.printStackTrace();
-                throw new XMException(500,"多线程获取获取数据出错com.xmmems.service.ExceedStandardService.findByDateAndSiteName");
+                throw new XMException(500, "多线程获取获取数据出错com.xmmems.service.ExceedStandardService.findByDateAndSiteName");
             }
             //获取质量类别集合
             for (EnvHourData envHourData : envHourDatas) {
 
-                List<Map<String, String>> itemList = JsonUtils.nativeRead(envHourData.getContent(), new TypeReference<List<Map<String, String>>>() {
-                });
+                List<Map<String, String>> itemList = JsonUtils.nativeRead(envHourData.getContent(), new TypeReference<List<Map<String, String>>>() {});
                 for (Map<String, String> item : itemList) {
                     String itemName = item.get("itemName");
                     if (collect.contains(itemName)) {
@@ -204,7 +201,7 @@ public class ExceedStandardService {
         }
     }
 
-    public List<Map<String, Object>> realtime() {
+    public List<Map<String, Object>> realtime(String siteType) {
         Future<Map<String, List<EnvQualityConf>>> allEnvQualityConfsFuture = PoolExecutor.submit(new Callable<Map<String, List<EnvQualityConf>>>() {
             @Override
             public Map<String, List<EnvQualityConf>> call() throws Exception {
@@ -219,30 +216,17 @@ public class ExceedStandardService {
             }
         });
 
-        SysUserToken loginUser = UserHolder.getLoginUser();
-        Future<List<Map<String, Object>>> realTimeDataFuture = PoolExecutor.submit(new Callable<List<Map<String, Object>>>() {
-            @Override
-            public List<Map<String, Object>> call() throws Exception {
-                UserHolder.setLoginUser(loginUser);
-                //实时数据
-                return monitorService.getRealTimeData();
-            }
-        });
-
         List<Map<String, Object>> list = new ArrayList<>();
-        Map<String, List<EnvQualityConf>> allEnvQualityConfs = null;
-        List<Map<String, Object>> realTimeData = null;
         try {
-            allEnvQualityConfs = allEnvQualityConfsFuture.get();
-            realTimeData = realTimeDataFuture.get();
+            List<Map<String, Object>> realTimeData = monitorService.getRealTimeData(siteType);
+            Map<String, List<EnvQualityConf>> allEnvQualityConfs = allEnvQualityConfsFuture.get();
+            handlerRealExceed(list, allEnvQualityConfs, realTimeData);
         } catch (Exception e) {
             String err = "使用多线程出错com.xmmems.service.ExceedStandardService.realtime";
             FileLog.error(err);
             e.printStackTrace();
             throw new XMException(500, err);
         }
-
-        handlerRealExceed(list, allEnvQualityConfs, realTimeData);
 
         return list;
     }

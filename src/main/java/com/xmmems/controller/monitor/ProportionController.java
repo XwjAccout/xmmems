@@ -1,12 +1,12 @@
 package com.xmmems.controller.monitor;
 
-import com.xmmems.operationlog.annotation.SystemControllerLog;
 import com.xmmems.service.MonitorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -21,18 +21,16 @@ public class ProportionController {
     private MonitorService monitorService;
 
     @GetMapping("/Proportion")
-    @SystemControllerLog(descrption = "水质比重", actionType = "4")
-    public List Proportion() {
+    public List Proportion(@RequestParam(value = "siteType", required = false) String siteType) {
         List<String> result = new ArrayList<>();
        //测试拉取
-        List<Map<String, Object>> realTimeData = monitorService.getRealTimeData();
+        List<Map<String, Object>> realTimeData = monitorService.getRealTimeData(siteType);
         realTimeData.forEach(temp->{
             String level = temp.get("level")+"";
             if (!level.contains("-")) {
                 result.add(level);
             }
         });
-        System.out.println("********Proportion"+result);
         return result;
     }
 

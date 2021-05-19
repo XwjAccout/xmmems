@@ -24,7 +24,9 @@ public interface BaseSiteMapper {
 
     int updateByPrimaryKey(BaseSite record);
 
-    List<BaseSite> selectByExampleByAccountId( Integer accountId, String siteName);
+    List<BaseSite> selectByExampleByAccountId(
+            @Param("accountId") Integer accountId,
+            @Param("siteName") String siteName, @Param("siteType") String siteType);
 
     @Select("select * from account_site asite,base_site bsite where asite.accountId = #{accountId} and bsite.id = asite.siteId and bsite.isvalid = 1 order by bsite.sort")
     List<BaseSiteDTO> getSites(Integer accountId);
@@ -32,8 +34,8 @@ public interface BaseSiteMapper {
     @Select("select * from base_site where isvalid = 1")
     List<BaseSite> getBaseSites();
 
-    @Select("select b.id,b.`siteName` from account_site a , base_site b where a.`siteId` = b.`id` and a.accountId=#{accountId} and isvalid='1'")
-    List<Map<String, Object>> getSiteIdAndNameByAccountId(Integer accountId);
+    List<Map<String, Object>> getSiteIdAndNameByAccountId(
+            @Param("accountId") Integer accountId, @Param("siteType") String siteType);
 
     @Select("select distinct z.siteId,z.siteName from zero_check z,account_site a where z.`siteId` = a.`siteId` and a.`accountId` = #{accountId} ")
     List<Map<String, Object>> getSiteIdAndNameExcludeZeroCheck(Integer accountId);

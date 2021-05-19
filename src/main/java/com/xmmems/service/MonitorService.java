@@ -21,7 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -60,13 +59,15 @@ public class MonitorService {
         return commonService.getBaseSiteItemBySiteId(siteId);
     }
 
-    public List<BaseSiteitemDTO> getColumnsAll() {
+    public List<BaseSiteitemDTO> getColumnsAll(String siteType) {
         //查询站点id
         BaseSiteExample example = new BaseSiteExample();
         example.setOrderByClause("id desc");
         BaseSiteExample.Criteria criteria = example.createCriteria();
         criteria.andIsvalidEqualTo("1");
-
+        if (siteType != null) {
+            criteria.andSiteTypeEqualTo(siteType);
+        }
         List<BaseSite> baseSites = baseSiteMapper.selectByExample(example);
         String[] sList = new String[baseSites.size()];
         for (int i = 0; i < baseSites.size(); i++) {
@@ -74,12 +75,7 @@ public class MonitorService {
         }
         String s = StringUtils.join(sList, ",");
         //根据所有站点id查询监测项目
-        List<BaseSiteitemDTO> list = baseSiteitemMapper.getColumnsAll(s);
-
-        if (list.isEmpty()) {
-            throw new XMException(ExceptionEnum.MONITORREPORT_NOT_FOUND);
-        }
-        return list;
+        return baseSiteitemMapper.getColumnsAll(s);
     }
 
     public List<BaseSiteDTO> getSites() {
@@ -274,7 +270,7 @@ public class MonitorService {
         //使endCalendar减去这些天数，将问题转换为两时间的毫秒数之差不足一天的情况
         //endCalendar.add(Calendar.DAY_OF_MONTH, -1);//再使endCalendar减去1天
         if (beginCalendar.get(Calendar.DAY_OF_MONTH) == endCalendar.get(Calendar.DAY_OF_MONTH))
-            //比较两日期的DAY_OF_MONTH是否相等
+        //比较两日期的DAY_OF_MONTH是否相等
         {
             return betweenDays + 1;
             //相等说明确实跨天了
@@ -287,8 +283,8 @@ public class MonitorService {
     /**
      * 实时监测数据
      */
-    public List<Map<String, Object>> getRealTimeData() {
-        List<Map<String, Object>> list = envRealtimeDataMapper.getRealTimeData(UserHolder.loginId());
+    public List<Map<String, Object>> getRealTimeData(String siteType) {
+        List<Map<String, Object>> list = envRealtimeDataMapper.getRealTimeData(UserHolder.loginId(), siteType);
 
         if (list.size() > 0) {
             for (Map<String, Object> site : list) {
@@ -367,9 +363,7 @@ public class MonitorService {
         PageHelper.startPage(page, limit);
         //封装查询条件
         List<Map<String, Object>> records = envHourDataMapper.selectHistoryData(siteId, startTime, endTime, order);
-        if (CollectionUtils.isEmpty(records)) {
-            throw new XMException(ExceptionEnum.ENVHOURDATA_NOT_FOUND);
-        }
+
         PageInfo<Map<String, Object>> mapPageInfo = new PageInfo<>(records);
 
         for (Map<String, Object> record : records) {
@@ -500,7 +494,7 @@ public class MonitorService {
     }
 
     public Map<String, Object> getRealTimeDataBySiteId(String siteId) {
-        List<Map<String, Object>> list = getRealTimeData();
+        List<Map<String, Object>> list = getRealTimeData(null);
         for (Map<String, Object> l : list) {
             if ((l.get("siteId") + "").equals(siteId)) {
                 return l;
@@ -578,6 +572,7 @@ public class MonitorService {
 
     /**
      * //处理过滤后数据
+     *
      * @param siteItemsFuture
      * @param mapListFuture
      * @param mapList
@@ -769,10 +764,10 @@ public class MonitorService {
     }
 
     //type 1 日  2 周   3 月  4 年
-    public List<Map<String, String>> singleComparison(String startTime, String endTime, Integer type) {
+    public List<Map<String, String>> singleComparison(String startTime, String endTime, Integer type,String siteType) {
         //用来存储各个站点名称以及其平均值   站点名称  平均值map
         Map<String, Map<String, String>> siteAvgMap = new HashMap<>(16);
-        List<Map<String, Object>> site = baseService.findBaseSiteByAccountId();
+        List<Map<String, Object>> site = baseService.findBaseSiteByAccountId(siteType);
         for (Map<String, Object> map : site) {
             Integer siteId = Integer.valueOf(map.get("id") + "");
             String siteName = map.get("siteName") + "";

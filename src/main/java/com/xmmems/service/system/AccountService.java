@@ -93,7 +93,7 @@ public class AccountService {
     @Autowired
     private BaseService baseService;
 
-    public AccountDTO findById(Integer id) {
+    public AccountDTO findById(Integer id,String siteType) {
         Account account = accountMapper.selectByPrimaryKey(id);
         if (account == null) {
             throw new XMException(ExceptionEnum.ACCOUNT_NOT_FOUND);
@@ -104,7 +104,7 @@ public class AccountService {
         List<RoleDTO> dtos = roleService.findRoleByAccountId(id);
         accountDTO.setRoleDTOS(dtos);
         //添加站点信息
-        List<Map<String, Object>> mapList = baseService.findAccountId(id);
+        List<Map<String, Object>> mapList = baseService.findAccountId(id, siteType);
         accountDTO.setSites(mapList);
 
 

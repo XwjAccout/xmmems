@@ -83,6 +83,7 @@ ly:
       - /water/save
       - /assessment
       - /task
+      - /monitor
 
 network: "0 31 21 * * ?"
 
@@ -117,4 +118,6 @@ report:
     - 总氮=10
     - 总磷=10
 
-
+httpcfg:
+  use: true
+  urlprefix: http://127.0.0.1:12345

@@ -21,27 +21,26 @@ public class ExceedStandardController {
 
     @GetMapping("/findByDateAndSiteName")
     @SystemControllerLog(descrption = "查询超标情况统计", actionType = "4")
-    public ResponseEntity<List<ExceedStandard>> findByDateAndSiteName(@RequestParam("start") String start,
-                                                                      @RequestParam("end") String end,
-                                                                      @RequestParam(value = "siteId") String siteId,
-                                                                      @RequestParam(value = "scale",defaultValue = "false") Boolean scale
-    ){
-        List<ExceedStandard> list = exceedStandardService.findByDateAndSiteName(start, end, siteId,scale);
+    public ResponseEntity<List<ExceedStandard>> findByDateAndSiteName(
+            @RequestParam("start") String start,
+            @RequestParam("end") String end,
+            @RequestParam(value = "siteId") String siteId,
+            @RequestParam(value = "scale", defaultValue = "false") Boolean scale) {
+        List<ExceedStandard> list = exceedStandardService.findByDateAndSiteName(start, end, siteId, scale);
         return ResponseEntity.ok(list);
     }
 
     @GetMapping("/realtime")
     @SystemControllerLog(descrption = "实时达标情况", actionType = "4")
-    public ResponseEntity<List<Map<String,Object>>> realtime(){
-
-        List<Map<String, Object>> realtime = exceedStandardService.realtime();
-        System.out.println("*******realtime"+realtime);
+    public ResponseEntity<List<Map<String, Object>>> realtime(
+            @RequestParam(value = "siteType", required = false) String siteType) {
+        List<Map<String, Object>> realtime = exceedStandardService.realtime(siteType);
         return ResponseEntity.ok(realtime);
     }
 
     @GetMapping("/qualityEvaluation")
     @SystemControllerLog(descrption = "查询质量评价", actionType = "4")
-    public Object qualityEvaluation(@RequestParam(value = "siteId",required = false) String siteId){
+    public Object qualityEvaluation(@RequestParam(value = "siteId", required = false) String siteId) {
         return exceedStandardService.qualityEvaluation(siteId);
     }
 }

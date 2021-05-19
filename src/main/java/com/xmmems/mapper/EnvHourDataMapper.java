@@ -1,6 +1,7 @@
 package com.xmmems.mapper;
 
 
+import com.xmmems.domain.base.BaseItem;
 import com.xmmems.domain.env.EnvHourData;
 import com.xmmems.domain.env.EnvHourDataExample;
 import com.xmmems.dto.BaseSiteitemDTO;
@@ -65,4 +66,8 @@ public interface EnvHourDataMapper {
     BaseSiteitemDTO siteItemGetItemsBySiteIdAnditemId(@Param("siteId") Integer siteId,@Param("itemId") Integer itemId);
 
     List<String> selectContent(@Param("siteId") Integer siteId,@Param("start") String start,@Param("end") String end);
+
+    void deleteByTime(@Param("siteId") Integer siteId, @Param("genTime") String genTime);
+
+    List<BaseItem> selectAllBaseItem();
 }
