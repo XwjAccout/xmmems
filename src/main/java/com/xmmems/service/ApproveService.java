@@ -276,6 +276,58 @@ public class ApproveService {
         return false;
     }
 
+    public void addDataSave(Integer siteId, String siteName, String monitorTime, String itemData, String[] times, HashMap<String, String> mapBody) {
+
+        List<BaseItem> baseItems = envHourDataMapper.selectAllBaseItem();
+        Map<String, Integer> collect = new HashMap<>();
+        for (BaseItem baseItem : baseItems) {
+            Integer put = collect.put(baseItem.getName(), baseItem.getId());
+            if (put != null) {
+                throw new IllegalStateException("数据库存在同名监测项目");
+            }
+        }
+        List<Map<String, String>> mapList = JsonUtils.nativeRead(itemData, new TypeReference<List<Map<String, String>>>() {});
+        Iterator<Map<String, String>> iterator = mapList.iterator();
+        while (iterator.hasNext()) {
+            Map<String, String> map = iterator.next();
+
+            String value = map.get("value");
+            if (value == null) {
+                iterator.remove();
+                continue;
+            }
+            String itemName = map.get("itemName");
+            if (!isChinese(itemName) && !"pH".equalsIgnoreCase(itemName)) {
+                iterator.remove();
+                continue;
+            }
+            Integer itemId = collect.get(itemName);
+            if (itemId == null) {
+                iterator.remove();
+                continue;
+            }
+            map.put("itemId", itemId + "");
+            map.put("troubleCode", "");
+            map.put("troubleName", "");
+            map.put("originValue", map.get("value"));
+        }
+        for (String m : times) {
+
+            String mtime = monitorTime + " " + m + ":00:00";
+            envHourDataMapper.deleteByTime(siteId, mtime);
+            EnvHourData envHourData = new EnvHourData();
+            envHourData.setSiteId(siteId);
+            envHourData.setSiteName(siteName);
+            envHourData.setGenTime(DateFormat.parseAll(mtime));
+            envHourData.setContent(JsonUtils.toString(mapList));
+            if (mapBody.size() > 0) {
+                String s = mapBody.get(m);
+                envHourData.setHandle(s);
+            }
+            envHourDataMapper.insertSelective(envHourData);
+        }
+    }
+
     public void addDataSave(Integer siteId, String siteName, String monitorTime, String itemData, String[] times) {
 
         List<BaseItem> baseItems = envHourDataMapper.selectAllBaseItem();

@@ -1,5 +1,7 @@
 package com.xmmems.controller.monitor;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.xmmems.common.utils.JsonUtils;
 import com.xmmems.controller.monitor.httpcfg.HttpUtils;
 import com.xmmems.dto.PageResult;
 import com.xmmems.operationlog.annotation.SystemControllerLog;
@@ -75,7 +77,7 @@ public class ApproveController {
             map.put("multipleParam", multipleParam);
             map.put("dbNameAndHourDataId", dbNameAndHourDataId);
 
-            httpUtils.setPost("/saveAdjust", map);
+            httpUtils.postReturnVoid("/saveAdjust", map);
         }
 
 
@@ -113,7 +115,7 @@ public class ApproveController {
             map.put("endTime", endTime);
             map.put("dbNameAndHourDataId", dbNameAndHourDataId);
 
-            httpUtils.setPost("/resetAdjust", map);
+            httpUtils.postReturnVoid("/resetAdjust", map);
         }
         approveService.resetAdjust(siteId, siteName, adjustKey, startTime, endTime);
         return ResponseEntity.ok().build();
@@ -143,7 +145,9 @@ public class ApproveController {
             @RequestParam("itemData") String itemData,
             @RequestParam("time") String[] time,
             @RequestParam(value = "dbNameAndHourDataId", defaultValue = "local") String dbNameAndHourDataId) {
-        if (!dbNameAndHourDataId.contains("local")) {
+        if (dbNameAndHourDataId.contains("local")) {
+            approveService.addDataSave(siteId, siteName, monitorTime, itemData, time);
+        } else {
             //不包含需要同步其他数据库操作
             HashMap<String, String> map = new HashMap<>();
             map.put("siteId", siteId + "");
@@ -153,9 +157,10 @@ public class ApproveController {
             map.put("time", Arrays.toString(time).replaceAll("[\\[\\] ]", ""));
             map.put("dbNameAndHourDataId", dbNameAndHourDataId);
 
-            httpUtils.setPost("/saveDate", map);
+            String json = httpUtils.postReturnBody("/saveDate", map);
+            HashMap<String, String> mapBody = JsonUtils.nativeRead(json, new TypeReference<HashMap<String, String>>() {});
+            approveService.addDataSave(siteId, siteName, monitorTime, itemData, time, mapBody);
         }
-        approveService.addDataSave(siteId, siteName, monitorTime, itemData, time);
         return ResponseEntity.ok().build();
     }
 
@@ -170,7 +175,7 @@ public class ApproveController {
             map.put("ids", Arrays.toString(ids).replaceAll("[\\[\\] ]", ""));
             map.put("dbNameAndHourDataId", dbNameAndHourDataId);
 
-            httpUtils.setPost("/deleteByIds", map);
+            httpUtils.postReturnVoid("/deleteByIds", map);
         }
         approveService.deleteByIds(ids);
         return ResponseEntity.ok().build();

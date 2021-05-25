@@ -120,4 +120,4 @@ report:
 
 httpcfg:
   use: true
-  urlprefix: http://127.0.0.1:12345
+  urlprefix: http://127.0.0.1:12345/mul
