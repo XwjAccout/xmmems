@@ -6,7 +6,6 @@ import com.xmmems.dto.BaseSiteitemDTO;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 import java.util.Map;
@@ -43,9 +42,6 @@ public interface BaseSiteitemMapper {
 
     @Select("select * from base_siteitem where siteId=#{siteId} and sort=#{sort} ORDER BY sort")
     BaseSiteitem getSiteItemsort(@Param("siteId") Integer siteId, @Param("sort") Integer sort);
-
-    @Update(" UPDATE SET sort=sort+1 where base_siteitem where id=#{id}")
-    int updateBybaseSiteitem(@Param("id") Integer id);
 
     @Delete("delete from `base_siteitem` where siteId=#{siteId} and itemId=#{itemId}")
     int delItem(@Param("siteId") Integer siteId, @Param("itemId") Integer itemId);

@@ -40,18 +40,19 @@ public class BaseService {
     private BaseSiteitemMapper baseSiteitemMapper;
     @Autowired
     private CommonService commonService;
+
     //分页查询
-    public PageResult<BaseSite> sitePageQuery(Integer limit, Integer page, String siteName,String siteType) {
+    public PageResult<BaseSite> sitePageQuery(Integer limit, Integer page, String siteName, String siteType) {
 
         try {
             //封装分页信息
             PageHelper.startPage(page, limit);
-            List<BaseSite> baseSites = baseSiteMapper.selectByExampleByAccountId(UserHolder.loginId(),siteName,siteType);
+            List<BaseSite> baseSites = baseSiteMapper.selectByExampleByAccountId(UserHolder.loginId(), siteName, siteType);
 
             //得到pageHelper的分页对象
             PageInfo<BaseSite> pageInfo = new PageInfo<>(baseSites);
             //封装自定义的分页对象
-            return  new PageResult<>(pageInfo.getSize(), page, pageInfo.getTotal(), pageInfo.getPages(), pageInfo.getList());
+            return new PageResult<>(pageInfo.getSize(), page, pageInfo.getTotal(), pageInfo.getPages(), pageInfo.getList());
         } catch (Exception e) {
 
             throw new XMException(ExceptionEnum.BASESITE_NOT_FOUND);
@@ -123,7 +124,7 @@ public class BaseService {
         //得到pageHelper的分页对象
         PageInfo<BaseItem> pageInfo = new PageInfo<>(baseItems);
         //封装自定义的分页对象
-        return  new PageResult<>(pageInfo.getPageSize(), page, pageInfo.getTotal(), pageInfo.getPages(), pageInfo.getList());
+        return new PageResult<>(pageInfo.getPageSize(), page, pageInfo.getTotal(), pageInfo.getPages(), pageInfo.getList());
     }
 
     public PageResult<EnvQualityConf> baseQualityconfPageQuery(Integer limit, Integer page, String kpiName) {
@@ -150,30 +151,36 @@ public class BaseService {
     //添加数据
     public void siteSave(BaseSite baseSite) {
         baseSite.setIsvalid("1");
-        int i = baseSiteMapper.insertSelective(baseSite);
-        if (i < 1) {
-            throw new XMException(ExceptionEnum.INSERT_OPERATION_FAIL);
+        try {
+            baseSiteMapper.insertSelective(baseSite);
+            commonService.initBaseSite();
+        } catch (Exception e) {
+            throw new XMException(ExceptionEnum.INSERT_ERROR);
         }
     }
 
     public void baseKpitypeSave(EnvKpiType envKpiType) {
         int i = envKpiTypeMapper.insertSelective(envKpiType);
         if (i < 1) {
-            throw new XMException(ExceptionEnum.INSERT_OPERATION_FAIL);
+            throw new XMException(ExceptionEnum.INSERT_ERROR);
         }
     }
 
     public void baseItemSave(BaseItem baseItem) {
-        int i = baseItemMapper.insertSelective(baseItem);
-        if (i < 1) {
-            throw new XMException(ExceptionEnum.INSERT_OPERATION_FAIL);
+        try {
+            baseItemMapper.insertSelective(baseItem);
+            commonService.initBaseItem();
+        } catch (Exception e) {
+            throw new XMException(ExceptionEnum.INSERT_ERROR);
         }
     }
 
     public void baseQualityconfSave(EnvQualityConf envQualityConf) {
-        int i = envQualityConfMapper.insertSelective(envQualityConf);
-        if (i < 1) {
-            throw new XMException(ExceptionEnum.INSERT_OPERATION_FAIL);
+        try {
+            envQualityConfMapper.insertSelective(envQualityConf);
+            commonService.initEnvQualityConf();
+        } catch (Exception e) {
+            throw new XMException(ExceptionEnum.INSERT_ERROR);
         }
     }
 
@@ -216,73 +223,88 @@ public class BaseService {
 
     //根据id更新数据
     public void siteUpdate(BaseSite baseSite) {
-        int i = baseSiteMapper.updateByPrimaryKeySelective(baseSite);
-        if (i < 1) {
-            throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
+        try {
+            baseSiteMapper.updateByPrimaryKeySelective(baseSite);
+            commonService.initBaseSite();
+        } catch (Exception e) {
+            throw new XMException(ExceptionEnum.UPDATE_ERROR);
         }
     }
 
     public void baseAreaUpdate(BaseArea baseSite) {
         int i = baseAreaMapper.updateByPrimaryKeySelective(baseSite);
         if (i < 1) {
-            throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
+            throw new XMException(ExceptionEnum.UPDATE_ERROR);
         }
     }
 
     public void baseItemUpdate(BaseItem baseSite) {
-        int i = baseItemMapper.updateByPrimaryKeySelective(baseSite);
-        if (i < 1) {
-            throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
+        try {
+            baseItemMapper.updateByPrimaryKeySelective(baseSite);
+            commonService.initBaseItem();
+        } catch (Exception e) {
+            throw new XMException(ExceptionEnum.UPDATE_ERROR);
         }
     }
 
     public void baseKpitypeUpdate(EnvKpiType envKpiType) {
-        int i = envKpiTypeMapper.updateByPrimaryKeySelective(envKpiType);
-        if (i < 1) {
-            throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
+        try {
+            envKpiTypeMapper.updateByPrimaryKeySelective(envKpiType);
+        } catch (Exception e) {
+            throw new XMException(ExceptionEnum.UPDATE_ERROR);
         }
     }
 
     public void baseQualityconfUpdate(EnvQualityConf envQualityConf) {
-        int i = envQualityConfMapper.updateByPrimaryKeySelective(envQualityConf);
-        if (i < 1) {
-            throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
+        try {
+            envQualityConfMapper.updateByPrimaryKeySelective(envQualityConf);
+            commonService.initEnvQualityConf();
+        } catch (Exception e) {
+            throw new XMException(ExceptionEnum.UPDATE_ERROR);
         }
     }
 
     //根据id删除数据
     public void siteDelete(Integer id) {
-        int i = baseSiteMapper.deleteByPrimaryKey(id);
-        if (i < 1) {
-            throw new XMException(ExceptionEnum.DELETE_OPERATION_FAIL);
+        try {
+            baseSiteMapper.deleteByPrimaryKey(id);
+            commonService.initBaseSite();
+        } catch (Exception e) {
+            throw new XMException(ExceptionEnum.DELETE_ERROR);
         }
+
     }
 
     public void baseAreaDelete(Integer id) {
         int i = baseAreaMapper.deleteByPrimaryKey(Long.valueOf(id));
         if (i < 1) {
-            throw new XMException(ExceptionEnum.DELETE_OPERATION_FAIL);
+            throw new XMException(ExceptionEnum.DELETE_ERROR);
         }
     }
 
     public void baseItemDelete(Integer id) {
-        int i = baseItemMapper.deleteByPrimaryKey(id);
-        if (i < 1) {
-            throw new XMException(ExceptionEnum.DELETE_OPERATION_FAIL);
+        try {
+            baseItemMapper.deleteByPrimaryKey(id);
+            commonService.initBaseItem();
+        } catch (Exception e) {
+            throw new XMException(ExceptionEnum.DELETE_ERROR);
         }
     }
 
     public void baseKpitypeDelete(Integer id) {
-        int i = envKpiTypeMapper.deleteByPrimaryKey(id);
-        if (i < 1) {
-            throw new XMException(ExceptionEnum.DELETE_OPERATION_FAIL);
+        try {
+            envKpiTypeMapper.deleteByPrimaryKey(id);
+        } catch (Exception e) {
+            throw new XMException(ExceptionEnum.DELETE_ERROR);
         }
     }
 
     public void baseQualityconfDelete(Integer id) {
-        int i = envQualityConfMapper.deleteByPrimaryKey(id);
-        if (i < 1) {
-            throw new XMException(ExceptionEnum.DELETE_OPERATION_FAIL);
+        try {
+            envQualityConfMapper.deleteByPrimaryKey(id);
+            commonService.initEnvQualityConf();
+        } catch (Exception e) {
+            throw new XMException(ExceptionEnum.DELETE_ERROR);
         }
     }
 
@@ -299,7 +321,7 @@ public class BaseService {
         List<Map<String, String>> mapList = new ArrayList<>();
         //转换为map减少数据传输量
         for (BaseSite baseSite : baseSites) {
-            if (siteType!=null && !siteType.equals(baseSite.getSiteType())) {
+            if (siteType != null && !siteType.equals(baseSite.getSiteType())) {
                 continue;
             }
             Map<String, String> map = new HashMap<>(8);
@@ -312,10 +334,10 @@ public class BaseService {
     }
 
     public List<Map<String, Object>> findBaseSiteByAccountId(String siteType) {
-        return baseSiteMapper.getSiteIdAndNameByAccountId(UserHolder.loginId(),siteType);
+        return baseSiteMapper.getSiteIdAndNameByAccountId(UserHolder.loginId(), siteType);
     }
 
-    public List<Map<String, Object>> findAccountId(Integer id,String siteType) {
+    public List<Map<String, Object>> findAccountId(Integer id, String siteType) {
         return baseSiteMapper.getSiteIdAndNameByAccountId(id, siteType);
     }
 
@@ -323,49 +345,49 @@ public class BaseService {
         return baseSiteitemMapper.getSiteItem(siteId);
     }
 
-    public Integer updateBybaseSiteitem(Integer upAndDown,Integer siteId, Integer id) {
+    public Integer updateBybaseSiteitem(Integer upAndDown, Integer siteId, Integer id) {
 
-        int result=0;
+        int result = 0;
         //查询当前
-        BaseSiteitem baseSiteitem= baseSiteitemMapper.selectByPrimaryKey(id);
-        if(upAndDown==0){
+        BaseSiteitem baseSiteitem = baseSiteitemMapper.selectByPrimaryKey(id);
+        if (upAndDown == 0) {
             //获取上一个
-            BaseSiteitem baseSit=null;
-            if(baseSiteitem.getSort().intValue()==1){
-                baseSit=  baseSiteitemMapper.getSiteItemsort(baseSiteitem.getSiteId(), baseSiteitem.getSort().intValue());
-            }else{
-                baseSit=  baseSiteitemMapper.getSiteItemsort(baseSiteitem.getSiteId(), baseSiteitem.getSort().intValue()-1);
+            BaseSiteitem baseSit = null;
+            if (baseSiteitem.getSort().intValue() == 1) {
+                baseSit = baseSiteitemMapper.getSiteItemsort(baseSiteitem.getSiteId(), baseSiteitem.getSort().intValue());
+            } else {
+                baseSit = baseSiteitemMapper.getSiteItemsort(baseSiteitem.getSiteId(), baseSiteitem.getSort().intValue() - 1);
             }
-            if(baseSit!=null){
+            if (baseSit != null) {
                 //更新 当前要改的
-                BaseSiteitem baseSiteitemup1=new BaseSiteitem();
+                BaseSiteitem baseSiteitemup1 = new BaseSiteitem();
                 baseSiteitemup1.setSort(baseSit.getSort());
                 baseSiteitemup1.setId(id);
-                result=  baseSiteitemMapper.updateByPrimaryKeySelective(baseSiteitemup1);
+                result = baseSiteitemMapper.updateByPrimaryKeySelective(baseSiteitemup1);
                 //更新 上一个要改的
-                BaseSiteitem baseSiteitemup2=new BaseSiteitem();
+                BaseSiteitem baseSiteitemup2 = new BaseSiteitem();
                 baseSiteitemup2.setSort(baseSiteitem.getSort());
                 baseSiteitemup2.setId(baseSit.getId());
 
-                result=  baseSiteitemMapper.updateByPrimaryKeySelective(baseSiteitemup2);
-            }else{
+                result = baseSiteitemMapper.updateByPrimaryKeySelective(baseSiteitemup2);
+            } else {
                 throw new XMException(ExceptionEnum.ERROR1);
             }
 
-        }else if(upAndDown==1){
+        } else if (upAndDown == 1) {
             //获取下一个
-            BaseSiteitem   baseSitDown=  baseSiteitemMapper.getSiteItemsort(baseSiteitem.getSiteId(), baseSiteitem.getSort().intValue()+1);
+            BaseSiteitem baseSitDown = baseSiteitemMapper.getSiteItemsort(baseSiteitem.getSiteId(), baseSiteitem.getSort().intValue() + 1);
             //更新 当前要改的
-            BaseSiteitem baseSiteitemupDown1=new BaseSiteitem();
+            BaseSiteitem baseSiteitemupDown1 = new BaseSiteitem();
             baseSiteitemupDown1.setSort(baseSitDown.getSort());
             baseSiteitemupDown1.setId(id);
-            result=  baseSiteitemMapper.updateByPrimaryKeySelective(baseSiteitemupDown1);
+            result = baseSiteitemMapper.updateByPrimaryKeySelective(baseSiteitemupDown1);
 
             //更新 下一个要改的
-            BaseSiteitem baseSiteitemupDown2=new BaseSiteitem();
+            BaseSiteitem baseSiteitemupDown2 = new BaseSiteitem();
             baseSiteitemupDown2.setSort(baseSiteitem.getSort());
             baseSiteitemupDown2.setId(baseSitDown.getId());
-            result=  baseSiteitemMapper.updateByPrimaryKeySelective(baseSiteitemupDown2);
+            result = baseSiteitemMapper.updateByPrimaryKeySelective(baseSiteitemupDown2);
         }
         return result;
     }
@@ -375,7 +397,7 @@ public class BaseService {
     }
 
     public void addItem(Integer siteId, String siteName, Integer itemId, String itemName) {
-        int i = baseSiteitemMapper.insertBaseSiteItem(siteId,itemId,siteName,itemName);
+        int i = baseSiteitemMapper.insertBaseSiteItem(siteId, itemId, siteName, itemName);
         if (i < 1) {
             throw new XMException(ExceptionEnum.INSERT_OPERATION_FAIL);
         }
@@ -388,12 +410,12 @@ public class BaseService {
         }
     }
 
-    public List<Map<String,Object>> getSiteIdAndNameExcludeZeroCheck(){
+    public List<Map<String, Object>> getSiteIdAndNameExcludeZeroCheck() {
         return baseSiteMapper.getSiteIdAndNameExcludeZeroCheck(UserHolder.loginId());
     }
 
     public int updateDetectionLimit(Integer siteId, Integer itemId, String limit) {
-       int i =  baseSiteitemMapper.updateDetectionLimit(siteId, itemId,limit);
+        int i = baseSiteitemMapper.updateDetectionLimit(siteId, itemId, limit);
         if (i < 1) {
             throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
         }
@@ -401,39 +423,34 @@ public class BaseService {
     }
 
     public void updateSort(Integer siteId, Integer itemId, Double sort) {
-        int i =  baseSiteitemMapper.updateSort(siteId, itemId,sort);
+        int i = baseSiteitemMapper.updateSort(siteId, itemId, sort);
         if (i < 1) {
             throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
         }
     }
 
     public void updateNumber(Integer siteId, Integer itemId, Integer number) {
-        int i =  baseSiteitemMapper.updateNumber(siteId, itemId,number);
+        int i = baseSiteitemMapper.updateNumber(siteId, itemId, number);
         if (i < 1) {
             throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
         }
     }
 
-    public   List<BaseSiteitem> selectBysite(){
+    public List<BaseSiteitem> selectBysite() {
         return baseSiteitemMapper.selectBysite();
     }
 
-    public List<BaseItem> findAllItems() {
-        return commonService.getBaseItemList();
-    }
-
-
     public ArrayList<Object> siteSort(String siteType) {
         Integer userId = UserHolder.loginId();
-        List<Map<String, Object>> datas = baseSiteMapper.getSiteIdAndNameByAccountId(userId,siteType);
+        List<Map<String, Object>> datas = baseSiteMapper.getSiteIdAndNameByAccountId(userId, siteType);
 
-        Map<String,List<Map<String, Object>>> map = new HashMap<>();
+        Map<String, List<Map<String, Object>>> map = new HashMap<>();
 
         //分类
         for (Map<String, Object> data : datas) {
             String cityName = (String)data.get("cityName");
             List<Map<String, Object>> list = map.get(cityName);
-            if (list==null) {
+            if (list == null) {
                 list = new ArrayList<>();
                 map.put(cityName, list);
             }
@@ -446,7 +463,6 @@ public class BaseService {
         //计算个数
 
 
-
         //转换为父子结构集合
         Map<String, Object> map1 = new HashMap<>();
 
@@ -457,7 +473,7 @@ public class BaseService {
 
             Map<String, Object> map2 = new HashMap<>();
             List<Map<String, Object>> siteList = entry.getValue();
-            map2.put("name", entry.getKey()+ " ("+siteList.size()+'/'+siteList.size()+')');
+            map2.put("name", entry.getKey() + " (" + siteList.size() + '/' + siteList.size() + ')');
             map2.put("menu", siteList);
 
             tt.add(map2);

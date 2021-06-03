@@ -50,7 +50,7 @@ public class CommonService {
     private static Map<Integer, List<BaseSiteitemDTO>> BASE_SITE_ITEM_MAP = new HashMap<>(16);
     private static long BASE_SITE_ITEM_MAP_Effective_Time = 0;
 
-    private void initSite() {
+    public void initBaseSite() {
         //初始化有效的站点集合(超过10秒才会更新)
         if (System.currentTimeMillis() - BASE_SITE_LIST_Effective_Time > 10000) {
 
@@ -63,7 +63,7 @@ public class CommonService {
         }
     }
 
-    private void initEnvQualityConf() {
+    public void initEnvQualityConf() {
         //初始化所有的质量类别集合(超过10秒才会更新)
         if (System.currentTimeMillis() - ENV_QUALITY_CONF_LIST_Effective_Time > 10000) {
 
@@ -72,7 +72,7 @@ public class CommonService {
         }
     }
 
-    private void initBaseItem() {
+    public void initBaseItem() {
         //初始化键值对集合，key值为itemName or itemId ，value 值为BaseItem(超过10秒才会更新)
         if (System.currentTimeMillis() - BASE_ITEM_MAP_Effective_Time > 10000) {
 
@@ -88,13 +88,13 @@ public class CommonService {
 
     //获取有效的站点集合
     public List<BaseSite> getBaseSiteList() {
-        initSite();
+        initBaseSite();
         return BASE_SITE_LIST;
     }
 
     //获取站点map集合
     public Map<String, BaseSite> getAllSiteMap() {
-        initSite();
+        initBaseSite();
         return ALL_SITE_MAP;
     }
 
