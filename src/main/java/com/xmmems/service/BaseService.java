@@ -20,10 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -426,4 +423,49 @@ public class BaseService {
     }
 
 
+    public ArrayList<Object> siteSort(String siteType) {
+        Integer userId = UserHolder.loginId();
+        List<Map<String, Object>> datas = baseSiteMapper.getSiteIdAndNameByAccountId(userId,siteType);
+
+        Map<String,List<Map<String, Object>>> map = new HashMap<>();
+
+        //分类
+        for (Map<String, Object> data : datas) {
+            String cityName = (String)data.get("cityName");
+            List<Map<String, Object>> list = map.get(cityName);
+            if (list==null) {
+                list = new ArrayList<>();
+                map.put(cityName, list);
+            }
+            data.put("name", data.get("siteName"));
+            data.remove("cityName");
+            data.remove("siteName");
+
+            list.add(data);
+        }
+        //计算个数
+
+
+
+        //转换为父子结构集合
+        Map<String, Object> map1 = new HashMap<>();
+
+        map1.put("name", "地区");
+        List<Object> tt = new ArrayList<>();
+        map1.put("menu", tt);
+        for (Map.Entry<String, List<Map<String, Object>>> entry : map.entrySet()) {
+
+            Map<String, Object> map2 = new HashMap<>();
+            List<Map<String, Object>> siteList = entry.getValue();
+            map2.put("name", entry.getKey()+ " ("+siteList.size()+'/'+siteList.size()+')');
+            map2.put("menu", siteList);
+
+            tt.add(map2);
+        }
+
+        ArrayList<Object> objects = new ArrayList<>();
+        objects.add(map1);
+        return objects;
+
+    }
 }

@@ -28,7 +28,7 @@ public class RealtimeDataService {
      */
     private void getItemValueScale() {
 
-        if (System.currentTimeMillis() - effectiveTime > 10000) {
+        if (System.currentTimeMillis() - effectiveTime > 2000) {
             List<Map<String, Object>> list = baseItemMapper.selectNameAndDigits();
 
             list.forEach(itemDigit -> {

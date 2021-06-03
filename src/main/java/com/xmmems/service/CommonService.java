@@ -44,7 +44,7 @@ public class CommonService {
     private static long ENV_QUALITY_CONF_LIST_Effective_Time = 0;
 
     private static List<BaseItem> BASE_ITEM_LIST = new ArrayList<>();
-    private static Map<String, BaseItem> BASE_ITEM_MAP = new HashMap<>(200);
+    private static Map<String, BaseItem> BASE_ITEM_MAP = new HashMap<>(256);
     private static long BASE_ITEM_MAP_Effective_Time = 0;
 
     private static Map<Integer, List<BaseSiteitemDTO>> BASE_SITE_ITEM_MAP = new HashMap<>(16);
@@ -65,7 +65,7 @@ public class CommonService {
 
     private void initEnvQualityConf() {
         //初始化所有的质量类别集合(超过10秒才会更新)
-        if (System.currentTimeMillis() - ENV_QUALITY_CONF_LIST_Effective_Time > 20000) {
+        if (System.currentTimeMillis() - ENV_QUALITY_CONF_LIST_Effective_Time > 10000) {
 
             ENV_QUALITY_CONF_LIST = envQualityConfMapper.selectByExample(new EnvQualityConfExample());
             ENV_QUALITY_CONF_LIST_Effective_Time = System.currentTimeMillis();
@@ -74,7 +74,7 @@ public class CommonService {
 
     private void initBaseItem() {
         //初始化键值对集合，key值为itemName or itemId ，value 值为BaseItem(超过10秒才会更新)
-        if (System.currentTimeMillis() - BASE_ITEM_MAP_Effective_Time > 30000) {
+        if (System.currentTimeMillis() - BASE_ITEM_MAP_Effective_Time > 10000) {
 
             List<BaseItem> baseItems = baseItemMapper.selectByExample(new BaseItemExample());
             BASE_ITEM_LIST = baseItems;
@@ -116,7 +116,7 @@ public class CommonService {
 
 
     private void initBaseSiteItemMap(Integer siteId) {
-        if ((System.currentTimeMillis() - BASE_SITE_ITEM_MAP_Effective_Time > 20000)) {
+        if ((System.currentTimeMillis() - BASE_SITE_ITEM_MAP_Effective_Time > 10000)) {
             List<BaseSiteitemDTO> items = baseSiteitemMapper.getColumns(siteId);
             BASE_SITE_ITEM_MAP.put(siteId, items);
             BASE_SITE_ITEM_MAP_Effective_Time = System.currentTimeMillis();

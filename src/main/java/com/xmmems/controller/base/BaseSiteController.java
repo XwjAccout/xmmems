@@ -162,4 +162,12 @@ public class BaseSiteController {
         List<BaseSiteitem> mapList = baseService.selectBysite();
         return ResponseEntity.ok(mapList);
     }
+
+    //获取站点分类列表
+    @GetMapping("/site/sort")
+    public ResponseEntity<Object> siteSort(@RequestParam(value = "siteType", required = false) String siteType) {
+        return ResponseEntity.ok(baseService.siteSort(siteType));
+    }
+
 }
+

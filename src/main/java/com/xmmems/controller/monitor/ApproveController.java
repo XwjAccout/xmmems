@@ -60,7 +60,7 @@ public class ApproveController {
             @RequestParam(value = "endTime", required = false) String endTime,
             @RequestParam(value = "multipleParam", required = false) String multipleParam,
             @RequestParam(value = "dbNameAndHourDataId", defaultValue = "local") String dbNameAndHourDataId) {
-        if (!dbNameAndHourDataId.contains("local")) {
+        if (dbNameAndHourDataId.contains("$")) {
             //不包含需要同步其他数据库操作
             HashMap<String, String> map = new HashMap<>();
             map.put("adjust", adjust);
@@ -79,7 +79,6 @@ public class ApproveController {
 
             httpUtils.postReturnVoid("/saveAdjust", map);
         }
-
 
         approveService.saveAdjust(adjust, siteId, recordId, adjustKey, adjustValue, originValue, troubleCode, troubleName, multipleAdjust, startTime, endTime, multipleParam);
         return ResponseEntity.ok().build();
@@ -105,7 +104,7 @@ public class ApproveController {
             @RequestParam("startTime") String startTime,
             @RequestParam("endTime") String endTime,
             @RequestParam(value = "dbNameAndHourDataId", defaultValue = "local") String dbNameAndHourDataId) {
-        if (!dbNameAndHourDataId.contains("local")) {
+        if (dbNameAndHourDataId.contains("$")) {
             //不包含需要同步其他数据库操作
             HashMap<String, String> map = new HashMap<>();
             map.put("siteId", siteId + "");
@@ -145,9 +144,7 @@ public class ApproveController {
             @RequestParam("itemData") String itemData,
             @RequestParam("time") String[] time,
             @RequestParam(value = "dbNameAndHourDataId", defaultValue = "local") String dbNameAndHourDataId) {
-        if (dbNameAndHourDataId.contains("local")) {
-            approveService.addDataSave(siteId, siteName, monitorTime, itemData, time);
-        } else {
+        if (dbNameAndHourDataId.contains("$")) {
             //不包含需要同步其他数据库操作
             HashMap<String, String> map = new HashMap<>();
             map.put("siteId", siteId + "");
@@ -158,18 +155,24 @@ public class ApproveController {
             map.put("dbNameAndHourDataId", dbNameAndHourDataId);
 
             String json = httpUtils.postReturnBody("/saveDate", map);
-            HashMap<String, String> mapBody = JsonUtils.nativeRead(json, new TypeReference<HashMap<String, String>>() {});
-            approveService.addDataSave(siteId, siteName, monitorTime, itemData, time, mapBody);
+            if (json == null) {
+                approveService.addDataSave(siteId, siteName, monitorTime, itemData, time);
+            } else {
+                HashMap<String, String> mapBody = JsonUtils.nativeRead(json, new TypeReference<HashMap<String, String>>() {});
+                approveService.addDataSave(siteId, siteName, monitorTime, itemData, time, mapBody);
+            }
+        } else {
+            approveService.addDataSave(siteId, siteName, monitorTime, itemData, time);
         }
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/deleteByIds")
     @SystemControllerLog(descrption = "根据id删除补录数据", actionType = "3")
-    public ResponseEntity<Void> deleteByIds(@RequestParam("ids") Integer[] ids,
-                                            @RequestParam(value = "dbNameAndHourDataId", defaultValue = "local")
-                                                    String dbNameAndHourDataId) {
-        if (!dbNameAndHourDataId.contains("local")) {
+    public ResponseEntity<Void> deleteByIds(
+            @RequestParam("ids") Integer[] ids,
+            @RequestParam(value = "dbNameAndHourDataId", defaultValue = "local") String dbNameAndHourDataId) {
+        if (dbNameAndHourDataId.contains("$")) {
             //不包含需要同步其他数据库操作
             HashMap<String, String> map = new HashMap<>();
             map.put("ids", Arrays.toString(ids).replaceAll("[\\[\\] ]", ""));

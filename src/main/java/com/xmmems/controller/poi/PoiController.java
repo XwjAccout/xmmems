@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -476,6 +477,8 @@ public class PoiController {
         setColumnWidth(sheet);
     }
 
+    @Autowired
+    private HttpServletRequest request;
     /**
      * 下载
      */
@@ -485,7 +488,7 @@ public class PoiController {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
             workbook.write(bos);
-            downloadUtil.download(bos, response, returnName);
+            downloadUtil.download(bos, response, returnName,request);
             workbook.close();
         } catch (IOException e) {
             throw new XMException(500, e.getMessage());

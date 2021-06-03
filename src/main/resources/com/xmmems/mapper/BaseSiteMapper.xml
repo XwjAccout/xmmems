@@ -405,7 +405,7 @@
     </if>
   </select>
     <select id="getSiteIdAndNameByAccountId" resultType="java.util.Map">
-      select b.id,b.`siteName`
+      select b.id,b.`siteName`,b.cityName
       from account_site a , base_site b
       where a.`siteId` = b.`id`
       and a.accountId=#{accountId}
