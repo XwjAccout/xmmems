@@ -86,6 +86,18 @@ public class CommonService {
         }
     }
 
+    public void initBaseSiteItemMap(Integer siteId) {
+        if ((System.currentTimeMillis() - BASE_SITE_ITEM_MAP_Effective_Time > 10000)) {
+            List<BaseSiteitemDTO> items = baseSiteitemMapper.getColumns(siteId);
+            BASE_SITE_ITEM_MAP.put(siteId, items);
+            BASE_SITE_ITEM_MAP_Effective_Time = System.currentTimeMillis();
+        }
+        if (!BASE_SITE_ITEM_MAP.containsKey(siteId)) {
+            List<BaseSiteitemDTO> items = baseSiteitemMapper.getColumns(siteId);
+            BASE_SITE_ITEM_MAP.put(siteId, items);
+        }
+    }
+
     //获取有效的站点集合
     public List<BaseSite> getBaseSiteList() {
         initBaseSite();
@@ -112,19 +124,6 @@ public class CommonService {
     public List<BaseItem> getBaseItemList() {
         initBaseItem();
         return BASE_ITEM_LIST;
-    }
-
-
-    private void initBaseSiteItemMap(Integer siteId) {
-        if ((System.currentTimeMillis() - BASE_SITE_ITEM_MAP_Effective_Time > 10000)) {
-            List<BaseSiteitemDTO> items = baseSiteitemMapper.getColumns(siteId);
-            BASE_SITE_ITEM_MAP.put(siteId, items);
-            BASE_SITE_ITEM_MAP_Effective_Time = System.currentTimeMillis();
-        }
-        if (!BASE_SITE_ITEM_MAP.containsKey(siteId)) {
-            List<BaseSiteitemDTO> items = baseSiteitemMapper.getColumns(siteId);
-            BASE_SITE_ITEM_MAP.put(siteId, items);
-        }
     }
 
     public List<BaseSiteitemDTO> getBaseSiteItemBySiteId(Integer siteId) {

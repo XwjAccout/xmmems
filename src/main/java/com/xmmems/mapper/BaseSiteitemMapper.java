@@ -49,7 +49,6 @@ public interface BaseSiteitemMapper {
     @Select("SELECT number FROM `base_siteitem` WHERE siteId = #{siteId} AND itemName = #{itemName}")
     Integer selectBySiteIdAndItemName(@Param("siteId") Integer siteId, @Param("itemName") String itemName);
 
-    //@Select("SELECT itemName,number FROM `base_siteitem` WHERE isValid = '1' and siteId = #{siteId}")
     @Select("SELECT cast(itemId as char) as itemId ,itemName,cast(number as char) as number FROM `base_siteitem` WHERE siteId = #{siteId}")
     List<Map<String, String>> selectBySiteId(Integer siteId);
 
@@ -66,10 +65,10 @@ public interface BaseSiteitemMapper {
 
     //获取所有站点id，项目id中间表数据
     List<Map<String, Integer>> getValidSiteIdItemId();
+
     @Select("select * from base_siteitem where itemId=27")
     List<BaseSiteitem> selectBysite();
 
-    //
     List<Map<String, String>> selectByAccountId(Integer loginId);
 
     Integer selectNumber(@Param("siteId") Integer siteId,@Param("itemId") Integer itemId);

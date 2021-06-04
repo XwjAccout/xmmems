@@ -131,7 +131,7 @@ public class BaseSiteController {
     public ResponseEntity<Void> updateDetectionLimit(
             @RequestParam(value = "siteId") Integer siteId,
             @RequestParam(value = "itemId") Integer itemId, @RequestParam(value = "limit") String limit) {
-        int i = baseService.updateDetectionLimit(siteId, itemId, limit);
+        baseService.updateDetectionLimit(siteId, itemId, limit);
         return ResponseEntity.ok().build();
     }
 

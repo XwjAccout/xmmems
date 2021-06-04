@@ -370,6 +370,8 @@ public class BaseService {
                 baseSiteitemup2.setId(baseSit.getId());
 
                 result = baseSiteitemMapper.updateByPrimaryKeySelective(baseSiteitemup2);
+
+                commonService.initBaseSiteItemMap(siteId);
             } else {
                 throw new XMException(ExceptionEnum.ERROR1);
             }
@@ -388,6 +390,8 @@ public class BaseService {
             baseSiteitemupDown2.setSort(baseSiteitem.getSort());
             baseSiteitemupDown2.setId(baseSitDown.getId());
             result = baseSiteitemMapper.updateByPrimaryKeySelective(baseSiteitemupDown2);
+
+            commonService.initBaseSiteItemMap(siteId);
         }
         return result;
     }
@@ -397,42 +401,52 @@ public class BaseService {
     }
 
     public void addItem(Integer siteId, String siteName, Integer itemId, String itemName) {
-        int i = baseSiteitemMapper.insertBaseSiteItem(siteId, itemId, siteName, itemName);
-        if (i < 1) {
-            throw new XMException(ExceptionEnum.INSERT_OPERATION_FAIL);
+        try {
+            baseSiteitemMapper.insertBaseSiteItem(siteId, itemId, siteName, itemName);
+            commonService.initBaseSiteItemMap(siteId);
+        } catch (Exception e) {
+            throw new XMException(ExceptionEnum.INSERT_ERROR);
         }
     }
 
     public void delItem(Integer siteId, Integer itemId) {
-        int i = baseSiteitemMapper.delItem(siteId, itemId);
-        if (i < 1) {
-            throw new XMException(ExceptionEnum.DELETE_OPERATION_FAIL);
+        try {
+            baseSiteitemMapper.delItem(siteId, itemId);
+            commonService.initBaseSiteItemMap(siteId);
+        } catch (Exception e) {
+            throw new XMException(ExceptionEnum.DELETE_ERROR);
         }
+
     }
 
     public List<Map<String, Object>> getSiteIdAndNameExcludeZeroCheck() {
         return baseSiteMapper.getSiteIdAndNameExcludeZeroCheck(UserHolder.loginId());
     }
 
-    public int updateDetectionLimit(Integer siteId, Integer itemId, String limit) {
-        int i = baseSiteitemMapper.updateDetectionLimit(siteId, itemId, limit);
-        if (i < 1) {
-            throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
+    public void updateDetectionLimit(Integer siteId, Integer itemId, String limit) {
+        try {
+            baseSiteitemMapper.updateDetectionLimit(siteId, itemId, limit);
+            commonService.initBaseSiteItemMap(siteId);
+        } catch (Exception e) {
+            throw new XMException(ExceptionEnum.UPDATE_ERROR);
         }
-        return i;
     }
 
     public void updateSort(Integer siteId, Integer itemId, Double sort) {
-        int i = baseSiteitemMapper.updateSort(siteId, itemId, sort);
-        if (i < 1) {
-            throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
+        try {
+            baseSiteitemMapper.updateSort(siteId, itemId, sort);
+            commonService.initBaseSiteItemMap(siteId);
+        } catch (Exception e) {
+            throw new XMException(ExceptionEnum.UPDATE_ERROR);
         }
     }
 
     public void updateNumber(Integer siteId, Integer itemId, Integer number) {
-        int i = baseSiteitemMapper.updateNumber(siteId, itemId, number);
-        if (i < 1) {
-            throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
+        try {
+            baseSiteitemMapper.updateNumber(siteId, itemId, number);
+            commonService.initBaseSiteItemMap(siteId);
+        } catch (Exception e) {
+            throw new XMException(ExceptionEnum.UPDATE_ERROR);
         }
     }
 
