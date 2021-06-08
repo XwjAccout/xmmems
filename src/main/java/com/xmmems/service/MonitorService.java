@@ -117,6 +117,7 @@ public class MonitorService {
         //获取站点siteId对应的有效的监测指标
         Map<String, Integer> itemNameAndNumbersMap = getitemNameAndNumbersMap(siteId);
         handlerMonthDataList(siteId, returnMonthData, dayNum, itemNameAndNumbersMap, res.listMap, null, statistics, eH, sH);
+        addSiteName(returnMonthData, res.siteName);
         return returnMonthData;
     }
 
@@ -236,6 +237,7 @@ public class MonitorService {
             handleOtherIntoReturnData(returnYearData, itemNameAndValuesList, siteId, dayNum, itemNameAndNumbersMap, false, statistics, "yy", itemNameAndValuesListOfMonth, eH, sH);
 
         }
+        addSiteName(returnYearData,res.siteName);
         return returnYearData;
     }
 
@@ -742,7 +744,8 @@ public class MonitorService {
                     } else if ("主要污染物".equals(moniterTime)) {
                         map.remove("moniterTime");
                         String next = map.keySet().iterator().next();
-                        temp.put("main", map.get(next));
+                        String value = map.get(next);
+                        temp.put("main", StringUtils.isBlank(value) ? "-" : value);
                     } else if ("平均数据捕捉率(%)".equals(moniterTime)) {
                         map.remove("moniterTime");
                         String next = map.keySet().iterator().next();
@@ -764,7 +767,7 @@ public class MonitorService {
     }
 
     //type 1 日  2 周   3 月  4 年
-    public List<Map<String, String>> singleComparison(String startTime, String endTime, Integer type,String siteType) {
+    public List<Map<String, String>> singleComparison(String startTime, String endTime, Integer type, String siteType) {
         //用来存储各个站点名称以及其平均值   站点名称  平均值map
         Map<String, Map<String, String>> siteAvgMap = new HashMap<>(16);
         List<Map<String, Object>> site = baseService.findBaseSiteByAccountId(siteType);
@@ -972,10 +975,12 @@ public class MonitorService {
     private class Res {
         public Integer dayNum;
         public List<Map<String, Object>> listMap;
+        public Object siteName;
 
         public Res(Integer dayNum, List<Map<String, Object>> listMap) {
             this.dayNum = dayNum;
             this.listMap = listMap;
+            this.siteName = listMap.get(0).get("siteName");
         }
     }
 
@@ -1002,6 +1007,7 @@ public class MonitorService {
         //获取站点siteId对应的有效的监测指标
         Map<String, Integer> itemNameAndNumbersMap = getitemNameAndNumbersMap(siteId);
         handlerDayDataList(siteId, returnData, dayNum, itemNameAndNumbersMap, res.listMap, null, null, statistics, eH, sH);
+        addSiteName(returnData, res.siteName);
         return returnData;
     }
 
@@ -1226,8 +1232,10 @@ public class MonitorService {
             String waterQualityCategory = itemWaterQualityCategory(siteId, subCategoryMap);
             //主要污染物
             String mainPollutants = itemMainPollutants(subCategoryMap, siteId);
+            if (StringUtils.isBlank(mainPollutants)) {
+                mainPollutants = "-";
+            }
             //平均数据捕捉率
-            //String avgIntegrity = itemAvgEfficiency(sinEfficiencyMap, itemNames);
             String avgIntegrity = itemAvgIntegrity(sinIntegrityMap);
             //平均有效数据获取率
             String avgEfficiency = itemAvgEfficiency(sinEfficiencyMap);
@@ -1914,5 +1922,12 @@ public class MonitorService {
 
             return (int)(t1 - t2);
         });
+    }
+
+    //为报表数据添加站点名称
+    private static void addSiteName(List<Map<String, String>> returnData, Object siteName) {
+        for (Map<String, String> returnDatum : returnData) {
+            returnDatum.put("siteName", siteName+"");
+        }
     }
 }

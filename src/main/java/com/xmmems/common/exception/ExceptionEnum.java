@@ -2,17 +2,6 @@ package com.xmmems.common.exception;
 
 import lombok.Getter;
 
-/*
-* 成功的操作	状态码
-添加	201
-查询	200
-删除	204
-更新	204
-
-*
-*
-*
-* */
 @Getter
 public enum ExceptionEnum {
     INVALID_FILE_TYPE(400, "无效的文件类型！"),

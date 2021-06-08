@@ -17,10 +17,4 @@ public class ExceptionResult {
         e.printStackTrace();
     }
 
-    public ExceptionResult(NullPointerException e) {
-        this.status = 500;
-        this.message = "空指针异常:"+e.getLocalizedMessage();
-        this.timestamp = DateTime.now().toString("yyyy-MM-dd HH:mm:ss");
-        e.printStackTrace();
-    }
 }

@@ -2,9 +2,6 @@ package com.xmmems.controller.monitor;
 
 import com.xmmems.dto.BaseSiteitemDTO;
 import com.xmmems.dto.PageResult;
-import com.xmmems.mapper.CounterchargeLogMapper;
-import com.xmmems.operationlog.annotation.SystemControllerLog;
-import com.xmmems.service.BaseService;
 import com.xmmems.service.MonitorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,16 +20,11 @@ import java.util.Map;
 public class MonitorHistoryController {
     @Autowired
     private MonitorService monitorService;
-    @Autowired
-    private BaseService baseService;
-    @Autowired
-    private CounterchargeLogMapper counterchargeLogMapper;
 
     /**
      * 获取表头数据，也就是站点项目信息
      */
     @GetMapping("/getColumns")
-    @SystemControllerLog(descrption = "根据站点id获取表头数据，也就是站点项目信息", actionType = "4")
     public ResponseEntity<List<BaseSiteitemDTO>> getColumns(@RequestParam(value = "siteId") Integer siteId) {
         List<BaseSiteitemDTO> list = monitorService.getColumns(siteId);
         return ResponseEntity.ok(list);
@@ -42,18 +34,15 @@ public class MonitorHistoryController {
      * 获取表头数据，也就是站点项目信息
      */
     @GetMapping("/getColumnsAll")
-    @SystemControllerLog(descrption = "根据站点id获取表头数据，也就是站点项目信息所有的", actionType = "4")
     public ResponseEntity<List<BaseSiteitemDTO>> getColumnsAll(@RequestParam(value = "siteType", required = false) String siteType) {
         List<BaseSiteitemDTO> list = monitorService.getColumnsAll(siteType);
         return ResponseEntity.ok(list);
     }
 
-
     /**
      * 分页查询历史数据
      */
     @GetMapping("/getHistoryData")
-    @SystemControllerLog(descrption = "分页查询历史数据", actionType = "4")
     public ResponseEntity<PageResult<Map<String, Object>>> getHistoryData(
             @RequestParam(value = "limit", defaultValue = "100000000") Integer limit,
             @RequestParam(value = "page", defaultValue = "1") Integer page,
@@ -70,11 +59,9 @@ public class MonitorHistoryController {
      * 单参数趋势变化分析
      */
     @GetMapping("/trend")
-    @SystemControllerLog(descrption = "单参数趋势变化分析", actionType = "4")
     public ResponseEntity<List<Map<String, Object>>> trend(@RequestParam(value = "itemName", required = false) String itemName,
                                                            @RequestParam(value = "trend", required = false) String trend) {
         List<Map<String, Object>> list = monitorService.trend(itemName, trend);
         return ResponseEntity.ok(list);
     }
-
 }

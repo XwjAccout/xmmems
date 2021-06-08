@@ -90,10 +90,8 @@ public class SystemLogAspect {
         //放行拦截
         try {
             proceed = joinPoint.proceed();
-
         } catch (Throwable throwable) {
-            System.out.println(systemLog.toString());
-            throw new XMException(500, throwable.getMessage());
+            throwable.printStackTrace();
         }
 
         systemLogService.save(systemLog);

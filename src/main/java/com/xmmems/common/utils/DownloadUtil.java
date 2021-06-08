@@ -98,19 +98,19 @@ public class DownloadUtil {
     /**
      * @param byteArrayOutputStream 将文件内容写入ByteArrayOutputStream
      * @param response              HttpServletResponse	写入response
-     * @param name                  返回的文件名
+     * @param fileName                  返回的文件名
      */
-    public void download(ByteArrayOutputStream byteArrayOutputStream, HttpServletResponse response, String name, HttpServletRequest request) throws IOException {
+    public void download(ByteArrayOutputStream byteArrayOutputStream, HttpServletResponse response, String fileName, HttpServletRequest request) throws IOException {
 
         String agent = request.getHeader("User-Agent");
 
         //ie内核
-        name = URLEncoder.encode(name, "UTF-8");
+        fileName = URLEncoder.encode(fileName, "UTF-8");
 
 
         response.setContentType("application/octet-stream;charset=utf-8");
         //保存的文件名,必须和页面编码一致,否则乱码
-        response.setHeader("Content-Disposition", "attachment;filename=" + name);
+        response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
         response.setContentLength(byteArrayOutputStream.size());
 
         //取得输出流

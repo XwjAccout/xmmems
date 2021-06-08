@@ -25,7 +25,6 @@ public interface BaseSiteitemMapper {
 
     int updateByPrimaryKey(BaseSiteitem record);
 
-
     @Select("select bs.*,bi.unit from base_siteitem bs left join base_item bi on bs.itemId=bi.id where bs.siteId=#{siteId} order by isValid desc, sort asc")
     List<BaseSiteitemDTO> siteItemGetItemsBySiteId(Integer siteId);
 

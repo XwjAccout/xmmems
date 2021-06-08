@@ -6,13 +6,11 @@ import com.xmmems.common.exception.XMException;
 import com.xmmems.common.utils.DateFormat;
 import com.xmmems.common.utils.DownloadUtil;
 import com.xmmems.domain.ExceedStandard;
-import com.xmmems.domain.ExcelFile;
 import com.xmmems.dto.BaseSiteitemDTO;
 import com.xmmems.dto.PageResult;
-import com.xmmems.mapper.ExcelFileMapper;
-import com.xmmems.operationlog.annotation.SystemControllerLog;
 import com.xmmems.service.ExceedStandardService;
 import com.xmmems.service.MonitorService;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -25,13 +23,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/poi")
@@ -43,8 +44,8 @@ public class PoiController {
     @Autowired
     private ExceedStandardService exceedStandardService;
 
-    @Autowired
-    private ExcelFileMapper excelFileMapper;
+    //    @Autowired
+    //    private ExcelFileMapper excelFileMapper;
 
     @Value("${poipath.excel}")
     private String excelPath;
@@ -58,99 +59,35 @@ public class PoiController {
             @RequestParam(value = "seasons") Integer seasons,
             @RequestParam(value = "year") Integer year,
             @RequestParam(value = "statistics", required = false) List<Integer> statistics,
-            @RequestParam(value = "isdisk", defaultValue = "true") Boolean isdisk,
             @RequestParam(value = "isDayAvg", defaultValue = "false") Boolean isDayAvg, HttpServletResponse response,
             @RequestParam(value = "limit", defaultValue = "true") Boolean limit) {
-        //优先磁盘获取
-        String anObject = year + "-" + seasons;
-        String yyyyStr = DateFormat.format(DateFormat.yyyy, new Date());
-        String mmstr = DateFormat.format(DateFormat.MM, new Date());
-        int mmi = Integer.parseInt(mmstr);
-        String nowseasons = null;
-        switch (mmi) {
-            case 1:
-            case 2:
-            case 3:
-                nowseasons = yyyyStr + "-1";
-                break;
-            case 4:
-            case 5:
-            case 6:
-                nowseasons = yyyyStr + "-2";
-                break;
-            case 7:
-            case 8:
-            case 9:
-                nowseasons = yyyyStr + "-3";
-                break;
-            case 10:
-            case 11:
-            case 12:
-                nowseasons = yyyyStr + "-4";
-                break;
-            default:
-                break;
-        }
 
-        String type = "seasons" + (isDayAvg ? "日均值" : "月均值");
-        if (isdisk && !anObject.equals(nowseasons)) {
-            if (getFileFromDisk(siteId, response, anObject, type)) {
-                return;
-            }
-        }
         //第1步：导出第一行标题
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet();
-        setAllTitle(siteId, workbook, sheet, "地表水环境质量数据季报表");
+        List<BaseSiteitemDTO> columns = monitorService.getColumns(siteId);
+        String siteName = columns.get(0).getSiteName();
+        String fileName = siteName + "水质季报表(" + year + "年第" + seasons + "季度" + (isDayAvg ? "日均值报表)" : "月均值报表)");
+        setAllTitle(siteId, workbook, sheet, fileName);
 
         List<Map<String, String>> mapList = monitorService.seasons(siteId, seasons, year, statistics, limit, isDayAvg);
         setDataValue(workbook, sheet, (List)mapList, siteId);
-        List<BaseSiteitemDTO> columns = monitorService.getColumns(siteId);
-        String siteName = columns.get(0).getSiteName();
-        String returnName = siteName + "-" + anObject + "季" + (isDayAvg ? "日均值" : "月均值") + "报表.xlsx";
-        insertToDBandDisk(siteId, anObject, workbook, returnName, type);
         //第2步：  下载文件
-        download(response, workbook, returnName);
-    }
-
-    private void insertToDBandDisk(Integer siteId, String timeStr, Workbook workbook, String returnName, String type) {
-        File file = new File(excelPath);
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-        String url = file.getAbsolutePath() + "/" + returnName;
-        try (FileOutputStream fileOutputStream = new FileOutputStream(url)) {
-            //保存文件到磁盘
-            workbook.write(fileOutputStream);
-
-            ExcelFile record = new ExcelFile();
-            record.setTimeStr(timeStr);
-            record.setSiteId(siteId);
-            record.setType(type);
-            record.setExcelUrl(url);
-
-            try {
-                excelFileMapper.insert(record);
-            } catch (Exception e) {
-                excelFileMapper.updateByPrimaryKey(record);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new XMException(500, "保存到硬盘失败");
-        }
+        download(response, workbook, fileName);
     }
 
     private void setAllTitle(Integer siteId, Workbook workbook, Sheet sheet, String title) {
         List<BaseSiteitemDTO> list = monitorService.getColumns(siteId);
         Row row = setTitle(workbook, sheet, list, title);
-        List<String> itemNames = list.stream().map(BaseSiteitemDTO::getItemName).collect(Collectors.toList());
-        List<String> units = list.stream().map(BaseSiteitemDTO::getUnit).collect(Collectors.toList());
-        for (int i = 0; i < itemNames.size(); i++) {
+
+        Stream<BaseSiteitemDTO> stream = list.stream();
+        Map<String, String> collect = stream.collect(Collectors.toMap(k -> k.getItemName(), v -> v.getUnit() == null ? "" : v.getUnit()));
+        Iterator<Map.Entry<String, String>> iterator = collect.entrySet().iterator();
+        for (int i = 0; iterator.hasNext(); i++) {
+            Map.Entry<String, String> next = iterator.next();
             //第3-10列
             Cell cell = row.createCell(i + 1);
-            cell.setCellValue(itemNames.get(i) + (units.get(i) == null ? "" : ("(" + units.get(i) + ")")));
-            // cell.setCellStyle(this.title(workbook));
+            cell.setCellValue(next.getKey() + (StringUtils.isBlank(next.getValue()) ? "" : ("(" + next.getValue() + ")")));
         }
     }
 
@@ -201,24 +138,29 @@ public class PoiController {
     }
 
     /**
-     * 年报表
+     * 月均值报表
      */
     @RequestMapping("/printYearExcel")
     public void printYearExcel(
             @RequestParam(value = "siteId") Integer siteId,
             @RequestParam(value = "startTime") String startTime,
-            @RequestParam(value = "endTime") String endTime, @RequestParam(value = "statistics", required = false)
-                    List<Integer> statistics, HttpServletResponse response,
-            @RequestParam(value = "limit", defaultValue = "true") Boolean limit) {
+            @RequestParam(value = "endTime") String endTime,
+            @RequestParam(value = "statistics", required = false) List<Integer> statistics,
+            @RequestParam(value = "limit", defaultValue = "true") Boolean limit, HttpServletResponse response) {
+
+        List<BaseSiteitemDTO> columns = monitorService.getColumns(siteId);
+        String siteName = columns.get(0).getSiteName();
+        String fileName = siteName + "水质月均值报表(" + formatStrDate(startTime, endTime) + ")";
+
         //第1步：导出第一行标题
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet();
-        setAllTitle(siteId, workbook, sheet, "地表水环境质量数据月均值报表");
+        setAllTitle(siteId, workbook, sheet, fileName);
 
         List<Map<String, String>> mapList = monitorService.year(siteId, startTime, endTime, statistics, limit);
         setDataValue(workbook, sheet, (List)mapList, siteId);
         //第2步：  下载文件
-        download(response, workbook, "月均值报表.xlsx");
+        download(response, workbook, fileName);
 
     }
 
@@ -233,16 +175,19 @@ public class PoiController {
                     List<Integer> statistics, HttpServletResponse response,
             @RequestParam(value = "limit", defaultValue = "true") Boolean limit) {
 
+        List<BaseSiteitemDTO> columns = monitorService.getColumns(siteId);
+        String siteName = columns.get(0).getSiteName();
+        String fileName = siteName + "水质日均值报表(" + formatStrDate(startTime, endTime) + ")";
+
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet();
-        setAllTitle(siteId, workbook, sheet, "地表水环境质量数据月日均值报表");
+        setAllTitle(siteId, workbook, sheet, fileName);
 
         List<Map<String, String>> mapList = monitorService.month(siteId, startTime, endTime, statistics, limit);
         setDataValue(workbook, sheet, (List)mapList, siteId);
         //日报表，月报表，年报表均完成，周报表因为比较少用，直接用日报表自行选择即可 admin 2020/6/19 16:58
         //第2步：  下载文件
-        download(response, workbook, "日均值报表.xlsx");
-
+        download(response, workbook, fileName);
     }
 
     /**
@@ -255,16 +200,18 @@ public class PoiController {
             @RequestParam(value = "endTime") String endTime,
             @RequestParam(value = "statistics", required = false) List<Integer> statistics,
             @RequestParam(value = "limit", defaultValue = "true") Boolean limit, HttpServletResponse response) {
+        List<BaseSiteitemDTO> columns = monitorService.getColumns(siteId);
+        String siteName = columns.get(0).getSiteName();
+        String fileName = siteName + "水质时段报表(" + formatStrDate(startTime, endTime, true) + ")";
 
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet();
-        setAllTitle(siteId, workbook, sheet, "地表水环境质量数据时段报表");
+        setAllTitle(siteId, workbook, sheet, fileName);
 
         List<Map<String, String>> day = monitorService.day(siteId, startTime, endTime, statistics, limit);
         setDataValue(workbook, sheet, (List)day, siteId);
         //第2步：  下载文件
-        download(response, workbook, "时段报表.xlsx");
-
+        download(response, workbook, fileName);
     }
 
     /**
@@ -276,31 +223,21 @@ public class PoiController {
             @RequestParam(value = "week") Integer week,
             @RequestParam(value = "year") Integer year,
             @RequestParam(value = "statistics", required = false) List<Integer> statistics,
-            @RequestParam(value = "isdisk", defaultValue = "true") Boolean isdisk,
             @RequestParam(value = "limit", defaultValue = "true") Boolean limit, HttpServletResponse response) {
-        //优先磁盘获取
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-ww");
-        String anObject = year + "-" + week;
-        String type = "week";
-        if (isdisk && !sdf.format(System.currentTimeMillis()).equals(anObject)) {
-
-            if (getFileFromDisk(siteId, response, anObject, type)) {
-                return;
-            }
-        }
-        Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet();
-        setAllTitle(siteId, workbook, sheet, "地表水环境质量数据周报表");
-
-        List<Map<String, String>> week1 = monitorService.week(siteId, year, week, statistics, limit);
-        setDataValue(workbook, sheet, (List)week1, siteId);
 
         List<BaseSiteitemDTO> columns = monitorService.getColumns(siteId);
         String siteName = columns.get(0).getSiteName();
-        String returnName = siteName + "-" + year + "年第" + week + "周报表.xlsx";
-        insertToDBandDisk(siteId, anObject, workbook, returnName, type);
+        String fileName = siteName + "水质周报表(" + year + "年第" + week + "周)";
+
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet();
+        setAllTitle(siteId, workbook, sheet, fileName);
+
+        List<Map<String, String>> mapList = monitorService.week(siteId, year, week, statistics, limit);
+        setDataValue(workbook, sheet, (List)mapList, siteId);
+
         //第2步：  下载文件
-        download(response, workbook, returnName);
+        download(response, workbook, fileName);
     }
 
     //月报表查询功能,其实就是获取某个月的日均值报表
@@ -310,34 +247,22 @@ public class PoiController {
             @RequestParam(value = "year") Integer year,
             @RequestParam(value = "month") Integer month,
             @RequestParam(value = "statistics", required = false) List<Integer> statistics,
-            @RequestParam(value = "limit", defaultValue = "true") Boolean limit,
-            @RequestParam(value = "isdisk", defaultValue = "true") Boolean isdisk, HttpServletResponse response) {
-        //优先磁盘获取
-        String anObject = year + "-" + month;
-        String type = "month";
-        if (isdisk && !DateFormat.format(DateFormat.yyyy_MM, new Date()).equals(anObject)) {
-
-            if (getFileFromDisk(siteId, response, anObject, type)) {
-                return;
-            }
-        }
-
-        Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet();
-        setAllTitle(siteId, workbook, sheet, "地表水环境质量数据月报表");
-
-        //第二行到 mapList.size()-1+2行：具体数据展示，导出数据行
-        List<Map<String, String>> week1 = monitorService.realMonth(siteId, year, month, statistics, limit);
-        setDataValue(workbook, sheet, (List)week1, siteId);
+            @RequestParam(value = "limit", defaultValue = "true") Boolean limit, HttpServletResponse response) {
 
         List<BaseSiteitemDTO> columns = monitorService.getColumns(siteId);
         String siteName = columns.get(0).getSiteName();
-        String returnName = siteName + "-" + year + "年第" + month + "月报表.xlsx";
+        String fileName = siteName + "水质月报表(" + year + "年第" + month + "月)";
 
-        insertToDBandDisk(siteId, anObject, workbook, returnName, type);
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet();
+        setAllTitle(siteId, workbook, sheet, fileName);
+
+        //第二行到 mapList.size()-1+2行：具体数据展示，导出数据行
+        List<Map<String, String>> mapList = monitorService.realMonth(siteId, year, month, statistics, limit);
+        setDataValue(workbook, sheet, (List)mapList, siteId);
 
         //第2步：  下载文件
-        download(response, workbook, returnName);
+        download(response, workbook, fileName);
     }
 
 
@@ -347,60 +272,21 @@ public class PoiController {
             @RequestParam(value = "siteId") Integer siteId,
             @RequestParam(value = "year") Integer year,
             @RequestParam(value = "statistics", required = false) List<Integer> statistics,
-            @RequestParam(value = "limit", defaultValue = "true") Boolean limit,
-            @RequestParam(value = "isdisk", defaultValue = "true") Boolean isdisk, HttpServletResponse response) {
-        //优先磁盘获取
-        String anObject = year + "";
-        String type = "year";
-        if (isdisk && !DateFormat.format(DateFormat.yyyy, new Date()).equals(anObject)) {
-
-            if (getFileFromDisk(siteId, response, anObject, type)) {
-                return;
-            }
-        }
-
-        Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet();
-        setAllTitle(siteId, workbook, sheet, "地表水环境质量数据年报表");
-
-        List<Map<String, String>> week1 = monitorService.realYear(siteId, year, statistics, limit);
-        setDataValue(workbook, sheet, (List)week1, siteId);
+            @RequestParam(value = "limit", defaultValue = "true") Boolean limit, HttpServletResponse response) {
 
         List<BaseSiteitemDTO> columns = monitorService.getColumns(siteId);
         String siteName = columns.get(0).getSiteName();
-        String returnName = siteName + "-" + year + "年报表.xlsx";
+        String fileName = siteName + "水质年报表(" + year + "年)";
 
-        insertToDBandDisk(siteId, anObject, workbook, returnName, type);
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet();
+        setAllTitle(siteId, workbook, sheet, fileName);
+
+        List<Map<String, String>> mapList = monitorService.realYear(siteId, year, statistics, limit);
+        setDataValue(workbook, sheet, (List)mapList, siteId);
 
         //第2步：  下载文件
-        download(response, workbook, returnName);
-    }
-
-    private boolean getFileFromDisk(Integer siteId, HttpServletResponse response, String timeStr, String type) {
-        ExcelFile oldExcel = new ExcelFile();
-        oldExcel.setTimeStr(timeStr);
-        oldExcel.setSiteId(siteId);
-        oldExcel.setType(type);
-
-        ExcelFile select = excelFileMapper.selectOne(oldExcel);
-        if (select != null) {
-            try {
-                String excelUrl = select.getExcelUrl();
-                File file = new File(excelUrl);
-                if (file.isFile()) {
-
-                    Workbook wb = WorkbookFactory.create(file); //拿到文件
-                    if (wb != null) {
-                        download(response, wb, file.getName());
-                        wb.close();
-                        return true;
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return false;
+        download(response, workbook, fileName);
     }
 
     //日报表查询功能，其实就是某一天的时段报表
@@ -409,33 +295,22 @@ public class PoiController {
             @RequestParam(value = "siteId") Integer siteId,
             @RequestParam(value = "day") String day,
             @RequestParam(value = "statistics", required = false) List<Integer> statistics,
-            @RequestParam(value = "limit", defaultValue = "true") Boolean limit,
-            @RequestParam(value = "isdisk", defaultValue = "true") Boolean isdisk, HttpServletResponse response) {
-        //优先磁盘获取
-        String type = "day";
-        if (isdisk && !DateFormat.formatSome(System.currentTimeMillis()).equals(day)) {
-
-            if (getFileFromDisk(siteId, response, day, type)) {
-                return;
-            }
-        }
-
-        Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet();
-        setAllTitle(siteId, workbook, sheet, "地表水环境质量数据日报表");
-
-        //第二行到 mapList.size()-1+2行：具体数据展示，导出数据行
-        List<Map<String, String>> week1 = monitorService.realDay(siteId, day, statistics, limit);
-        setDataValue(workbook, sheet, (List)week1, siteId);
+            @RequestParam(value = "limit", defaultValue = "true") Boolean limit, HttpServletResponse response) {
 
         List<BaseSiteitemDTO> columns = monitorService.getColumns(siteId);
         String siteName = columns.get(0).getSiteName();
-        String returnName = siteName + "-" + day + "日报表.xlsx";
+        String fileName = siteName + "水质日报表(" + day.replaceFirst("-", "年").replace('-', '月') + "日)";
 
-        insertToDBandDisk(siteId, day, workbook, returnName, type);
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet();
+        setAllTitle(siteId, workbook, sheet, fileName);
+
+        //第二行到 mapList.size()-1+2行：具体数据展示，导出数据行
+        List<Map<String, String>> mapList = monitorService.realDay(siteId, day, statistics, limit);
+        setDataValue(workbook, sheet, (List)mapList, siteId);
 
         //第2步：  下载文件
-        download(response, workbook, returnName);
+        download(response, workbook, fileName);
     }
 
     /**
@@ -479,16 +354,17 @@ public class PoiController {
 
     @Autowired
     private HttpServletRequest request;
+
     /**
      * 下载
      */
-    private void download(HttpServletResponse response, Workbook workbook, String returnName) {
+    private void download(HttpServletResponse response, Workbook workbook, String fileName) {
         DownloadUtil downloadUtil = new DownloadUtil();
         // excel文件流---->bos------>response
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
             workbook.write(bos);
-            downloadUtil.download(bos, response, returnName,request);
+            downloadUtil.download(bos, response, fileName+".xlsx", request);
             workbook.close();
         } catch (IOException e) {
             throw new XMException(500, e.getMessage());
@@ -501,6 +377,7 @@ public class PoiController {
         }
         TL.remove();
     }
+
 
     /**
      * 设置列宽度
@@ -606,40 +483,34 @@ public class PoiController {
      * 下载历史数据
      */
     @RequestMapping("/printHistory")
-    @SystemControllerLog(descrption = "历史数据下载", actionType = "6")
     public void printHistory(
             @RequestParam(value = "siteId") Integer siteId,
             @RequestParam(value = "startTime") String startTime,
             @RequestParam(value = "endTime") String endTime, HttpServletResponse response) {
-        List<BaseSiteitemDTO> list = monitorService.getColumns(siteId);
+        List<BaseSiteitemDTO> columns = monitorService.getColumns(siteId);
+        String siteName = columns.get(0).getSiteName();
+        String fileName = siteName + "水质历史报表(" + formatStrDate(startTime, endTime, true) + ")";
+
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet();
-        Row row = setTitle(workbook, sheet, list, "地表水环境质量数据历史报表");
-        List<String> itemNames = list.stream().map(BaseSiteitemDTO::getItemName).collect(Collectors.toList());
-        List<String> units = list.stream().map(BaseSiteitemDTO::getUnit).collect(Collectors.toList());
-        for (int i = 0; i < itemNames.size(); i++) {
-            //第3-10列
-            Cell cell = row.createCell(i + 1);
-            cell.setCellValue(itemNames.get(i) + (units.get(i) == null ? "" : ("(" + units.get(i) + ")")));
-        }
+        setAllTitle(siteId, workbook, sheet, fileName);
+
         PageResult<Map<String, Object>> pageResult = monitorService.getHistoryData(Integer.MAX_VALUE, 1, siteId, startTime, endTime, "ASC", false);
         List<Map<String, Object>> mapList = pageResult.getRows();
 
         setDataValue(workbook, sheet, mapList, siteId);
 
         //第2步：  下载文件
-        download(response, workbook, "历史报表.xlsx");
+        download(response, workbook, fileName);
 
     }
 
     @RequestMapping("/printExceed")
-    @SystemControllerLog(descrption = "超标情况统计下载", actionType = "6")
     public void printExceed(
             @RequestParam(value = "start") String start,
             @RequestParam(value = "end") String end,
             @RequestParam(value = "siteId") String siteId, HttpServletResponse response) {
 
-        //String start, String end, String siteId, String siteName, Boolean scale, Integer num
         List<ExceedStandard> exceedStandards = exceedStandardService.findByDateAndSiteName(start, end, siteId, false);
         if (exceedStandards.size() > 0) {
             Workbook workbook = new XSSFWorkbook();
@@ -683,8 +554,8 @@ public class PoiController {
             }
 
             setColumnWidth(sheet);
-
-            download(response, workbook, "超标情况统计.xlsx");
+            String siteName = exceedStandards.get(0).getSiteName();
+            download(response, workbook, siteName + "水质超标情况统计(" + formatStrDate(start, end, true) + ")");
 
         } else {
             try {
@@ -699,5 +570,19 @@ public class PoiController {
                 throw new XMException(500, e.getMessage());
             }
         }
+    }
+
+    //2020-01-01 转换为 2020年01月01日
+    private static String formatStrDate(String str) {
+        return str.replaceFirst("-", "年").replace('-', '月') + '日';
+    }
+
+    private static String formatStrDate(String s, String e) {
+        return s.replaceFirst("-", "年").replace('-', '月') + "日至" + e.replaceFirst("-", "年").replace('-', '月') + '日';
+    }
+
+    private static String formatStrDate(String s, String e, boolean min) {
+        return s.replaceFirst("-", "年").replace('-', '月').replace(' ', '日').replace(':', '时').replace(':', '分') + "秒至" + e.
+                replaceFirst("-", "年").replace('-', '月').replace(' ', '日').replace(':', '时').replace(':', '分') + '秒';
     }
 }
