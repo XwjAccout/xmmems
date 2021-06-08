@@ -45,9 +45,8 @@ public class MonitorReportController {
     public ResponseEntity<List<Map<String, String>>> week(@RequestParam(value = "siteId") Integer siteId,
                                                           @RequestParam(value = "year") Integer year,
                                                           @RequestParam(value = "week") Integer week,
-                                                          @RequestParam(value = "statistics", required = false) List<Integer> statistics,
-                                                          @RequestParam(value = "limit", defaultValue = "true") Boolean limit) {
-        return ResponseEntity.ok(monitorService.week(siteId, year, week, statistics, limit));
+                                                          @RequestParam(value = "statistics", required = false) List<Integer> statistics) {
+        return ResponseEntity.ok(monitorService.week(siteId, year, week, statistics, false));
     }
 
     //日均值报表查询功能
@@ -56,9 +55,8 @@ public class MonitorReportController {
     public ResponseEntity<List<Map<String, String>>> month(@RequestParam(value = "siteId") Integer siteId,
                                                            @RequestParam(value = "startTime") String startTime,
                                                            @RequestParam(value = "endTime") String endTime,
-                                                           @RequestParam(value = "statistics", required = false) List<Integer> statistics,
-                                                           @RequestParam(value = "limit", defaultValue = "true") Boolean limit) {
-        return ResponseEntity.ok(monitorService.month(siteId, startTime, endTime, statistics, limit));
+                                                           @RequestParam(value = "statistics", required = false) List<Integer> statistics) {
+        return ResponseEntity.ok(monitorService.month(siteId, startTime, endTime, statistics, false));
     }
 
     //月均值报表查询功能
@@ -67,9 +65,8 @@ public class MonitorReportController {
     public ResponseEntity<List<Map<String, String>>> year(@RequestParam(value = "siteId") Integer siteId,
                                                           @RequestParam(value = "startTime") String startTime,
                                                           @RequestParam(value = "endTime") String endTime,
-                                                          @RequestParam(value = "statistics", required = false) List<Integer> statistics,
-                                                          @RequestParam(value = "limit", defaultValue = "true") Boolean limit) {
-        return ResponseEntity.ok(monitorService.year(siteId, startTime, endTime, statistics, limit));
+                                                          @RequestParam(value = "statistics", required = false) List<Integer> statistics) {
+        return ResponseEntity.ok(monitorService.year(siteId, startTime, endTime, statistics, false));
     }
 
     //四季报表查询功能，其实就是按某季度获取3个月均值报表的
@@ -79,9 +76,8 @@ public class MonitorReportController {
                                                              @RequestParam(value = "year") Integer year,
                                                              @RequestParam(value = "seasons") Integer seasons,
                                                              @RequestParam(value = "statistics", required = false) List<Integer> statistics,
-                                                             @RequestParam(value = "isDayAvg", defaultValue = "false") Boolean isDayAvg,
-                                                             @RequestParam(value = "limit", defaultValue = "true") Boolean limit) {
-        return ResponseEntity.ok(monitorService.seasons(siteId, seasons, year, statistics, limit, isDayAvg));
+                                                             @RequestParam(value = "isDayAvg", defaultValue = "false") Boolean isDayAvg) {
+        return ResponseEntity.ok(monitorService.seasons(siteId, seasons, year, statistics, false, isDayAvg));
     }
 
     //月报表查询功能,其实就是获取某个月的日均值报表
@@ -90,9 +86,8 @@ public class MonitorReportController {
     public ResponseEntity<List<Map<String, String>>> realMonth(@RequestParam(value = "siteId") Integer siteId,
                                                                @RequestParam(value = "year") Integer year,
                                                                @RequestParam(value = "month") Integer month,
-                                                               @RequestParam(value = "statistics", required = false) List<Integer> statistics,
-                                                               @RequestParam(value = "limit", defaultValue = "true") Boolean limit) {
-        return ResponseEntity.ok(monitorService.realMonth(siteId, year, month, statistics, limit));
+                                                               @RequestParam(value = "statistics", required = false) List<Integer> statistics) {
+        return ResponseEntity.ok(monitorService.realMonth(siteId, year, month, statistics, false));
     }
 
 
@@ -101,9 +96,8 @@ public class MonitorReportController {
     @SystemControllerLog(descrption = "年报表", actionType = "4")
     public ResponseEntity<List<Map<String, String>>> realYear(@RequestParam(value = "siteId") Integer siteId,
                                                               @RequestParam(value = "year") Integer year,
-                                                              @RequestParam(value = "statistics", required = false) List<Integer> statistics,
-                                                              @RequestParam(value = "limit", defaultValue = "true") Boolean limit) {
-        return ResponseEntity.ok(monitorService.realYear(siteId, year, statistics, limit));
+                                                              @RequestParam(value = "statistics", required = false) List<Integer> statistics) {
+        return ResponseEntity.ok(monitorService.realYear(siteId, year, statistics, false));
     }
 
     //日报表查询功能，其实就是某一天的时段报表
