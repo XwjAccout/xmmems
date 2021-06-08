@@ -35,7 +35,7 @@ public class MonitorReportController {
                                                          @RequestParam(value = "startTime") String startTime,
                                                          @RequestParam(value = "endTime") String endTime,
                                                          @RequestParam(value = "statistics", required = false) List<Integer> statistics,
-                                                         @RequestParam(value = "limit", defaultValue = "true") Boolean limit) {
+                                                         @RequestParam(value = "limit", defaultValue = "false") Boolean limit) {
         return ResponseEntity.ok(monitorService.day(siteId, startTime, endTime, statistics, limit));
     }
 
@@ -106,7 +106,7 @@ public class MonitorReportController {
     public ResponseEntity<List<Map<String, String>>> realDay(@RequestParam(value = "siteId") Integer siteId,
                                                              @RequestParam(value = "day") String day,
                                                              @RequestParam(value = "statistics", required = false) List<Integer> statistics,
-                                                             @RequestParam(value = "limit", defaultValue = "true") Boolean limit) {
+                                                             @RequestParam(value = "limit", defaultValue = "false") Boolean limit) {
         return ResponseEntity.ok(monitorService.realDay(siteId, day, statistics, limit));
     }
 }

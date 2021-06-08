@@ -59,8 +59,7 @@ public class PoiController {
             @RequestParam(value = "seasons") Integer seasons,
             @RequestParam(value = "year") Integer year,
             @RequestParam(value = "statistics", required = false) List<Integer> statistics,
-            @RequestParam(value = "isDayAvg", defaultValue = "false") Boolean isDayAvg, HttpServletResponse response,
-            @RequestParam(value = "limit", defaultValue = "true") Boolean limit) {
+            @RequestParam(value = "isDayAvg", defaultValue = "false") Boolean isDayAvg, HttpServletResponse response) {
 
         //第1步：导出第一行标题
         Workbook workbook = new XSSFWorkbook();
@@ -70,7 +69,7 @@ public class PoiController {
         String fileName = siteName + "水质季报表(" + year + "年第" + seasons + "季度" + (isDayAvg ? "日均值报表)" : "月均值报表)");
         setAllTitle(siteId, workbook, sheet, fileName);
 
-        List<Map<String, String>> mapList = monitorService.seasons(siteId, seasons, year, statistics, limit, isDayAvg);
+        List<Map<String, String>> mapList = monitorService.seasons(siteId, seasons, year, statistics, false, isDayAvg);
         setDataValue(workbook, sheet, (List)mapList, siteId);
         //第2步：  下载文件
         download(response, workbook, fileName);
@@ -145,8 +144,7 @@ public class PoiController {
             @RequestParam(value = "siteId") Integer siteId,
             @RequestParam(value = "startTime") String startTime,
             @RequestParam(value = "endTime") String endTime,
-            @RequestParam(value = "statistics", required = false) List<Integer> statistics,
-            @RequestParam(value = "limit", defaultValue = "true") Boolean limit, HttpServletResponse response) {
+            @RequestParam(value = "statistics", required = false) List<Integer> statistics, HttpServletResponse response) {
 
         List<BaseSiteitemDTO> columns = monitorService.getColumns(siteId);
         String siteName = columns.get(0).getSiteName();
@@ -157,7 +155,7 @@ public class PoiController {
         Sheet sheet = workbook.createSheet();
         setAllTitle(siteId, workbook, sheet, fileName);
 
-        List<Map<String, String>> mapList = monitorService.year(siteId, startTime, endTime, statistics, limit);
+        List<Map<String, String>> mapList = monitorService.year(siteId, startTime, endTime, statistics, false);
         setDataValue(workbook, sheet, (List)mapList, siteId);
         //第2步：  下载文件
         download(response, workbook, fileName);
@@ -172,8 +170,7 @@ public class PoiController {
             @RequestParam(value = "siteId") Integer siteId,
             @RequestParam(value = "startTime") String startTime,
             @RequestParam(value = "endTime") String endTime, @RequestParam(value = "statistics", required = false)
-                    List<Integer> statistics, HttpServletResponse response,
-            @RequestParam(value = "limit", defaultValue = "true") Boolean limit) {
+                    List<Integer> statistics, HttpServletResponse response) {
 
         List<BaseSiteitemDTO> columns = monitorService.getColumns(siteId);
         String siteName = columns.get(0).getSiteName();
@@ -183,7 +180,7 @@ public class PoiController {
         Sheet sheet = workbook.createSheet();
         setAllTitle(siteId, workbook, sheet, fileName);
 
-        List<Map<String, String>> mapList = monitorService.month(siteId, startTime, endTime, statistics, limit);
+        List<Map<String, String>> mapList = monitorService.month(siteId, startTime, endTime, statistics, false);
         setDataValue(workbook, sheet, (List)mapList, siteId);
         //日报表，月报表，年报表均完成，周报表因为比较少用，直接用日报表自行选择即可 admin 2020/6/19 16:58
         //第2步：  下载文件
@@ -191,7 +188,7 @@ public class PoiController {
     }
 
     /**
-     * 日报表
+     * 时段报表
      */
     @RequestMapping("/printDayExcel")
     public void printDayExcel(
@@ -199,7 +196,7 @@ public class PoiController {
             @RequestParam(value = "startTime") String startTime,
             @RequestParam(value = "endTime") String endTime,
             @RequestParam(value = "statistics", required = false) List<Integer> statistics,
-            @RequestParam(value = "limit", defaultValue = "true") Boolean limit, HttpServletResponse response) {
+            @RequestParam(value = "limit", defaultValue = "false") Boolean limit, HttpServletResponse response) {
         List<BaseSiteitemDTO> columns = monitorService.getColumns(siteId);
         String siteName = columns.get(0).getSiteName();
         String fileName = siteName + "水质时段报表(" + formatStrDate(startTime, endTime, true) + ")";
@@ -222,8 +219,7 @@ public class PoiController {
             @RequestParam(value = "siteId") Integer siteId,
             @RequestParam(value = "week") Integer week,
             @RequestParam(value = "year") Integer year,
-            @RequestParam(value = "statistics", required = false) List<Integer> statistics,
-            @RequestParam(value = "limit", defaultValue = "true") Boolean limit, HttpServletResponse response) {
+            @RequestParam(value = "statistics", required = false) List<Integer> statistics, HttpServletResponse response) {
 
         List<BaseSiteitemDTO> columns = monitorService.getColumns(siteId);
         String siteName = columns.get(0).getSiteName();
@@ -233,7 +229,7 @@ public class PoiController {
         Sheet sheet = workbook.createSheet();
         setAllTitle(siteId, workbook, sheet, fileName);
 
-        List<Map<String, String>> mapList = monitorService.week(siteId, year, week, statistics, limit);
+        List<Map<String, String>> mapList = monitorService.week(siteId, year, week, statistics, false);
         setDataValue(workbook, sheet, (List)mapList, siteId);
 
         //第2步：  下载文件
@@ -246,8 +242,7 @@ public class PoiController {
             @RequestParam(value = "siteId") Integer siteId,
             @RequestParam(value = "year") Integer year,
             @RequestParam(value = "month") Integer month,
-            @RequestParam(value = "statistics", required = false) List<Integer> statistics,
-            @RequestParam(value = "limit", defaultValue = "true") Boolean limit, HttpServletResponse response) {
+            @RequestParam(value = "statistics", required = false) List<Integer> statistics, HttpServletResponse response) {
 
         List<BaseSiteitemDTO> columns = monitorService.getColumns(siteId);
         String siteName = columns.get(0).getSiteName();
@@ -258,7 +253,7 @@ public class PoiController {
         setAllTitle(siteId, workbook, sheet, fileName);
 
         //第二行到 mapList.size()-1+2行：具体数据展示，导出数据行
-        List<Map<String, String>> mapList = monitorService.realMonth(siteId, year, month, statistics, limit);
+        List<Map<String, String>> mapList = monitorService.realMonth(siteId, year, month, statistics, false);
         setDataValue(workbook, sheet, (List)mapList, siteId);
 
         //第2步：  下载文件
@@ -271,8 +266,7 @@ public class PoiController {
     public void realYear(
             @RequestParam(value = "siteId") Integer siteId,
             @RequestParam(value = "year") Integer year,
-            @RequestParam(value = "statistics", required = false) List<Integer> statistics,
-            @RequestParam(value = "limit", defaultValue = "true") Boolean limit, HttpServletResponse response) {
+            @RequestParam(value = "statistics", required = false) List<Integer> statistics, HttpServletResponse response) {
 
         List<BaseSiteitemDTO> columns = monitorService.getColumns(siteId);
         String siteName = columns.get(0).getSiteName();
@@ -282,7 +276,7 @@ public class PoiController {
         Sheet sheet = workbook.createSheet();
         setAllTitle(siteId, workbook, sheet, fileName);
 
-        List<Map<String, String>> mapList = monitorService.realYear(siteId, year, statistics, limit);
+        List<Map<String, String>> mapList = monitorService.realYear(siteId, year, statistics, false);
         setDataValue(workbook, sheet, (List)mapList, siteId);
 
         //第2步：  下载文件
@@ -295,7 +289,7 @@ public class PoiController {
             @RequestParam(value = "siteId") Integer siteId,
             @RequestParam(value = "day") String day,
             @RequestParam(value = "statistics", required = false) List<Integer> statistics,
-            @RequestParam(value = "limit", defaultValue = "true") Boolean limit, HttpServletResponse response) {
+            @RequestParam(value = "limit", defaultValue = "false") Boolean limit, HttpServletResponse response) {
 
         List<BaseSiteitemDTO> columns = monitorService.getColumns(siteId);
         String siteName = columns.get(0).getSiteName();
