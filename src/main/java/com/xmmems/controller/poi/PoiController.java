@@ -10,7 +10,6 @@ import com.xmmems.dto.BaseSiteitemDTO;
 import com.xmmems.dto.PageResult;
 import com.xmmems.service.ExceedStandardService;
 import com.xmmems.service.MonitorService;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -27,10 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -80,13 +76,13 @@ public class PoiController {
         Row row = setTitle(workbook, sheet, list, title);
 
         Stream<BaseSiteitemDTO> stream = list.stream();
-        Map<String, String> collect = stream.collect(Collectors.toMap(k -> k.getItemName(), v -> v.getUnit() == null ? "" : v.getUnit()));
+        LinkedHashMap<String, String> collect = stream.collect(Collectors.toMap(BaseSiteitemDTO::getItemName, v -> v.getUnit() == null ? "" : "(" + v.getUnit() + ")", (t1, t2) -> t1, LinkedHashMap::new));
         Iterator<Map.Entry<String, String>> iterator = collect.entrySet().iterator();
         for (int i = 0; iterator.hasNext(); i++) {
             Map.Entry<String, String> next = iterator.next();
             //第3-10列
             Cell cell = row.createCell(i + 1);
-            cell.setCellValue(next.getKey() + (StringUtils.isBlank(next.getValue()) ? "" : ("(" + next.getValue() + ")")));
+            cell.setCellValue(next.getKey() + next.getValue());
         }
     }
 
@@ -143,8 +139,8 @@ public class PoiController {
     public void printYearExcel(
             @RequestParam(value = "siteId") Integer siteId,
             @RequestParam(value = "startTime") String startTime,
-            @RequestParam(value = "endTime") String endTime,
-            @RequestParam(value = "statistics", required = false) List<Integer> statistics, HttpServletResponse response) {
+            @RequestParam(value = "endTime") String endTime, @RequestParam(value = "statistics", required = false)
+                    List<Integer> statistics, HttpServletResponse response) {
 
         List<BaseSiteitemDTO> columns = monitorService.getColumns(siteId);
         String siteName = columns.get(0).getSiteName();
@@ -163,7 +159,7 @@ public class PoiController {
     }
 
     /**
-     * 月报表
+     * 日均值报表
      */
     @RequestMapping("/printMonthExcel")
     public void printMonthExcel(
@@ -218,8 +214,8 @@ public class PoiController {
     public void printWeekExcel(
             @RequestParam(value = "siteId") Integer siteId,
             @RequestParam(value = "week") Integer week,
-            @RequestParam(value = "year") Integer year,
-            @RequestParam(value = "statistics", required = false) List<Integer> statistics, HttpServletResponse response) {
+            @RequestParam(value = "year") Integer year, @RequestParam(value = "statistics", required = false)
+                    List<Integer> statistics, HttpServletResponse response) {
 
         List<BaseSiteitemDTO> columns = monitorService.getColumns(siteId);
         String siteName = columns.get(0).getSiteName();
@@ -241,8 +237,8 @@ public class PoiController {
     public void realMonth(
             @RequestParam(value = "siteId") Integer siteId,
             @RequestParam(value = "year") Integer year,
-            @RequestParam(value = "month") Integer month,
-            @RequestParam(value = "statistics", required = false) List<Integer> statistics, HttpServletResponse response) {
+            @RequestParam(value = "month") Integer month, @RequestParam(value = "statistics", required = false)
+                    List<Integer> statistics, HttpServletResponse response) {
 
         List<BaseSiteitemDTO> columns = monitorService.getColumns(siteId);
         String siteName = columns.get(0).getSiteName();
@@ -265,8 +261,8 @@ public class PoiController {
     @GetMapping("/printRealYearExcel")
     public void realYear(
             @RequestParam(value = "siteId") Integer siteId,
-            @RequestParam(value = "year") Integer year,
-            @RequestParam(value = "statistics", required = false) List<Integer> statistics, HttpServletResponse response) {
+            @RequestParam(value = "year") Integer year, @RequestParam(value = "statistics", required = false)
+                    List<Integer> statistics, HttpServletResponse response) {
 
         List<BaseSiteitemDTO> columns = monitorService.getColumns(siteId);
         String siteName = columns.get(0).getSiteName();
@@ -358,7 +354,7 @@ public class PoiController {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
             workbook.write(bos);
-            downloadUtil.download(bos, response, fileName+".xlsx", request);
+            downloadUtil.download(bos, response, fileName + ".xlsx", request);
             workbook.close();
         } catch (IOException e) {
             throw new XMException(500, e.getMessage());

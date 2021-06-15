@@ -9,6 +9,7 @@ import com.xmmems.common.auth.domain.UserHolder;
 import com.xmmems.common.auth.utils.JwtUtils;
 import com.xmmems.common.exception.ExceptionResult;
 import com.xmmems.common.exception.XMException;
+import com.xmmems.common.utils.JsonUtils;
 import com.xmmems.dto.UserDTO;
 import com.xmmems.gateway.config.FilterProperties;
 import com.xmmems.service.system.AccountService;
@@ -47,6 +48,8 @@ public class AuthFilter extends HttpFilter {
         String method = request.getMethod();
         String remoteHost = request.getRemoteHost();
         log.info("【过滤器】请求进入过滤器！"+request.getMethod() + "  " + request.getRequestURI()+"  "+remoteHost);
+        log.info("【过滤器】请求参数！"+ JsonUtils.toString(request.getParameterMap()));
+
         if (HttpMethod.OPTIONS.toString().equals(method)) {
             response.setStatus(HttpStatus.NO_CONTENT.value());
         } else {

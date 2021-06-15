@@ -48,7 +48,7 @@ public class CommonService {
     private static Map<Integer, List<BaseSiteitemDTO>> BASE_SITE_ITEM_MAP = new HashMap<>(16);
 
     @PostConstruct
-    public void initBaseSite() {
+    public synchronized void initBaseSite() {
         BASE_SITE_LIST = baseSiteMapper.getBaseSites();
         for (BaseSite value : BASE_SITE_LIST) {
             ALL_SITE_MAP.put(value.getId() + "", value);
@@ -57,12 +57,12 @@ public class CommonService {
     }
 
     @PostConstruct
-    public void initEnvQualityConf() {
+    public synchronized void initEnvQualityConf() {
         ENV_QUALITY_CONF_LIST = envQualityConfMapper.selectByExample(new EnvQualityConfExample());
     }
 
     @PostConstruct
-    public void initBaseItem() {
+    public synchronized void initBaseItem() {
         List<BaseItem> baseItems = baseItemMapper.selectByExample(new BaseItemExample());
         BASE_ITEM_LIST = baseItems;
         for (BaseItem baseItem : baseItems) {
@@ -71,12 +71,12 @@ public class CommonService {
         }
     }
 
-    public void initBaseSiteItemMap(Integer siteId) {
+    public synchronized void initBaseSiteItemMap(Integer siteId) {
         List<BaseSiteitemDTO> items = baseSiteitemMapper.getColumns(siteId);
         BASE_SITE_ITEM_MAP.put(siteId, items);
     }
 
-    public void initBaseSiteItemMap2(Integer siteId) {
+    public synchronized void initBaseSiteItemMap2(Integer siteId) {
         if (!BASE_SITE_ITEM_MAP.containsKey(siteId)) {
             List<BaseSiteitemDTO> items = baseSiteitemMapper.getColumns(siteId);
             BASE_SITE_ITEM_MAP.put(siteId, items);

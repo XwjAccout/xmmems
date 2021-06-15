@@ -1,6 +1,7 @@
 package com.xmmems.common.exception;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -29,7 +30,10 @@ public class XMExceptionHandlerController {
             XMException exception = new XMException(500, "文件IO操作异常;" + e.getLocalizedMessage());
             return ResponseEntity.status(500).body(new ExceptionResult(exception));
         } else if (e instanceof MethodArgumentTypeMismatchException) {
-            XMException exception = new XMException(400, "客户端请求异常;" + e.getLocalizedMessage());
+            XMException exception = new XMException(400, "客户端请求参数类型异常;" + e.getLocalizedMessage());
+            return ResponseEntity.status(400).body(new ExceptionResult(exception));
+        } else if (e instanceof MissingServletRequestParameterException) {
+            XMException exception = new XMException(400, "客户端请求参数名称异常;" + e.getLocalizedMessage());
             return ResponseEntity.status(400).body(new ExceptionResult(exception));
         } else if (e instanceof NullPointerException) {
             XMException exception = new XMException(500, "空指针异常;" + e.getLocalizedMessage());
@@ -47,6 +51,7 @@ public class XMExceptionHandlerController {
             XMException exception = new XMException(500, "其他运行时异常;" + e.getLocalizedMessage());
             return ResponseEntity.status(500).body(new ExceptionResult(exception));
         } else {
+            System.out.println(e.getClass().getName());
             XMException exception = new XMException(500, "其他异常;" + e.getLocalizedMessage());
             return ResponseEntity.status(500).body(new ExceptionResult(exception));
         }
