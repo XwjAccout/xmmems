@@ -174,8 +174,7 @@ public class MenuService {
     }
 
     public List<MenuDTO> findByAccountId() {
-        Integer id = UserHolder.loginId();
-        List<Menu> menus = menuMapper.selectByAccountId(id);
+        List<Menu> menus = menuMapper.selectByAccountId(UserHolder.loginId());
         if (CollectionUtils.isEmpty(menus)) {
             throw new XMException(ExceptionEnum.MENU_NOT_FOUND);
         }
@@ -187,16 +186,11 @@ public class MenuService {
         return list;
     }
 
-    public List<Map<String, Object>> findMenuTree(Integer roleId) {
+    public List<Map<String, Object>> findMenuTree() {
         //传送的对象
         List<Map<String, Object>> list0 = new ArrayList<>();
 
-        List<Menu> menus = null;
-        if (roleId == null) {
-            menus = menuMapper.selectAll();
-        } else {
-            menus = menuMapper.selectByRoleId(roleId);
-        }
+        List<Menu> menus = menuMapper.selectByAccountId(UserHolder.loginId());
 
         //不为空
         if (!CollectionUtils.isEmpty(menus)) {

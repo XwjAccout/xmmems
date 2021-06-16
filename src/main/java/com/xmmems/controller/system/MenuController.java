@@ -137,13 +137,11 @@ public class MenuController {
 
     /**
      * 根据角色id查询所有菜单，如果没有，则查询全部菜单
-     * @param roleId
-     * @return
      */
     @GetMapping("/findMenuTree")
-    @SystemControllerLog(descrption = "树结构查询菜单(根据角色id)", actionType = "4")
-    public ResponseEntity<List<Map<String,Object>>> findMenuTree(@RequestParam(value = "roleId",required = false) Integer roleId){
-        List<Map<String, Object>> list = menuService.findMenuTree(roleId);
+    @SystemControllerLog(descrption = "树结构查询菜单", actionType = "4")
+    public ResponseEntity<List<Map<String,Object>>> findMenuTree(){
+        List<Map<String, Object>> list = menuService.findMenuTree();
         return ResponseEntity.ok(list);
     }
 
