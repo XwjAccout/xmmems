@@ -54,7 +54,6 @@ public class SendnoticeService {
         PageHelper.startPage(page, limit);
         Example example = new Example(Sendnotice.class);
         Example.Criteria criteria = example.createCriteria();
-        System.out.println(UserHolder.loginId());
         criteria.andEqualTo("receiveAccountId", UserHolder.loginId());
         criteria.andEqualTo("sendAccountId", UserHolder.loginId());
         if (StringUtils.isNotBlank(createTimeStart)) {

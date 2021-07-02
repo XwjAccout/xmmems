@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.xmmems.common.exception.XMException;
 import com.xmmems.common.utils.*;
 import com.xmmems.domain.ExceedStandard;
+import com.xmmems.domain.base.BaseItem;
 import com.xmmems.domain.base.BaseSite;
 import com.xmmems.domain.env.EnvHourData;
 import com.xmmems.domain.env.EnvHourDataExample;
@@ -171,8 +172,9 @@ public class ExceedStandardService {
                 e.setItemId(item.get("itemId"));
                 e.setItemName(itemName);
                 e.setItemValue(bigDecimal1.toPlainString());
-                if (baseItemMapper.selectByName(itemName) != null) {
-                    e.setItemUnit(baseItemMapper.selectByName(itemName).getUnit());
+                BaseItem b = commonService.getBaseItemByItemNameOrItemId(itemName);
+                if (b != null) {
+                    e.setItemUnit(b.getUnit());
                 }
                 if (!"溶解氧".equals(itemName)) {
                     e.setItemStandard(envQualityConf.getMaxVal());

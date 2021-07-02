@@ -237,7 +237,7 @@ public class MonitorService {
             handleOtherIntoReturnData(returnYearData, itemNameAndValuesList, siteId, dayNum, itemNameAndNumbersMap, false, statistics, "yy", itemNameAndValuesListOfMonth, eH, sH);
 
         }
-        addSiteName(returnYearData,res.siteName);
+        addSiteName(returnYearData, res.siteName);
         return returnYearData;
     }
 
@@ -291,11 +291,6 @@ public class MonitorService {
         if (list.size() > 0) {
             for (Map<String, Object> site : list) {
                 String siteId = site.get("siteId") + "";
-                List<Map<String, String>> limit = baseSiteitemMapper.getDetectionLimit(Integer.valueOf(siteId));
-                Map<String, String> limitMap = new HashMap<>(32);
-                if (limit.size() > 0) {
-                    limit.forEach(temp -> limitMap.put(temp.get("itemId"), temp.get("limitNum")));
-                }
 
                 List<BaseSiteitemDTO> columns = getColumns(Integer.valueOf(siteId));
                 List<String> collect = columns.stream().map(BaseSiteitemDTO::getItemName).collect(Collectors.toList());
@@ -311,7 +306,7 @@ public class MonitorService {
 
                         String value = monitorItem.get("value");
                         //获取监测值格式化与设置是否正常标志$$
-                        String value1 = handlerValue(monitorItem, limitMap);
+                        String value1 = handlerValue(monitorItem);
                         subCategoryMap.put(itemName, itemSubCategory(itemName, value, Integer.parseInt(siteId)));
                         String s = subCategoryMap.get(itemName);
                         if (s.contains(("$$"))) {
@@ -330,30 +325,19 @@ public class MonitorService {
         return list;
     }
 
-    private String handlerValue(Map<String, String> contentItem, Map<String, String> limit) {
+    private String handlerValue(Map<String, String> contentItem) {
 
         String itemName = contentItem.get("itemName");
         String troubleCode = contentItem.get("troubleCode");
         String value = contentItem.get("value");
-        String itemId = contentItem.get("itemId");
-        //检出限键值对  总磷=0.01
-        String b = limit.get(itemId.replace(".0", ""));
-        //检出限
-        String scale = rds.scale(itemName, value);
-        if (value.length() > 0) {
 
-            if (StringUtils.isNotBlank(troubleCode) && !"N".equals(troubleCode) && !" N".equals(troubleCode)) {
-                value = scale + "$$" + troubleCode;
-            } else if (b != null && Double.parseDouble(value) <= Double.parseDouble(b)) {
-                //value = "$$≤" + b;
-            }
-        }
-        if (value.contains("$$")) {
-            //在这里value 可能为 12  ，12$$T  ,12$$M  等情况
+        //检出限
+        String scale = rds.formatValue(itemName, value);
+        if (value.length() > 0 && StringUtils.isNotBlank(troubleCode) && !"N".equals(troubleCode) && !" N".equals(troubleCode)) {
+            value = scale + "$$" + troubleCode;
             return value;
-        } else {
-            return scale;
         }
+        return scale;
     }
 
     /**
@@ -482,7 +466,7 @@ public class MonitorService {
             String itemName = contentItem.get("itemName");
             String troubleCode = contentItem.get("troubleCode");
             String value = contentItem.get("value");
-            value = rds.scale(itemName, value);
+            value = rds.formatValue(itemName, value);
 
             boolean b = StringUtils.isBlank(troubleCode) || "N".equals(troubleCode) || " N".equals(troubleCode);
             if (value.length() > 0 && b) {
@@ -1081,8 +1065,7 @@ public class MonitorService {
             String itemName = entry.getKey();
 
             if ("moniterTime".equals(itemName)) {
-                avgMap.put("moniterTime", "平均值");
-                returnData.add(avgMap);
+
                 if (!isAvg) {
                     minMap.put("moniterTime", "最小值");
                     maxMap.put("moniterTime", "最大值");
@@ -1104,6 +1087,8 @@ public class MonitorService {
                         if (statistics.contains(1)) {
                             returnData.add(maxMap);
                         }
+                        avgMap.put("moniterTime", "平均值");
+                        returnData.add(avgMap);
                         if (statistics.contains(2)) {
                             returnData.add(subCategoryMap);
                         }
@@ -1131,8 +1116,14 @@ public class MonitorService {
                         if (statistics.contains(10)) {
                             returnData.add(avgFailureMap);
                         }
+                    } else {
+                        avgMap.put("moniterTime", "平均值");
+                        returnData.add(avgMap);
                     }
 
+                } else {
+                    avgMap.put("moniterTime", "平均值");
+                    returnData.add(avgMap);
                 }
 
             } else {
@@ -1458,7 +1449,7 @@ public class MonitorService {
             return "";
         }
         double v = d / num;
-        return rds.scale(itemName, v + "");
+        return rds.formatValue(itemName, v + "");
 
     }
 
@@ -1537,7 +1528,7 @@ public class MonitorService {
                 String itemId = contentItem.get("itemId");
 
                 if (value.length() > 0) {
-                    String scale = rds.scale(itemName, value);
+                    String scale = rds.formatValue(itemName, value);
                     if (StringUtils.isNotBlank(troubleCode) && !"N".equals(troubleCode) && !" N".equals(troubleCode)) {
                         value = scale + "$$" + troubleCode;
 
@@ -1549,7 +1540,6 @@ public class MonitorService {
                         }
                     }
                     if (value.contains("$$")) {
-
                         tempMap.put(itemName, value);
                     } else {
                         tempMap.put(itemName, scale);
@@ -1927,7 +1917,7 @@ public class MonitorService {
     //为报表数据添加站点名称
     private static void addSiteName(List<Map<String, String>> returnData, Object siteName) {
         for (Map<String, String> returnDatum : returnData) {
-            returnDatum.put("siteName", siteName+"");
+            returnDatum.put("siteName", siteName + "");
         }
     }
 }

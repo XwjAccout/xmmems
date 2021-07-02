@@ -572,7 +572,21 @@ public class PoiController {
     }
 
     private static String formatStrDate(String s, String e, boolean min) {
-        return s.replaceFirst("-", "年").replace('-', '月').replace(' ', '日').replace(':', '时').replace(':', '分') + "秒至" + e.
-                replaceFirst("-", "年").replace('-', '月').replace(' ', '日').replace(':', '时').replace(':', '分') + '秒';
+        String st = s.replaceFirst("-", "年").replaceFirst("-", "月").replace(' ', '日').replaceFirst(":", "时").replace(':', '分');
+        //        + "秒至" +
+        if (st.contains("分")) {
+            st += "秒至";
+        } else {
+            st += "日至";
+        }
+        String et = e.replaceFirst("-", "年").replaceFirst("-", "月").replace(' ', '日').replaceFirst(":", "时").replace(':', '分');
+        //        + '秒';
+        if (et.contains("分")) {
+            et += "秒";
+        } else {
+            et += "日";
+        }
+
+        return st + et;
     }
 }

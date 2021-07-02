@@ -26,7 +26,7 @@ public interface MenuMapper {
     @Select("SELECT m.id,m.name FROM role_menu rm JOIN menu m ON rm.menuId=m.id WHERE rm.roleId=#{roleId}")
     List<Map<String, Object>> findByRoleId(Integer roleId);
 
-    @Select("SELECT DISTINCT m.* FROM menu m JOIN role_menu rm ON m.`id`=rm.`menuId` JOIN account_role ar ON rm.`roleId`=ar.`roleId` WHERE ar.`accountId`=#{accountId} AND m.`isvalid` = '1' ORDER BY m.`rank` asc")
+    @Select("SELECT DISTINCT m.* FROM menu m JOIN role_menu rm ON m.`id`=rm.`menuId` JOIN account_role ar ON rm.`roleId`=ar.`roleId` WHERE ar.`accountId`=#{accountId} AND m.`isvalid` = '1' ORDER BY m.`rank`,m.sort asc")
     List<Menu> selectByAccountId(Integer accountId);
 
 //    @Select("SELECT * FROM menu ORDER BY rank ASC")

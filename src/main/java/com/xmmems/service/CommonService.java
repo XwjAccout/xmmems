@@ -1,5 +1,6 @@
 package com.xmmems.service;
 
+import com.xmmems.common.utils.JsonUtils;
 import com.xmmems.domain.base.BaseItem;
 import com.xmmems.domain.base.BaseItemExample;
 import com.xmmems.domain.base.BaseSite;
@@ -44,16 +45,35 @@ public class CommonService {
 
     private static List<BaseItem> BASE_ITEM_LIST = new ArrayList<>();
     private static Map<String, BaseItem> BASE_ITEM_MAP = new HashMap<>(256);
+    //保留位数
+    private static Map<String, Integer> ITEM_DIGITS = new HashMap<>(256);
 
     private static Map<Integer, List<BaseSiteitemDTO>> BASE_SITE_ITEM_MAP = new HashMap<>(16);
 
     @PostConstruct
     public synchronized void initBaseSite() {
-        BASE_SITE_LIST = baseSiteMapper.getBaseSites();
-        for (BaseSite value : BASE_SITE_LIST) {
+        List<BaseSite> baseSites = baseSiteMapper.getBaseSites();
+        BASE_SITE_LIST = baseSites;
+        for (BaseSite value : baseSites) {
             ALL_SITE_MAP.put(value.getId() + "", value);
             ALL_SITE_MAP.put(value.getSiteName(), value);
         }
+    }
+
+    @PostConstruct
+    public synchronized void initItemMap(){
+        List<BaseSiteitemDTO> items = baseSiteitemMapper.getAllColumns();
+        Map<Integer, List<BaseSiteitemDTO>> tempMap = new HashMap<>(16);
+        for (BaseSiteitemDTO item : items) {
+            Integer siteId = item.getSiteId();
+            List<BaseSiteitemDTO> list = tempMap.get(siteId);
+            if (list == null) {
+                list = new ArrayList<>();
+                tempMap.put(siteId, list);
+            }
+            list.add(item);
+        }
+        BASE_SITE_ITEM_MAP = tempMap;
     }
 
     @PostConstruct
@@ -66,8 +86,14 @@ public class CommonService {
         List<BaseItem> baseItems = baseItemMapper.selectByExample(new BaseItemExample());
         BASE_ITEM_LIST = baseItems;
         for (BaseItem baseItem : baseItems) {
-            BASE_ITEM_MAP.put(baseItem.getName(), baseItem);
+            BaseItem put = BASE_ITEM_MAP.put(baseItem.getName(), baseItem);
             BASE_ITEM_MAP.put(baseItem.getId() + "", baseItem);
+            ITEM_DIGITS.put(baseItem.getName(), baseItem.getDigits());
+            ITEM_DIGITS.put(baseItem.getId() + "", baseItem.getDigits());
+            if (put != null) {
+                System.out.println("*******替换前*********" + JsonUtils.toString(put));
+                System.out.println("*******替换后*********" + JsonUtils.toString(baseItem));
+            }
         }
     }
 
@@ -100,6 +126,11 @@ public class CommonService {
 
     public BaseItem getBaseItemByItemNameOrItemId(String itemNameOrItemId) {
         return BASE_ITEM_MAP.get(itemNameOrItemId);
+    }
+
+    public Integer getItemDigitsByItemNameOrItemId(String itemNameOrItemId) {
+        Integer digits = ITEM_DIGITS.get(itemNameOrItemId);
+        return digits == null ? 5 : digits;
     }
 
     public List<BaseItem> getBaseItemList() {

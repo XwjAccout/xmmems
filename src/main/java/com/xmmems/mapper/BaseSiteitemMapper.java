@@ -31,6 +31,9 @@ public interface BaseSiteitemMapper {
     @Select("select bs.*,bi.unit,bi.code from base_siteitem bs left join base_item bi on bs.itemId=bi.id where bs.isValid=1 and bs.siteId=#{siteId} order by sort asc")
     List<BaseSiteitemDTO> getColumns(Integer siteId);
 
+    @Select("select bs.*,bi.unit,bi.code from base_siteitem bs left join base_item bi on bs.itemId=bi.id where bs.isValid=1 order by sort asc")
+    List<BaseSiteitemDTO> getAllColumns();
+
     @Select("select bs.*,bi.unit from base_siteitem bs left join base_item bi on bs.itemId=bi.id where bs.isValid=1 and siteId in(${siteidlist})  GROUP BY bs.itemName  order by sort asc")
     List<BaseSiteitemDTO> getColumnsAll(@Param("siteidlist") String siteidlist);
 

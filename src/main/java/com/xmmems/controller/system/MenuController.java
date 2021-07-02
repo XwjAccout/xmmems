@@ -140,9 +140,18 @@ public class MenuController {
      */
     @GetMapping("/findMenuTree")
     @SystemControllerLog(descrption = "树结构查询菜单", actionType = "4")
-    public ResponseEntity<List<Map<String,Object>>> findMenuTree(){
-        List<Map<String, Object>> list = menuService.findMenuTree();
+    public ResponseEntity<List<Map<String,Object>>> findMenuTree(@RequestParam(value = "roleId",required = false) Integer roleId){
+        List<Map<String, Object>> list = menuService.findMenuTree(roleId);
         return ResponseEntity.ok(list);
     }
 
+    /**
+     * 全部菜单
+     */
+    @GetMapping("/findMenuTreeAll")
+    @SystemControllerLog(descrption = "树结构查询菜单", actionType = "4")
+    public ResponseEntity<List<Map<String,Object>>> findMenuTreeAll(){
+        List<Map<String, Object>> list = menuService.findMenuTreeAll();
+        return ResponseEntity.ok(list);
+    }
 }

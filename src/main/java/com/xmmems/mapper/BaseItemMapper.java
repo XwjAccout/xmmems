@@ -36,4 +36,7 @@ public interface BaseItemMapper {
 
     @Select("SELECT digits FROM base_item WHERE id =#{itemId}")
     Integer selectScale(Integer itemId);
+
+    @Select("SELECT digits FROM base_item WHERE `name` =  #{itemName}")
+    List<Integer> selectDigitByName(String itemName);
 }

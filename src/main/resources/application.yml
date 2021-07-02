@@ -13,9 +13,9 @@ spring:
       max-file-size: 5MB # 限制一次上次文件的总大小
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://112.94.22.48:3306/thankung?useSSL=false&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
+    url: jdbc:mysql://127.0.0.1:3306/thankung?useSSL=false&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
     username: root
-    password: 123456
+    password: 123123
   pid:
     file: D:/java/pid.txt
     fail-on-write-error: true
@@ -69,11 +69,9 @@ ly:
       - /thankung/upload
       - /thankung/poi
       - /thankung/pdf
-      #- /exceed
       - /thankung/favicon.ico
       - /thankung/water/save
       - /thankung/assessment
-      - /thankung/task
       - /login
       - /log
       - /upload
@@ -82,8 +80,6 @@ ly:
       - /favicon.ico
       - /water/save
       - /assessment
-      - /task
-      - /monitor
 
 network: "0 31 21 * * ?"
 

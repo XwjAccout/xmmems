@@ -186,14 +186,19 @@ public class MenuService {
         return list;
     }
 
-    public List<Map<String, Object>> findMenuTree() {
+    public List<Map<String, Object>> findMenuTree(Integer roleId) {
         //传送的对象
         List<Map<String, Object>> list0 = new ArrayList<>();
 
-        List<Menu> menus = menuMapper.selectByAccountId(UserHolder.loginId());
+        List<Menu> menus = null;
+        if (roleId == null) {
+            menus = menuMapper.selectByAccountId(UserHolder.loginId());
+        } else {
+            menus = menuMapper.selectByRoleId(roleId);
+        }
 
         //不为空
-        if (!CollectionUtils.isEmpty(menus)) {
+        if (menus.size() > 0) {
             for (Menu menu0 : menus) {
                 if ("0".equals(menu0.getLevel())) {
                     Map<String, Object> map0 = new HashMap<>(8);
@@ -211,6 +216,48 @@ public class MenuService {
                             for (Menu menu2 : menus) {
                                 if ("2".equals(menu2.getLevel()) && menu2.getPcode().equals(menu1.getCode())) {
                                     Map<String, Object> map2 = new HashMap<>(8);
+                                    map2.put("name", menu2.getName());
+                                    map2.put("path", menu2.getNewUrl());
+                                    map2.put("id", menu2.getId());
+                                    list2.add(map2);
+                                }
+                            }
+                            map1.put("menu", list2);
+                            list1.add(map1);
+                        }
+                    }
+                    map0.put("menu", list1);
+                    //封装数据
+                    list0.add(map0);
+                }
+            }
+        }
+        return list0;
+    }
+
+    public List<Map<String, Object>> findMenuTreeAll() {
+        //传送的对象
+        List<Map<String, Object>> list0 = new ArrayList<>();
+        List<Menu> menus  = menuMapper.selectAll();;
+        //不为空
+        if (!CollectionUtils.isEmpty(menus)) {
+            for (Menu menu0 : menus) {
+                if ("0".equals(menu0.getLevel())) {
+                    Map<String, Object> map0 = new HashMap<>();
+                    map0.put("name", menu0.getName());
+                    map0.put("path", menu0.getNewUrl());
+                    map0.put("id", menu0.getId());
+                    List<Map<String, Object>> list1 = new ArrayList<>();
+                    for (Menu menu1 : menus) {
+                        if ("1".equals(menu1.getLevel()) && menu1.getPcode().equals(menu0.getCode())) {
+                            Map<String, Object> map1 = new HashMap<>();
+                            map1.put("name", menu1.getName());
+                            map1.put("path", menu1.getNewUrl());
+                            map1.put("id", menu1.getId());
+                            List<Map<String, Object>> list2 = new ArrayList<>();
+                            for (Menu menu2 : menus) {
+                                if ("2".equals(menu2.getLevel()) && menu2.getPcode().equals(menu1.getCode())) {
+                                    Map<String, Object> map2 = new HashMap<>();
                                     map2.put("name", menu2.getName());
                                     map2.put("path", menu2.getNewUrl());
                                     map2.put("id", menu2.getId());
