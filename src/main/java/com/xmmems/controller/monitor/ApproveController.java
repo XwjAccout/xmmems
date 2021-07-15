@@ -11,9 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 @RestController
@@ -29,7 +27,6 @@ public class ApproveController {
     /**
      * 审核数据查询
      */
-    ///monitor/approve/siteMonitoring
     @GetMapping("/siteMonitoring")
     @SystemControllerLog(descrption = "分页查询审批数据", actionType = "4")
     public ResponseEntity<PageResult<Map<String, Object>>> siteMonitoring(
@@ -46,7 +43,7 @@ public class ApproveController {
      */
     @PostMapping("/saveAdjust")
     @SystemControllerLog(descrption = "保存修正后补录数据", actionType = "1")
-    public ResponseEntity<PageResult<Map<String, Object>>> saveAdjust(
+    public ResponseEntity<String> saveAdjust(
             @RequestParam("adjust") String adjust,
             @RequestParam("siteId") Integer siteId,
             @RequestParam(value = "recordId", required = false) Integer recordId,
@@ -59,6 +56,8 @@ public class ApproveController {
             @RequestParam(value = "startTime", required = false) String startTime,
             @RequestParam(value = "endTime", required = false) String endTime,
             @RequestParam(value = "multipleParam", required = false) String multipleParam,
+            @RequestParam(value = "itemNameList", required = false) String itemNameListStr,
+            @RequestParam(value = "itemNameList", required = false) List<String> itemNameList,
             @RequestParam(value = "dbNameAndHourDataId", defaultValue = "local") String dbNameAndHourDataId) {
         if (dbNameAndHourDataId.contains("$")) {
             //不包含需要同步其他数据库操作
@@ -75,13 +74,19 @@ public class ApproveController {
             map.put("startTime", startTime);
             map.put("endTime", endTime);
             map.put("multipleParam", multipleParam);
+            map.put("itemNameList", itemNameListStr);
             map.put("dbNameAndHourDataId", dbNameAndHourDataId);
 
-            httpUtils.postReturnVoid("/saveAdjust", map);
+            Boolean aBoolean = httpUtils.postReturnBoolean("/saveAdjust", map);
+            if (aBoolean) {
+                approveService.saveAdjust(adjust, siteId, recordId, adjustKey, adjustValue, originValue, troubleCode, troubleName, multipleAdjust, startTime, endTime, multipleParam, itemNameList);
+                return ResponseEntity.ok("数据库同步审批成功");
+            }
+            return ResponseEntity.ok("数据库同步审批失败，请联系管理员查看具体原因！");
         }
 
-        approveService.saveAdjust(adjust, siteId, recordId, adjustKey, adjustValue, originValue, troubleCode, troubleName, multipleAdjust, startTime, endTime, multipleParam);
-        return ResponseEntity.ok().build();
+        approveService.saveAdjust(adjust, siteId, recordId, adjustKey, adjustValue, originValue, troubleCode, troubleName, multipleAdjust, startTime, endTime, multipleParam, itemNameList);
+        return ResponseEntity.ok("本地数据库审批成功");
     }
 
     /**
@@ -97,7 +102,7 @@ public class ApproveController {
      */
     @PostMapping("/resetAdjust")
     @SystemControllerLog(descrption = "还原修正过的补录数据", actionType = "2")
-    public ResponseEntity<PageResult<Map<String, Object>>> resetAdjust(
+    public ResponseEntity<String> resetAdjust(
             @RequestParam("siteId") Integer siteId,
             @RequestParam("siteName") String siteName,
             @RequestParam(value = "adjustKey", required = false) String adjustKey,
@@ -114,10 +119,16 @@ public class ApproveController {
             map.put("endTime", endTime);
             map.put("dbNameAndHourDataId", dbNameAndHourDataId);
 
-            httpUtils.postReturnVoid("/resetAdjust", map);
+            Boolean aBoolean = httpUtils.postReturnBoolean("/resetAdjust", map);
+            if (aBoolean) {
+                approveService.resetAdjust(siteId, siteName, adjustKey, startTime, endTime);
+                return ResponseEntity.ok("数据同步还原成功");
+            }
+            return ResponseEntity.ok("数据同步还原失败，请联系管理员查看具体原因！");
         }
         approveService.resetAdjust(siteId, siteName, adjustKey, startTime, endTime);
-        return ResponseEntity.ok().build();
+
+        return ResponseEntity.ok("本地数据还原成功");
     }
 
     /**
@@ -137,7 +148,7 @@ public class ApproveController {
      */
     @PostMapping("/saveDate")
     @SystemControllerLog(descrption = "添加或修改补录数据", actionType = "1")
-    public ResponseEntity<Void> saveDate(
+    public ResponseEntity<String> saveDate(
             @RequestParam("siteId") Integer siteId,
             @RequestParam("siteName") String siteName,
             @RequestParam("monitorTime") String monitorTime,
@@ -155,21 +166,21 @@ public class ApproveController {
             map.put("dbNameAndHourDataId", dbNameAndHourDataId);
 
             String json = httpUtils.postReturnBody("/saveDate", map);
-            if (json == null) {
-                approveService.addDataSave(siteId, siteName, monitorTime, itemData, time);
-            } else {
+            if (json != null) {
                 HashMap<String, String> mapBody = JsonUtils.nativeRead(json, new TypeReference<HashMap<String, String>>() {});
                 approveService.addDataSave(siteId, siteName, monitorTime, itemData, time, mapBody);
+                return ResponseEntity.ok("数据库同步补录成功");
             }
-        } else {
-            approveService.addDataSave(siteId, siteName, monitorTime, itemData, time);
+            return ResponseEntity.ok("数据库同步补录失败，请联系管理员查看具体原因！");
         }
-        return ResponseEntity.ok().build();
+        approveService.addDataSave(siteId, siteName, monitorTime, itemData, time);
+
+        return ResponseEntity.ok("本地数据库补录成功");
     }
 
     @PostMapping("/deleteByIds")
     @SystemControllerLog(descrption = "根据id删除补录数据", actionType = "3")
-    public ResponseEntity<Void> deleteByIds(
+    public ResponseEntity<String> deleteByIds(
             @RequestParam("ids") Integer[] ids,
             @RequestParam(value = "dbNameAndHourDataId", defaultValue = "local") String dbNameAndHourDataId) {
         if (dbNameAndHourDataId.contains("$")) {
@@ -178,11 +189,14 @@ public class ApproveController {
             map.put("ids", Arrays.toString(ids).replaceAll("[\\[\\] ]", ""));
             map.put("dbNameAndHourDataId", dbNameAndHourDataId);
 
-            httpUtils.postReturnVoid("/deleteByIds", map);
+            Boolean aBoolean = httpUtils.postReturnBoolean("/deleteByIds", map);
+            if (aBoolean) {
+                approveService.deleteByIds(ids);
+                return ResponseEntity.ok("数据同步删除成功");
+            }
+            return ResponseEntity.ok("数据同步删除失败，请联系管理员查看具体原因！");
         }
         approveService.deleteByIds(ids);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("本地数据删除成功");
     }
-
-
 }

@@ -58,7 +58,7 @@ ly:
     pubKeyPath: D:\ly_guangzhou120\rsa\rsa_key.pub # 公钥地址
     priKeyPath: D:\ly_guangzhou120\rsa\rsa_key # 私钥地址
     user:
-      expire: 1000000 # 过期时间,单位分钟 30
+      expire: 60 # 过期时间,单位分钟 30
       refreshTime: 15
       cookieName: token # cookie名称
       cookieDomain: xmmems.com # cookie的域

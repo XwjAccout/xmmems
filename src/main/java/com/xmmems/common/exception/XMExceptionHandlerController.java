@@ -1,11 +1,13 @@
 package com.xmmems.common.exception;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.util.NestedServletException;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -21,6 +23,7 @@ public class XMExceptionHandlerController {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResult> handlerException(Exception e) {
+        e.printStackTrace();
         if (e instanceof XMException) {
             XMException exception = (XMException)e;
             return ResponseEntity.status(exception.getStatus()).body(new ExceptionResult(exception));
@@ -34,7 +37,7 @@ public class XMExceptionHandlerController {
             XMException exception = new XMException(400, "中文异常信息[客户端请求参数类型异常];线程[" + Thread.currentThread().getName() + "];异常类型[" + e.getClass() + "];异常信息[" + e.getLocalizedMessage() + "]");
             return ResponseEntity.status(400).body(new ExceptionResult(exception));
         } else if (e instanceof MissingServletRequestParameterException) {
-            XMException exception = new XMException(400, "中文异常信息[客户端请求参数名称异常];线程[" + Thread.currentThread().getName() + "];异常类型[" + e.getClass() + "];异常信息[" + e.getLocalizedMessage() + "]");
+            XMException exception = new XMException(400, "中文异常信息[客户端请求参数缺失异常];线程[" + Thread.currentThread().getName() + "];异常类型[" + e.getClass() + "];异常信息[" + e.getLocalizedMessage() + "]");
             return ResponseEntity.status(400).body(new ExceptionResult(exception));
         } else if (e instanceof NullPointerException) {
             XMException exception = new XMException(500, "中文异常信息[空指针异常];线程[" + Thread.currentThread().getName() + "];异常类型[" + e.getClass() + "];异常信息[" + e.getLocalizedMessage() + "]");
@@ -48,8 +51,14 @@ public class XMExceptionHandlerController {
         } else if (e instanceof ArithmeticException) {
             XMException exception = new XMException(500, "中文异常信息[算术异常];线程[" + Thread.currentThread().getName() + "];异常类型[" + e.getClass() + "];异常信息[" + e.getLocalizedMessage() + "]");
             return ResponseEntity.status(500).body(new ExceptionResult(exception));
+        } else if (e instanceof NestedServletException) {
+            XMException exception = new XMException(500, "中文异常信息[内存溢出异常];线程[" + Thread.currentThread().getName() + "];异常类型[" + e.getClass() + "];异常信息[" + e.getLocalizedMessage() + "]");
+            return ResponseEntity.status(500).body(new ExceptionResult(exception));
         } else if (e instanceof HttpRequestMethodNotSupportedException) {
             XMException exception = new XMException(400, "中文异常信息[前端请求方法异常];线程[" + Thread.currentThread().getName() + "];异常类型[" + e.getClass() + "];异常信息[" + e.getLocalizedMessage() + "]");
+            return ResponseEntity.status(400).body(new ExceptionResult(exception));
+        } else if (e instanceof ExpiredJwtException) {
+            XMException exception = new XMException(400, "中文异常信息[登录超时];线程[" + Thread.currentThread().getName() + "];" + "异常类型[" + e.getClass() + "];异常信息[" + e.getLocalizedMessage() + "]");
             return ResponseEntity.status(400).body(new ExceptionResult(exception));
         } else if (e instanceof RuntimeException) {
             XMException exception = new XMException(500, "中文异常信息[其他运行时异常];线程[" + Thread.currentThread().getName() + "];异常类型[" + e.getClass() + "];异常信息[" + e.getLocalizedMessage() + "]");

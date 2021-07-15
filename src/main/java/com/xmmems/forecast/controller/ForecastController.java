@@ -1,5 +1,6 @@
 package com.xmmems.forecast.controller;
 
+import com.xmmems.common.exception.XMException;
 import com.xmmems.forecast.service.ForecastService;
 import com.xmmems.mapper.BaseItemMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -28,22 +30,31 @@ public class ForecastController {
     private BaseItemMapper baseItemMapper;
 
     @GetMapping("/arima")
-    public ResponseEntity<List<Map<String, String>>> preValue(@RequestParam("siteId") Integer siteId, @RequestParam("itemId") Integer itemId,
-                                                              @RequestParam("start") String start, @RequestParam("end") String end,
-                                                              @RequestParam(value = "type", defaultValue = "1") Integer type) {
-        final Integer scale = baseItemMapper.selectScale(itemId);
+    public ResponseEntity<List<Map<String, String>>> preValue(
+            @RequestParam("siteId") Integer siteId,
+            @RequestParam("itemId") Integer itemId,
+            @RequestParam("start") String start,
+            @RequestParam("end") String end, @RequestParam(value = "type", defaultValue = "1") Integer type) {
+        Integer scale = baseItemMapper.selectScale(itemId);
+        if (scale == null) {
+            scale = 5;
+        }
 
-        List<Map<String, String>> list = forecastService.preValue(siteId, itemId, start, end, type);
-        list.forEach(map -> {
+        List<Map<String, String>> list = null;
+        try {
+            list = forecastService.preValue(siteId, itemId, start, end, type, scale);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        } catch (ArrayIndexOutOfBoundsException e) {
+            e.printStackTrace();
+            throw new XMException(200, "该时间段数据太少或没有数据，无法预测");
+        }
+        for (Map<String, String> map : list) {
             String value = map.get("value");
-            String preValue = map.get("preValue");
             if (value != null) {
                 map.put("value", setScale(value, scale));
             }
-            if (preValue != null) {
-                map.put("preValue", setScale(preValue, scale));
-            }
-        });
+        }
         return ResponseEntity.ok(list);
     }
 

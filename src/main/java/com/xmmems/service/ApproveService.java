@@ -1,17 +1,13 @@
 package com.xmmems.service;
 
-import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.xmmems.common.auth.domain.UserHolder;
 import com.xmmems.common.exception.ExceptionEnum;
 import com.xmmems.common.exception.XMException;
 import com.xmmems.common.utils.DateFormat;
 import com.xmmems.common.utils.JsonUtils;
 import com.xmmems.domain.base.BaseItem;
 import com.xmmems.domain.env.EnvHourData;
-import com.xmmems.domain.env.EnvHourDataAuditLog;
 import com.xmmems.dto.PageResult;
-import com.xmmems.mapper.EnvHourDataAuditLogMapper;
 import com.xmmems.mapper.EnvHourDataMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -38,9 +34,6 @@ public class ApproveService {
 
     @Autowired
     private CommonService commonService;
-
-    @Autowired
-    private EnvHourDataAuditLogMapper envHourDataAuditLogMapper;
 
     public PageResult<Map<String, Object>> getHistoryDataHandled(Integer limit, Integer page, Integer siteId, String startTime, String endTime) {
         //查询历史分页数据
@@ -74,7 +67,7 @@ public class ApproveService {
     }
 
     //保存处理修正的数据1
-    public void saveAdjust(String adjust, Integer siteId, Integer recordId, String adjustKey, String adjustValue, String originValue, String troubleCode, String troubleName, String multipleAdjust, String startTime, String endTime, String multipleParam) {
+    public void saveAdjust(String adjust, Integer siteId, Integer recordId, String adjustKey, String adjustValue, String originValue, String troubleCode, String troubleName, String multipleAdjust, String startTime, String endTime, String multipleParam, List<String> itemNameList) {
 
         List<Map<String, Object>> hourDatas = new ArrayList<>();
         if ("true".equals(multipleAdjust)) {
@@ -87,38 +80,32 @@ public class ApproveService {
         }
 
         for (Map<String, Object> hourData : hourDatas) {
-            Map item = null;
+            boolean isUpdate = false;
             List<Map<String, String>> monitorItems = JsonUtils.nativeRead(hourData.get("content") + "", new TypeReference<List<Map<String, String>>>() {});
 
             String troubleNameKey = "troubleName";
             String troubleCodeKey = "troubleCode";
             for (Map<String, String> map : monitorItems) {
-                item = map;
-                if (StrUtil.equals("3", adjust)) {
-                    if (adjustKey.equals(map.get("itemName"))) {
-                        //"N"//正常
-                        map.put(troubleCodeKey, troubleCode);
-                        map.put(troubleNameKey, troubleName);
-                    }
-                } else {
-                    if ("true".equals(multipleAdjust) && "true".equals(multipleParam)) {
+                if ("true".equals(multipleAdjust)) {
+                    if (itemNameList != null && (itemNameList.contains(map.get("itemName")) || itemNameList.contains("全部") || itemNameList.contains("全选"))) {
                         map.put(troubleCodeKey, troubleCode);
                         map.put(troubleNameKey, troubleName);
                         if (!StringUtils.isBlank(adjustValue)) {
                             map.put("value", adjustValue);
                         }
-                    } else if (adjustKey.equals(map.get("itemName"))) {
-                        map.put(troubleCodeKey, troubleCode);
-                        map.put(troubleNameKey, troubleName);
-                        if (!StringUtils.isBlank(adjustValue)) {
-                            map.put("value", adjustValue);
-                        }
-                        break;
+                        isUpdate = true;
                     }
+                } else if (adjustKey.equals(map.get("itemName"))) {
+                    map.put(troubleCodeKey, troubleCode);
+                    map.put(troubleNameKey, troubleName);
+                    if (!StringUtils.isBlank(adjustValue)) {
+                        map.put("value", adjustValue);
+                    }
+                    isUpdate = true;
+                    break;
                 }
-
             }
-            if (item != null) {
+            if (isUpdate) {
                 hourData.put("content", monitorItems);
                 EnvHourData envHourData = EnvHourData.builder().id((Integer)hourData.get("id")).content(JsonUtils.toString(monitorItems)).build();
 
@@ -127,42 +114,12 @@ public class ApproveService {
                     log.error("更新envHourData数据失败");
                     throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
                 }
-
-                //创建审核监测项目修改的日志记录表,方便后期的还原操作
-                EnvHourDataAuditLog envHourDataAuditLog = new EnvHourDataAuditLog();
-                envHourDataAuditLog.setSiteId(envHourData.getSiteId());
-                //下面是因为通过gson转换后itemId由integer 转换 为 double，需要去掉小数点之后的数据
-                String itemId = item.get("itemId") + "";
-                itemId = itemId.split("\\.")[0];
-                envHourDataAuditLog.setItemId(Integer.valueOf(itemId));
-                envHourDataAuditLog.setSiteName(envHourData.getSiteName());
-                envHourDataAuditLog.setGenTime(envHourData.getGenTime());
-
-                if (StrUtil.equals("3", adjust)) {
-                    envHourDataAuditLog.setOriginValue(item.get("value") + "");
-                } else {
-                    envHourDataAuditLog.setOriginValue(originValue);
-                }
-
-                envHourDataAuditLog.setModifyTime(new Date());
-                envHourDataAuditLog.setModifyFlag(troubleCode);
-
-                envHourDataAuditLog.setPersion(UserHolder.getNickName());
-                envHourDataAuditLog.setModifyReason(troubleName);
-
-                int i1 = envHourDataAuditLogMapper.insertSelective(envHourDataAuditLog);
-                if (i1 != 1) {
-                    throw new XMException(ExceptionEnum.INSERT_OPERATION_FAIL);
-                }
             }
-
         }
     }
 
     //还原修正过的数据
     public void resetAdjust(Integer siteId, String siteName, String adjustKey, String startTime, String endTime) {
-        String itemId = "";
-
         List<Map<String, Object>> hourDatas = envHourDataMapper.selectHistoryData(siteId, startTime, endTime, "desc");
         for (Map<String, Object> hourData : hourDatas) {
             String content = hourData.get("content") + "";
@@ -175,7 +132,6 @@ public class ApproveService {
                         map.put("value", map.get("originValue"));
                     } else {
                         if (map.get("itemName").equals(adjustKey)) {
-                            itemId = String.valueOf(map.get("itemId"));
                             map.put("troubleCode", "");
                             map.put("troubleName", "");
                             map.put("value", map.get("originValue"));
@@ -188,26 +144,6 @@ public class ApproveService {
                 envHourData.setContent(JsonUtils.toString(monitorItems));
                 envHourDataMapper.updateByPrimaryKeySelective(envHourData);
             }
-        }
-
-        //还原记录
-        EnvHourDataAuditLog envHourDataAuditLog = new EnvHourDataAuditLog();
-        envHourDataAuditLog.setSiteId(siteId);
-        envHourDataAuditLog.setSiteName(siteName);
-        envHourDataAuditLog.setModifyTime(new Date());
-        String nickName = UserHolder.getNickName();
-        envHourDataAuditLog.setPersion(nickName);
-        if (StringUtils.isNotBlank(itemId)) {
-            itemId = itemId.split("\\.")[0];
-            envHourDataAuditLog.setItemId(Integer.valueOf(itemId));
-            envHourDataAuditLog.setModifyReason("恢复" + startTime + "-" + endTime + "的" + adjustKey + "数据");
-        } else {
-            envHourDataAuditLog.setModifyReason("恢复" + startTime + "-" + endTime + "的所有数据");
-        }
-
-        int i1 = envHourDataAuditLogMapper.insertSelective(envHourDataAuditLog);
-        if (i1 != 1) {
-            throw new XMException(ExceptionEnum.INSERT_OPERATION_FAIL);
         }
     }
 

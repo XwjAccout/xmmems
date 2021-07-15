@@ -61,7 +61,19 @@ public class AuthFilter extends HttpFilter {
                 //判断token是否存在
                 if (StringUtils.isBlank(token)) {
                     //阻止继续访问
-                    throw new XMException(401,"【过滤器】当前用户未认证，权限不足！"+remoteHost);
+//                    throw new XMException(401,"【过滤器】当前用户未认证，权限不足！"+remoteHost);
+                    try {
+                        response.setContentType("application/json;charset=utf-8");
+                        //                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        PrintWriter out = response.getWriter();
+                        ExceptionResult result =  new ExceptionResult(new XMException(401,"【过滤器】当前用户未认证，权限不足！"));
+                        out.write(new ObjectMapper().writeValueAsString(result));
+                        out.flush();
+                        out.close();
+                        return;
+                    } catch (Exception outEx) {
+                        outEx.printStackTrace();
+                    }
                 }
                 //解析token
                 Payload<SysUserToken> payload = null;
@@ -69,7 +81,19 @@ public class AuthFilter extends HttpFilter {
                     payload = JwtUtils.getInfoFromToken(token, jwtProp.getPublicKey(), SysUserToken.class);
                 } catch (Exception e) {
                     //阻止继续访问
-                    throw new XMException(401,"【过滤器】当前用户未认证，权限不足！"+remoteHost);
+//                    throw new XMException(401,"【过滤器】当前用户未认证，权限不足！"+remoteHost);
+                    try {
+                        response.setContentType("application/json;charset=utf-8");
+//                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        PrintWriter out = response.getWriter();
+                        ExceptionResult result =  new ExceptionResult(new XMException(401,"【过滤器】当前用户未认证，权限不足！"));
+                        out.write(new ObjectMapper().writeValueAsString(result));
+                        out.flush();
+                        out.close();
+                        return;
+                    } catch (Exception outEx) {
+                        outEx.printStackTrace();
+                    }
                 }
 
                 //得到载荷中的用户信息
@@ -97,12 +121,13 @@ public class AuthFilter extends HttpFilter {
 
                         try {
                             response.setContentType("application/json;charset=utf-8");
-                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                             PrintWriter out = response.getWriter();
                             ExceptionResult result =  new ExceptionResult(new XMException(500,err));
                             out.write(new ObjectMapper().writeValueAsString(result));
                             out.flush();
                             out.close();
+                            return;
                         } catch (Exception outEx) {
                             outEx.printStackTrace();
                         }
