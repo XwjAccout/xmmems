@@ -2,8 +2,10 @@ package com.xmmems.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.xmmems.common.auth.domain.UserHolder;
-import com.xmmems.common.utils.DateFormat;
 import com.xmmems.common.utils.JsonUtils;
+import com.xmmems.common.utils.XmRedis;
+import com.xmmems.common.utils.XmRedisConstans;
+import com.xmmems.common.utils.XmRedisEnum;
 import com.xmmems.domain.ExceedStandard;
 import com.xmmems.dto.BaseSiteDTO;
 import com.xmmems.mapper.BaseSiteitemMapper;
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @描述 使用多线程进行效率的控制层接口
@@ -85,34 +88,53 @@ public class CommonController {
     //获取监测项目
     @GetMapping("/allItems")
     public ResponseEntity<Object> allItems() {
-
-        //获取当前用户所拥有的的站点的对应的监测项目信息，去除重复的项目
-        List<Map<String, String>> body = baseSiteitemMapper.selectByAccountId(UserHolder.loginId());
-        return ResponseEntity.ok(body);
+        String key = XmRedisConstans.common_allItems_ + UserHolder.loginId();
+        Object data = XmRedis.get(key);
+        if (data != null) {
+            return ResponseEntity.ok(data);
+        }
+        synchronized (key) {
+            data = XmRedis.get(key);
+            if (data != null) {
+                return ResponseEntity.ok(data);
+            }
+            //获取当前用户所拥有的的站点的对应的监测项目信息，去除重复的项目
+            List<Map<String, String>> body = baseSiteitemMapper.selectByAccountId(UserHolder.loginId());
+            XmRedis.put(key, body);
+            return ResponseEntity.ok(body);
+        }
     }
-
 
     //获取超标统计数据
     @GetMapping("/exceed")
     public ResponseEntity<Object> exceed(@RequestParam(value = "siteType", required = false) String siteType) {
-        //根据账户id查找站点名称集合
-        List<Map<String, Object>> baseSite = baseService.findBaseSiteByAccountId(siteType);
-        String day = DateFormat.formatSome(System.currentTimeMillis());
-        List<ExceedStandard> list = new ArrayList<>();
-        baseSite.parallelStream().map(map -> map.get("id") + "").map(id -> exceedStandardService.findByDateAndSiteName(day + " 00:00:00", day + " 23:59:59", id, true)).forEach(list::addAll);
-        List<Map<String, String>> mapList = JsonUtils.nativeRead(JsonUtils.toString(list), new TypeReference<List<Map<String, String>>>() {});
-        mapList.parallelStream().forEach(mm -> {
-            mm.remove("id");
-            mm.remove("mnId");
-            mm.remove("itemCode");
-            mm.remove("siteId");
-            mm.remove("itemId");
-            mm.put("itemValue", mm.get("itemValue") + " " + mm.get("itemUnit"));
-            mm.remove("itemUnit");
-            mm.put("date", mm.get("date").substring(0, 13));
-        });
+        String key = XmRedisConstans.common_exceed_ + UserHolder.loginId();
+        Object data = XmRedis.get(key);
+        if (data != null) {
+            return ResponseEntity.ok(data);
+        }
 
-        //获取当前用户所拥有的的站点的对应的监测项目信息，去除重复的项目
-        return ResponseEntity.ok(mapList);
+        synchronized (key) {
+            data = XmRedis.get(key);
+            if (data != null) {
+                return ResponseEntity.ok(data);
+            }
+            List<Map<String, Object>> baseSite = baseService.findBaseSiteByAccountId(siteType);
+            List<Integer> siteIds = baseSite.stream().map(map -> Integer.valueOf(map.get("id") + "")).collect(Collectors.toList());
+            List<ExceedStandard> currentTime = exceedStandardService.findCurrentTime(siteIds);
+            List<Map<String, String>> mapList = JsonUtils.nativeRead(JsonUtils.toString(currentTime), new TypeReference<List<Map<String, String>>>() {});
+            mapList.forEach(mm -> {
+                mm.remove("id");
+                mm.remove("mnId");
+                mm.remove("itemCode");
+                mm.remove("siteId");
+                mm.remove("itemId");
+                mm.put("itemValue", mm.get("itemValue") + " " + mm.get("itemUnit"));
+                mm.remove("itemUnit");
+                mm.put("date", mm.get("date").substring(0, 13));
+            });
+            XmRedis.put(key, mapList, 30L, XmRedisEnum.MINUTE);
+            return ResponseEntity.ok(mapList);
+        }
     }
 }

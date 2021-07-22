@@ -2,7 +2,7 @@ package com.xmmems.forecast.controller;
 
 import com.xmmems.common.exception.XMException;
 import com.xmmems.forecast.service.ForecastService;
-import com.xmmems.mapper.BaseItemMapper;
+import com.xmmems.service.CommonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +27,7 @@ public class ForecastController {
     @Autowired
     private ForecastService forecastService;
     @Autowired
-    private BaseItemMapper baseItemMapper;
+    private CommonService commonService;
 
     @GetMapping("/arima")
     public ResponseEntity<List<Map<String, String>>> preValue(
@@ -35,10 +35,9 @@ public class ForecastController {
             @RequestParam("itemId") Integer itemId,
             @RequestParam("start") String start,
             @RequestParam("end") String end, @RequestParam(value = "type", defaultValue = "1") Integer type) {
-        Integer scale = baseItemMapper.selectScale(itemId);
-        if (scale == null) {
-            scale = 5;
-        }
+//        Integer scale = baseItemMapper.selectScale(itemId);
+
+        Integer scale = commonService.getItemDigitsByItemNameOrItemId(itemId + "");
 
         List<Map<String, String>> list = null;
         try {

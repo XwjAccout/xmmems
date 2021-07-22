@@ -53,6 +53,11 @@ public class ExceedStandardService {
 
         List<EnvHourData> envHourDatas = envHourDataMapper.selectByExampleWithBLOBs(example);
 
+        return getExceedStandards(siteId, scale, envHourDatas);
+        //获取全部数据
+    }
+
+    private List<ExceedStandard> getExceedStandards(String siteId, Boolean scale, List<EnvHourData> envHourDatas) {
         List<ExceedStandard> list = new ArrayList<>();
         if (envHourDatas != null) {
             Future<Map<String, List<EnvQualityConf>>> allEnvQualityConfsFuture = PoolExecutor.submit(new Callable<Map<String, List<EnvQualityConf>>>() {
@@ -134,9 +139,7 @@ public class ExceedStandardService {
                 }
             }
         }
-
         return list;
-        //获取全部数据
     }
 
     //获取标准水质
@@ -320,5 +323,27 @@ public class ExceedStandardService {
 
     public Object qualityEvaluation(String siteId) {
         return null;
+    }
+
+    public List<ExceedStandard> findCurrentTime(List<Integer> siteIds) {
+        String s = DateFormat.formatSome(System.currentTimeMillis());
+        String start = s + " 00:00:00";
+        String end = s + " 23:59:59";
+        EnvHourDataExample example = new EnvHourDataExample();
+        EnvHourDataExample.Criteria criteria = example.createCriteria();
+        criteria.andGenTimeGreaterThanOrEqualTo(DateFormat.parseAll(start));
+        criteria.andGenTimeLessThanOrEqualTo(DateFormat.parseAll(end));
+        criteria.andSiteIdIn(siteIds);
+
+        List<EnvHourData> envHourDatas = envHourDataMapper.selectByExampleWithBLOBs(example);
+        //按站点分类
+        Map<Integer, List<EnvHourData>> map = new HashMap<>();
+        for (EnvHourData envHourData : envHourDatas) {
+            Integer siteId = envHourData.getSiteId();
+            map.computeIfAbsent(siteId, k -> new ArrayList<>()).add(envHourData);
+        }
+        //分别查询超标数据
+        List<ExceedStandard> collect = map.entrySet().stream().map(e -> getExceedStandards(e.getKey() + "", true, e.getValue())).flatMap(List::stream).collect(Collectors.toList());
+        return collect;
     }
 }

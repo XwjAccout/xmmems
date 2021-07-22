@@ -7,6 +7,8 @@ import com.xmmems.common.exception.ExceptionEnum;
 import com.xmmems.common.exception.XMException;
 import com.xmmems.common.utils.BeanHelper;
 import com.xmmems.common.utils.CustomUtils;
+import com.xmmems.common.utils.XmRedis;
+import com.xmmems.common.utils.XmRedisConstans;
 import com.xmmems.domain.account.Account;
 import com.xmmems.domain.account.AccountExample;
 import com.xmmems.domain.base.BaseSite;
@@ -195,6 +197,7 @@ public class AccountService {
 
     public void saveSite(Integer accountId, Integer siteId) {
         int i = accountMapper.insertAccountIdAndSiteId(accountId, siteId);
+        XmRedis.remove(XmRedisConstans.common_allItems_+UserHolder.loginId());
         if (i < 1) {
             throw new XMException(ExceptionEnum.INSERT_OPERATION_FAIL);
         }
