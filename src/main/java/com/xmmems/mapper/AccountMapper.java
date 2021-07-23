@@ -36,11 +36,13 @@ public interface AccountMapper {
 
     @Delete("delete from account_site where accountId=#{accountId} and siteId=#{siteId}")
     int deleteAccountIdAndSiteId(@Param("accountId") Integer accountId,@Param("siteId") Integer siteId);
+
     @Update("update account set  password =#{password} , userName=#{userName} where id=#{id} ")
     int updatePassword(@Param("password") String password,@Param("userName") String userName, @Param("id") Integer id);
 
     @Select("SELECT * FROM `account` WHERE id = #{id}")
     Account selectById(Integer id);
+
     @Select(" SELECT * from base_site b,account a where b.id=a.centerSiteId and a.id=#{id}")
     BaseSite findBycenterSiteId(@Param("id") Integer id);
 }

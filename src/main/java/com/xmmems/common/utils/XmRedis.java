@@ -89,6 +89,10 @@ public class XmRedis {
     public static void remove(String key){
         REDIS.remove(key);
     }
+    //批量删除
+    public static void removeStartsWith(String keyPre){
+        REDIS.entrySet().removeIf(next -> next.getKey().startsWith(keyPre));
+    }
 
     /**
      * 存储数据的实体类

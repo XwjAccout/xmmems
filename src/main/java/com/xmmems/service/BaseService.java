@@ -6,8 +6,6 @@ import com.xmmems.common.auth.domain.UserHolder;
 import com.xmmems.common.exception.ExceptionEnum;
 import com.xmmems.common.exception.XMException;
 import com.xmmems.common.utils.CustomUtils;
-import com.xmmems.common.utils.XmRedis;
-import com.xmmems.common.utils.XmRedisConstans;
 import com.xmmems.domain.base.*;
 import com.xmmems.domain.env.EnvKpiType;
 import com.xmmems.domain.env.EnvKpiTypeExample;
@@ -377,7 +375,6 @@ public class BaseService {
                 result = baseSiteitemMapper.updateByPrimaryKeySelective(baseSiteitemup2);
 
                 commonService.initBaseSiteItemMap(siteId);
-                XmRedis.remove(XmRedisConstans.common_allItems_+UserHolder.loginId());
             } else {
                 throw new XMException(ExceptionEnum.ERROR1);
             }
@@ -398,7 +395,6 @@ public class BaseService {
             result = baseSiteitemMapper.updateByPrimaryKeySelective(baseSiteitemupDown2);
 
             commonService.initBaseSiteItemMap(siteId);
-            XmRedis.remove(XmRedisConstans.common_allItems_+UserHolder.loginId());
         }
         return result;
     }
@@ -411,7 +407,6 @@ public class BaseService {
         try {
             baseSiteitemMapper.insertBaseSiteItem(siteId, itemId, siteName, itemName);
             commonService.initBaseSiteItemMap(siteId);
-            XmRedis.remove(XmRedisConstans.common_allItems_+UserHolder.loginId());
         } catch (Exception e) {
             throw new XMException(ExceptionEnum.INSERT_ERROR);
         }
@@ -421,7 +416,6 @@ public class BaseService {
         try {
             baseSiteitemMapper.delItem(siteId, itemId);
             commonService.initBaseSiteItemMap(siteId);
-            XmRedis.remove(XmRedisConstans.common_allItems_+UserHolder.loginId());
         } catch (Exception e) {
             throw new XMException(ExceptionEnum.DELETE_ERROR);
         }

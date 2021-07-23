@@ -198,6 +198,7 @@ public class AccountService {
     public void saveSite(Integer accountId, Integer siteId) {
         int i = accountMapper.insertAccountIdAndSiteId(accountId, siteId);
         XmRedis.remove(XmRedisConstans.common_allItems_+UserHolder.loginId());
+        XmRedis.removeStartsWith(XmRedisConstans.site_sort_+UserHolder.loginId());
         if (i < 1) {
             throw new XMException(ExceptionEnum.INSERT_OPERATION_FAIL);
         }
@@ -205,6 +206,8 @@ public class AccountService {
 
     public void deleteSite(Integer accountId, Integer siteId) {
         int i = accountMapper.deleteAccountIdAndSiteId(accountId, siteId);
+        XmRedis.remove(XmRedisConstans.common_allItems_+UserHolder.loginId());
+        XmRedis.removeStartsWith(XmRedisConstans.site_sort_+UserHolder.loginId());
         if (i < 1) {
             throw new XMException(ExceptionEnum.DELETE_OPERATION_FAIL);
         }

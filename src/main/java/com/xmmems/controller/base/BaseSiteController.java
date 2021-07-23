@@ -1,5 +1,8 @@
 package com.xmmems.controller.base;
 
+import com.xmmems.common.auth.domain.UserHolder;
+import com.xmmems.common.utils.XmRedis;
+import com.xmmems.common.utils.XmRedisConstans;
 import com.xmmems.domain.base.BaseSite;
 import com.xmmems.domain.base.BaseSiteitem;
 import com.xmmems.dto.BaseSiteitemDTO;
@@ -11,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -166,8 +170,23 @@ public class BaseSiteController {
     //获取站点分类列表
     @GetMapping("/site/sort")
     public ResponseEntity<Object> siteSort(@RequestParam(value = "siteType", required = false) String siteType) {
-        return ResponseEntity.ok(baseService.siteSort(siteType));
+        String key = XmRedisConstans.site_sort_ + UserHolder.loginId();
+        if (siteType != null) {
+            key += siteType;
+        }
+        Object o = XmRedis.get(key);
+        if (o != null) {
+            return ResponseEntity.ok(o);
+        }
+        synchronized (key) {
+            o = XmRedis.get(key);
+            if (o != null) {
+                return ResponseEntity.ok(o);
+            }
+            ArrayList<Object> body = baseService.siteSort(siteType);
+            XmRedis.put(key, body);
+            return ResponseEntity.ok(body);
+        }
     }
-
 }
 

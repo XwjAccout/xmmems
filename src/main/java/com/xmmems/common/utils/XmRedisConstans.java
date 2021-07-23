@@ -11,6 +11,8 @@ public interface XmRedisConstans {
     public static final String common_allItems_ = "common_allItems_";
     //首页获取超标统计数据
     public static final String common_exceed_ = "common_exceed_";
+    //运维获取站点分类列表（左侧）
+    public static final String site_sort_ = "site_sort_";
 
 
 }
