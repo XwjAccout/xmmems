@@ -43,59 +43,70 @@ public class AccountService {
      * 根据用户名查找用户信息
      */
     public UserDTO findAccountByUsername(String username) {
-        Account account = accountMapper.findByName(username);
-        if (account == null) {
-            log.error("用户名{}不存在",username);
-            throw new XMException(ExceptionEnum.ACCOUNT_NOT_FOUND);
-        }
-        if (-1==account.getStatus()) {
-            String err = "用户"+username+"已经被管理员锁定,请联系管理员解锁";
-            log.error(err);
-            throw new XMException(500,err);
-        }
-        UserDTO userDTO = BeanHelper.copyProperties(account, UserDTO.class);
-        userDTO.setUsername(account.getUserName());
+        String key = XmRedisConstans.service_account_ + username;
 
-        //查询角色信息
-        List<RoleDTO> list = roleService.findRoleByAccountId(account.getId());
-        userDTO.setRoles(list);
+        Object data = XmRedis.get(key);
+        if (data != null) {
+            return (UserDTO)data;
+        }
 
-        return userDTO;
+        synchronized (key) {
+            data = XmRedis.get(key);
+            if (data != null) {
+                return (UserDTO)data;
+            }
+
+            Account account = accountMapper.findByName(username);
+            if (account == null) {
+                log.error("用户名{}不存在", username);
+                throw new XMException(ExceptionEnum.ACCOUNT_NOT_FOUND);
+            }
+            if (-1 == account.getStatus()) {
+                String err = "用户" + username + "已经被管理员锁定,请联系管理员解锁";
+                log.error(err);
+                throw new XMException(500, err);
+            }
+            UserDTO userDTO = BeanHelper.copyProperties(account, UserDTO.class);
+            userDTO.setUsername(account.getUserName());
+
+            //查询角色信息
+            List<RoleDTO> list = roleService.findRoleByAccountId(account.getId());
+            userDTO.setRoles(list);
+
+            XmRedis.put(key, userDTO);
+            return userDTO;
+        }
     }
-    //
+
     public BaseSite findBycenterSiteId() {
         return accountMapper.findBycenterSiteId(UserHolder.loginId());
     }
 
     public PageResult<AccountDTO> pageQuery(Integer limit, Integer page, String userName) {
-//        try {
-            //封装分页信息
-            PageHelper.startPage(page, limit);
-            //封装查询条件
-            AccountExample example = new AccountExample();
-            AccountExample.Criteria criteria = example.createCriteria();
-            if (StringUtils.isNotBlank(userName)) {
-                criteria.andUserNameLike(CustomUtils.likeValue(userName));
-            }
-            List<Account> accounts = accountMapper.selectByExample(example);
-            PageInfo<Account> info = new PageInfo<>(accounts);
-            if (CollectionUtils.isEmpty(accounts)) {
-                throw new XMException(ExceptionEnum.ACCOUNT_NOT_FOUND);
-            }
-            List<AccountDTO> dtos = BeanHelper.copyWithCollection(accounts, AccountDTO.class);
+        //封装分页信息
+        PageHelper.startPage(page, limit);
+        //封装查询条件
+        AccountExample example = new AccountExample();
+        AccountExample.Criteria criteria = example.createCriteria();
+        if (StringUtils.isNotBlank(userName)) {
+            criteria.andUserNameLike(CustomUtils.likeValue(userName));
+        }
+        List<Account> accounts = accountMapper.selectByExample(example);
+        PageInfo<Account> info = new PageInfo<>(accounts);
+        if (CollectionUtils.isEmpty(accounts)) {
+            throw new XMException(ExceptionEnum.ACCOUNT_NOT_FOUND);
+        }
+        List<AccountDTO> dtos = BeanHelper.copyWithCollection(accounts, AccountDTO.class);
 
-            //封装自定义的分页对象
-            //因为中间经过处理，所以分页插件总数需要重新设置
-            return new PageResult<>(info.getPageSize(), page, info.getTotal(), info.getPages(), dtos);
-//        } catch (Exception e) {
-//            throw new XMException(ExceptionEnum.ACCOUNT_NOT_FOUND);
-//        }
+        //封装自定义的分页对象
+        //因为中间经过处理，所以分页插件总数需要重新设置
+        return new PageResult<>(info.getPageSize(), page, info.getTotal(), info.getPages(), dtos);
     }
 
     @Autowired
     private BaseService baseService;
 
-    public AccountDTO findById(Integer id,String siteType) {
+    public AccountDTO findById(Integer id, String siteType) {
         Account account = accountMapper.selectByPrimaryKey(id);
         if (account == null) {
             throw new XMException(ExceptionEnum.ACCOUNT_NOT_FOUND);
@@ -108,7 +119,6 @@ public class AccountService {
         //添加站点信息
         List<Map<String, Object>> mapList = baseService.findAccountId(id, siteType);
         accountDTO.setSites(mapList);
-
 
         return accountDTO;
     }
@@ -123,6 +133,7 @@ public class AccountService {
         account.setPassword(encode);
 
         int i = accountMapper.insertSelective(account);
+        XmRedis.removeStartsWith(XmRedisConstans.service_account_);
         if (i < 1) {
             throw new XMException(ExceptionEnum.INSERT_OPERATION_FAIL);
         }
@@ -135,27 +146,32 @@ public class AccountService {
         account.setPassword(encode);
 
         int i = accountMapper.updateByPrimaryKeySelective(account);
+        XmRedis.removeStartsWith(XmRedisConstans.service_account_);
         if (i < 1) {
             throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
         }
     }
-    public String updatePassword(String password,String userName) {
+
+    public String updatePassword(String password, String userName) {
         //密码加密
         BCryptPasswordEncoder bp = new BCryptPasswordEncoder();
-        password= bp.encode(password);
-        int i = accountMapper.updatePassword(password,userName,UserHolder.loginId());
+        password = bp.encode(password);
+        int i = accountMapper.updatePassword(password, userName, UserHolder.loginId());
+        XmRedis.removeStartsWith(XmRedisConstans.service_account_);
         if (i < 1) {
             return "修改密码失败";
-//            throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
-        }else{
+            //            throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
+        } else {
             return "修改密码成功";
         }
     }
+
     public void delete(Integer id) {
         if (UserHolder.loginId().equals(id)) {
             throw new XMException(500, "不能删除自己的账号");
         }
         int i = accountMapper.deleteByPrimaryKey(id);
+        XmRedis.removeStartsWith(XmRedisConstans.service_account_);
         if (i < 1) {
             throw new XMException(ExceptionEnum.DELETE_OPERATION_FAIL);
         }
@@ -174,6 +190,7 @@ public class AccountService {
         record.setStatus(status);
 
         int i = accountMapper.updateByPrimaryKeySelective(record);
+        XmRedis.removeStartsWith(XmRedisConstans.service_account_);
         if (i < 1) {
             throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
         }
@@ -182,7 +199,7 @@ public class AccountService {
     public void saveRole(Integer accountId, Integer roleId) {
         //中间表
         int i = accountMapper.insertAccountIdAndRoleId(accountId, roleId);
-
+        XmRedis.removeStartsWith(XmRedisConstans.service_account_);
         if (i < 1) {
             throw new XMException(ExceptionEnum.INSERT_OPERATION_FAIL);
         }
@@ -190,6 +207,7 @@ public class AccountService {
 
     public void deleteRole(Integer accountId, Integer roleId) {
         int i = accountMapper.deleteAccountIdAndRoleId(accountId, roleId);
+        XmRedis.removeStartsWith(XmRedisConstans.service_account_);
         if (i < 1) {
             throw new XMException(ExceptionEnum.DELETE_OPERATION_FAIL);
         }
@@ -197,8 +215,8 @@ public class AccountService {
 
     public void saveSite(Integer accountId, Integer siteId) {
         int i = accountMapper.insertAccountIdAndSiteId(accountId, siteId);
-        XmRedis.remove(XmRedisConstans.common_allItems_+UserHolder.loginId());
-        XmRedis.removeStartsWith(XmRedisConstans.site_sort_+UserHolder.loginId());
+        XmRedis.remove(XmRedisConstans.common_allItems_ + UserHolder.loginId());
+        XmRedis.removeStartsWith(XmRedisConstans.site_sort_ + UserHolder.loginId());
         if (i < 1) {
             throw new XMException(ExceptionEnum.INSERT_OPERATION_FAIL);
         }
@@ -206,8 +224,8 @@ public class AccountService {
 
     public void deleteSite(Integer accountId, Integer siteId) {
         int i = accountMapper.deleteAccountIdAndSiteId(accountId, siteId);
-        XmRedis.remove(XmRedisConstans.common_allItems_+UserHolder.loginId());
-        XmRedis.removeStartsWith(XmRedisConstans.site_sort_+UserHolder.loginId());
+        XmRedis.remove(XmRedisConstans.common_allItems_ + UserHolder.loginId());
+        XmRedis.removeStartsWith(XmRedisConstans.site_sort_ + UserHolder.loginId());
         if (i < 1) {
             throw new XMException(ExceptionEnum.DELETE_OPERATION_FAIL);
         }
@@ -218,6 +236,7 @@ public class AccountService {
         record.setId(accountId);
         record.setCenterSiteId(siteId);
         int i = accountMapper.updateByPrimaryKeySelective(record);
+        XmRedis.removeStartsWith(XmRedisConstans.service_account_);
         if (i < 1) {
             throw new XMException(ExceptionEnum.UPDATE_OPERATION_FAIL);
         }
@@ -225,7 +244,7 @@ public class AccountService {
 
     public int selectState(Integer id) {
         Account account = accountMapper.selectById(id);
-        if(account!=null) {
+        if (account != null) {
             return account.getStatus();
         }
         return -1;

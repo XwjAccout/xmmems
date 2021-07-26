@@ -313,7 +313,8 @@ public class BaseService {
 
     //查询站点site 与 监测项目item 的中间表数据
     public List<BaseSiteitemDTO> siteItemGetItemsBySiteId(Integer siteId) {
-        return baseSiteitemMapper.siteItemGetItemsBySiteId(siteId);
+        return commonService.getBaseSiteItemBySiteId(siteId);
+//        return baseSiteitemMapper.siteItemGetItemsBySiteId(siteId);
     }
 
     public List<Map<String, String>> findAll(String siteType) {

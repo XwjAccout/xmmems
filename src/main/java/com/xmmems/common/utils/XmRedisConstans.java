@@ -1,18 +1,29 @@
 package com.xmmems.common.utils;
 
 /**
+ * @注意事项 使用这个模拟的redis，有get（）一般都有对应的remove（）或者 设置有效时间 来清除旧数据，然后才能支持get（）得到的数据为最新数据，
+ *          否则只能通过重启软件来实现数据的更新
  * @描述 redis key 值前缀 由 请求路径组成
  * @创建人 ithxw
  * @创建时间 2021.07.22 16:59
  */
 public interface XmRedisConstans {
 
+    //****************************************控制层控制 start  *****************************************************
     //首页获取所有项目
-    public static final String common_allItems_ = "common_allItems_";
+    String common_allItems_ = "common_allItems_";
     //首页获取超标统计数据
-    public static final String common_exceed_ = "common_exceed_";
+    String common_exceed_ = "common_exceed_";
     //运维获取站点分类列表（左侧）
-    public static final String site_sort_ = "site_sort_";
+    String site_sort_ = "site_sort_";
 
 
+    //****************************************控制层控制 end  *******************************************************
+
+
+    //****************************************业务层控制 start  *****************************************************
+
+    String service_account_ = "service_account_";
+
+    //****************************************业务层控制 end  *******************************************************
 }

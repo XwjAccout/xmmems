@@ -3,6 +3,8 @@ package com.xmmems.common.utils;
 import java.util.HashMap;
 
 /**
+ * @注意事项 使用这个模拟的redis，有get（）一般都有对应的remove（）或者 设置有效时间 来清除旧数据，然后才能支持get（）得到的数据为最新数据，
+ *          否则只能通过重启软件来实现数据的更新
  * @描述
  * @创建人 ithxw
  * @创建时间 2021.07.22 10:59
