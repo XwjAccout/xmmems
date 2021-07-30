@@ -77,10 +77,15 @@ public class ApproveController {
             map.put("itemNameList", itemNameListStr);
             map.put("dbNameAndHourDataId", dbNameAndHourDataId);
 
-            Boolean aBoolean = httpUtils.postReturnBoolean("/saveAdjust", map);
-            if (aBoolean) {
-                approveService.saveAdjust(adjust, siteId, recordId, adjustKey, adjustValue, originValue, troubleCode, troubleName, multipleAdjust, startTime, endTime, multipleParam, itemNameList);
-                return ResponseEntity.ok("数据库同步审批成功");
+            try {
+                Boolean aBoolean = httpUtils.postReturnBoolean("/saveAdjust", map);
+                if (aBoolean) {
+                    approveService.saveAdjust(adjust, siteId, recordId, adjustKey, adjustValue, originValue, troubleCode, troubleName, multipleAdjust, startTime, endTime, multipleParam, itemNameList);
+                    return ResponseEntity.ok("数据库同步审批成功");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.ok("数据库同步审批失败，请联系管理员查看具体原因！" + e.getMessage());
             }
             return ResponseEntity.ok("数据库同步审批失败，请联系管理员查看具体原因！");
         }
@@ -119,10 +124,15 @@ public class ApproveController {
             map.put("endTime", endTime);
             map.put("dbNameAndHourDataId", dbNameAndHourDataId);
 
-            Boolean aBoolean = httpUtils.postReturnBoolean("/resetAdjust", map);
-            if (aBoolean) {
-                approveService.resetAdjust(siteId, siteName, adjustKey, startTime, endTime);
-                return ResponseEntity.ok("数据同步还原成功");
+            try {
+                Boolean aBoolean = httpUtils.postReturnBoolean("/resetAdjust", map);
+                if (aBoolean) {
+                    approveService.resetAdjust(siteId, siteName, adjustKey, startTime, endTime);
+                    return ResponseEntity.ok("数据同步还原成功");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.ok("数据同步还原失败，请联系管理员查看具体原因！" + e.getMessage());
             }
             return ResponseEntity.ok("数据同步还原失败，请联系管理员查看具体原因！");
         }
@@ -165,11 +175,16 @@ public class ApproveController {
             map.put("time", Arrays.toString(time).replaceAll("[\\[\\] ]", ""));
             map.put("dbNameAndHourDataId", dbNameAndHourDataId);
 
-            String json = httpUtils.postReturnBody("/saveDate", map);
-            if (json != null) {
-                HashMap<String, String> mapBody = JsonUtils.nativeRead(json, new TypeReference<HashMap<String, String>>() {});
-                approveService.addDataSave(siteId, siteName, monitorTime, itemData, time, mapBody);
-                return ResponseEntity.ok("数据库同步补录成功");
+            try {
+                String json = httpUtils.postReturnBody("/saveDate", map);
+                if (json != null) {
+                    HashMap<String, String> mapBody = JsonUtils.nativeRead(json, new TypeReference<HashMap<String, String>>() {});
+                    approveService.addDataSave(siteId, siteName, monitorTime, itemData, time, mapBody);
+                    return ResponseEntity.ok("数据库同步补录成功");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.ok("数据库同步补录失败，请联系管理员查看具体原因！" + e.getMessage());
             }
             return ResponseEntity.ok("数据库同步补录失败，请联系管理员查看具体原因！");
         }
@@ -189,10 +204,15 @@ public class ApproveController {
             map.put("ids", Arrays.toString(ids).replaceAll("[\\[\\] ]", ""));
             map.put("dbNameAndHourDataId", dbNameAndHourDataId);
 
-            Boolean aBoolean = httpUtils.postReturnBoolean("/deleteByIds", map);
-            if (aBoolean) {
-                approveService.deleteByIds(ids);
-                return ResponseEntity.ok("数据同步删除成功");
+            try {
+                Boolean aBoolean = httpUtils.postReturnBoolean("/deleteByIds", map);
+                if (aBoolean) {
+                    approveService.deleteByIds(ids);
+                    return ResponseEntity.ok("数据同步删除成功");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.ok("数据同步删除失败，请联系管理员查看具体原因！" + e.getMessage());
             }
             return ResponseEntity.ok("数据同步删除失败，请联系管理员查看具体原因！");
         }

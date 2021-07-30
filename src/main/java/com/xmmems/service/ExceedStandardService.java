@@ -1,8 +1,9 @@
 package com.xmmems.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.xmmems.common.exception.XMException;
-import com.xmmems.common.utils.*;
+import com.xmmems.common.utils.DateFormat;
+import com.xmmems.common.utils.JsonUtils;
+import com.xmmems.common.utils.WaterLevelTransformUtil;
 import com.xmmems.domain.ExceedStandard;
 import com.xmmems.domain.base.BaseItem;
 import com.xmmems.domain.base.BaseSite;
@@ -18,8 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 /**
@@ -58,84 +57,61 @@ public class ExceedStandardService {
     }
 
     private List<ExceedStandard> getExceedStandards(String siteId, Boolean scale, List<EnvHourData> envHourDatas) {
+        if (envHourDatas == null) {
+            return new ArrayList<>();
+        }
+        //1、获取站点包含的监测项目
+        List<BaseSiteitemDTO> temp = commonService.getBaseSiteItemBySiteId(Integer.valueOf(siteId));
+        if (temp.isEmpty()) {
+            //没有检测项目，无法做质量类别比较判断，直接返回即可
+            return new ArrayList<>();
+        }
         List<ExceedStandard> list = new ArrayList<>();
-        if (envHourDatas != null) {
-            Future<Map<String, List<EnvQualityConf>>> allEnvQualityConfsFuture = PoolExecutor.submit(new Callable<Map<String, List<EnvQualityConf>>>() {
-                @Override
-                public Map<String, List<EnvQualityConf>> call() throws Exception {
-                    //2、查询所有指标的质量类别集合,查询全部 一次性查询，在根据项目名进行处理
-                    Map<String, List<EnvQualityConf>> allEnvQualityConfs = new HashMap<>(16);
-                    List<EnvQualityConf> envQualityConfList = commonService.getEnvQualityConfList();
-                    for (EnvQualityConf envQualityConf : envQualityConfList) {
-                        String kpiName = envQualityConf.getKpiName();
-                        allEnvQualityConfs.computeIfAbsent(kpiName, k -> new ArrayList<>()).add(envQualityConf);
-                    }
-                    return allEnvQualityConfs;
+        List<String> columns = temp.stream().map(BaseSiteitemDTO::getItemName).collect(Collectors.toList());
+
+        //2、查询所有指标的质量类别集合,查询全部 一次性查询，在根据项目名进行处理
+        Map<String, List<EnvQualityConf>> allEnvQualityConfs = commonService.getItemNameQualityConfMap();
+
+        String standardLevel = getSlevel(siteId);
+        //获取质量类别集合
+        for (EnvHourData envHourData : envHourDatas) {
+
+            List<Map<String, String>> itemList = JsonUtils.nativeRead(envHourData.getContent(), new TypeReference<List<Map<String, String>>>() {});
+            for (Map<String, String> item : itemList) {
+                String itemName = item.get("itemName");
+                if (!columns.contains(itemName)) {
+                    continue;
                 }
-            });
+                String value = item.get("value");
 
-            Future<List<String>> columnsFuture = PoolExecutor.submit(new Callable<List<String>>() {
-                @Override
-                public List<String> call() throws Exception {
-                    //获取站点包含的监测项目
-                    List<BaseSiteitemDTO> columns = monitorService.getColumns(Integer.valueOf(siteId));
-                    return columns.stream().map(BaseSiteitemDTO::getItemName).collect(Collectors.toList());
+                //是否保留两位小数
+                if (scale != null && scale) {
+                    value = new BigDecimal(value).setScale(2, BigDecimal.ROUND_HALF_EVEN).toPlainString();
                 }
-            });
 
+                //获取具体监测因子的质量类别集合
+                List<EnvQualityConf> envQualityConfs = allEnvQualityConfs.get(itemName);
+                if (envQualityConfs == null || envQualityConfs.size() == 0) {
+                    continue;
+                }
 
-            Map<String, List<EnvQualityConf>> allEnvQualityConfs = null;
-            List<String> collect = null;
-            String standardLevel = getSlevel(siteId);
-            try {
-                collect = columnsFuture.get();
-                allEnvQualityConfs = allEnvQualityConfsFuture.get();
-            } catch (Exception e) {
-                FileLog.error("多线程获取获取数据出错com.xmmems.service.ExceedStandardService.findByDateAndSiteName");
-                e.printStackTrace();
-                throw new XMException(500, "多线程获取获取数据出错com.xmmems.service.ExceedStandardService.findByDateAndSiteName");
-            }
-            //获取质量类别集合
-            for (EnvHourData envHourData : envHourDatas) {
-
-                List<Map<String, String>> itemList = JsonUtils.nativeRead(envHourData.getContent(), new TypeReference<List<Map<String, String>>>() {});
-                for (Map<String, String> item : itemList) {
-                    String itemName = item.get("itemName");
-                    if (collect.contains(itemName)) {
-                        String value = item.get("value");
-
-                        //是否保留两位小数
-                        if (scale != null && scale) {
-                            value = new BigDecimal(value).setScale(2, BigDecimal.ROUND_HALF_EVEN).toPlainString();
-                        }
-
-                        //获取具体监测因子的质量类别集合
-                        List<EnvQualityConf> envQualityConfs = allEnvQualityConfs.get(itemName);
-
-                        if (envQualityConfs != null && envQualityConfs.size() > 0) {
-
-                            if ("溶解氧".equals(itemName)) {
-                                for (EnvQualityConf envQualityConf : envQualityConfs) {
-                                    //超标情况  第三类为标准，小于则属于超标（IV，V 劣V等）
-
-                                    if (standardLevel.equals(envQualityConf.getLevel()) && new BigDecimal(value).compareTo(new BigDecimal(envQualityConf.getMinVal())) < 0) {
-                                        handleExceedDate(list, envHourData, item, itemName, value, envQualityConfs, envQualityConf, standardLevel);
-                                        break;//中断循环
-                                    }
-                                }
-                            } else {
-                                for (EnvQualityConf envQualityConf : envQualityConfs) {
-                                    //超标情况  第三类为标准，超过则属于超标（IV，V 劣V等）
-                                    if (standardLevel.equals(envQualityConf.getLevel()) && new BigDecimal(value).compareTo(new BigDecimal(envQualityConf.getMaxVal())) > 0) {
-                                        //超标情况
-                                        handleExceedDate(list, envHourData, item, itemName, value, envQualityConfs, envQualityConf, standardLevel);
-                                        break;//中断循环
-                                    }
-                                }
-                            }
+                if ("溶解氧".equals(itemName)) {
+                    for (EnvQualityConf envQualityConf : envQualityConfs) {
+                        //超标情况  第三类为标准，小于则属于超标（IV，V 劣V等）
+                        if (standardLevel.equals(envQualityConf.getLevel()) && new BigDecimal(value).compareTo(new BigDecimal(envQualityConf.getMinVal())) < 0) {
+                            handleExceedDate(list, envHourData, item, itemName, value, envQualityConfs, envQualityConf, standardLevel);
+                            break;//中断循环
                         }
                     }
-
+                } else {
+                    for (EnvQualityConf envQualityConf : envQualityConfs) {
+                        //超标情况  第三类为标准，超过则属于超标（IV，V 劣V等）
+                        if (standardLevel.equals(envQualityConf.getLevel()) && new BigDecimal(value).compareTo(new BigDecimal(envQualityConf.getMaxVal())) > 0) {
+                            //超标情况
+                            handleExceedDate(list, envHourData, item, itemName, value, envQualityConfs, envQualityConf, standardLevel);
+                            break;//中断循环
+                        }
+                    }
                 }
             }
         }
@@ -188,12 +164,9 @@ public class ExceedStandardService {
                 String wateType = envQualityConf2.getLevel();
                 if (!"溶解氧".equals(itemName)) {
                     BigDecimal divide = bigDecimal1.subtract(new BigDecimal(e.getItemStandard())).divide(new BigDecimal(e.getItemStandard()), 4, BigDecimal.ROUND_HALF_EVEN);
-                    BigDecimal bigDecimal = divide.setScale(1, BigDecimal.ROUND_HALF_EVEN);
+                    BigDecimal bigDecimal = divide.setScale(2, BigDecimal.ROUND_HALF_EVEN);
                     if (bigDecimal.compareTo(new BigDecimal(0)) == 0) {
-                        bigDecimal = divide.setScale(2, BigDecimal.ROUND_HALF_EVEN);
-                        if (bigDecimal.compareTo(new BigDecimal(0)) == 0) {
-                            bigDecimal = divide.setScale(3, BigDecimal.ROUND_HALF_EVEN);
-                        }
+                        bigDecimal = divide.setScale(3, BigDecimal.ROUND_HALF_EVEN);
                     }
                     String string = bigDecimal.toPlainString();
                     wateType = wateType + "类(" + string + ")";
@@ -207,36 +180,16 @@ public class ExceedStandardService {
     }
 
     public List<Map<String, Object>> realtime(String siteType) {
-        Future<Map<String, List<EnvQualityConf>>> allEnvQualityConfsFuture = PoolExecutor.submit(new Callable<Map<String, List<EnvQualityConf>>>() {
-            @Override
-            public Map<String, List<EnvQualityConf>> call() throws Exception {
-                //2、查询所有指标的质量类别集合,查询全部 一次性查询，在根据项目名进行处理
-                Map<String, List<EnvQualityConf>> allEnvQualityConfs = new HashMap<>(16);
-                List<EnvQualityConf> envQualityConfList = commonService.getEnvQualityConfList();
-                for (EnvQualityConf envQualityConf : envQualityConfList) {
-                    String kpiName = envQualityConf.getKpiName();
-                    allEnvQualityConfs.computeIfAbsent(kpiName, k -> new ArrayList<>()).add(envQualityConf);
-                }
-                return allEnvQualityConfs;
-            }
-        });
+        //2、查询所有指标的质量类别集合,查询全部 一次性查询，在根据项目名进行处理
+        Map<String, List<EnvQualityConf>> allEnvQualityConfs = commonService.getItemNameQualityConfMap();
 
-        List<Map<String, Object>> list = new ArrayList<>();
-        try {
-            List<Map<String, Object>> realTimeData = monitorService.getRealTimeData(siteType);
-            Map<String, List<EnvQualityConf>> allEnvQualityConfs = allEnvQualityConfsFuture.get();
-            handlerRealExceed(list, allEnvQualityConfs, realTimeData);
-        } catch (Exception e) {
-            String err = "使用多线程出错com.xmmems.service.ExceedStandardService.realtime";
-            FileLog.error(err);
-            e.printStackTrace();
-            throw new XMException(500, err);
-        }
+        List<Map<String, Object>> realTimeData = monitorService.getRealTimeData(siteType);
 
-        return list;
+        return handlerRealExceed(allEnvQualityConfs, realTimeData);
     }
 
-    private void handlerRealExceed(List<Map<String, Object>> list, Map<String, List<EnvQualityConf>> allEnvQualityConfs, List<Map<String, Object>> realTimeData) {
+    private List<Map<String, Object>> handlerRealExceed(Map<String, List<EnvQualityConf>> allEnvQualityConfs, List<Map<String, Object>> realTimeData) {
+        List<Map<String, Object>> list = new ArrayList<>();
         for (Map<String, Object> map : realTimeData) {
             Map<String, Object> temp = new HashMap<>(16);
             temp.put("siteName", map.get("siteName"));
@@ -245,7 +198,6 @@ public class ExceedStandardService {
             String levelStandard = map.get("levelStandard") + "";
             temp.put("levelStandard", levelStandard);
             if (level.contains("$$")) {
-
                 StringBuilder stringBuilder = new StringBuilder();
                 for (Map.Entry<String, Object> entry : map.entrySet()) {
                     String itemName = entry.getKey();
@@ -253,39 +205,41 @@ public class ExceedStandardService {
                         temp.put("moniterTime", entry.getValue());
                         continue;
                     }
-                    if (!"moniterTime-level-siteName-levelStandard-siteId".contains(itemName)) {
-                        String value = entry.getValue() + "";
-                        if (value.contains("$$") && !value.contains("≤")) {
-                            if (stringBuilder.length() != 0) {
-                                stringBuilder.append(",");
-                            }
-                            stringBuilder.append(itemName);
-                            List<EnvQualityConf> envQualityConfs = allEnvQualityConfs.get(itemName);
-                            if (envQualityConfs != null) {
-                                String tempValue = value.replaceAll("[^\\d\\.]", "");
-                                double v = Double.parseDouble(tempValue);
-                                for (EnvQualityConf envQualityConf : envQualityConfs) {
-                                    String kpiName = envQualityConf.getKpiName();
-                                    if (!"溶解氧".equals(kpiName)) {
-                                        if (envQualityConf.getLevel().equals(levelStandard)) {
-                                            double v1 = Double.parseDouble(envQualityConf.getMaxVal());
-                                            double v2 = (v - v1) / v1;
-                                            String string = new BigDecimal(v2).setScale(4, BigDecimal.ROUND_HALF_EVEN).stripTrailingZeros().toPlainString();
-                                            temp.put("beishu", itemName + "(" + envQualityConf.getMaxVal() + "/" + string + ")");
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
+                    if ("moniterTime-level-siteName-levelStandard-siteId".contains(itemName)) {
+                        continue;
+                    }
+                    String value = entry.getValue() + "";
+                    if (!value.contains("$$") || value.contains("≤")) {
+                        continue;
+                    }
+                    if (stringBuilder.length() != 0) {
+                        stringBuilder.append(",");
+                    }
+                    stringBuilder.append(itemName);
+                    List<EnvQualityConf> envQualityConfs = allEnvQualityConfs.get(itemName);
+                    if (envQualityConfs == null) {
+                        continue;
+                    }
+                    String tempValue = value.replaceAll("[^\\d\\.]", "");
+                    double v = Double.parseDouble(tempValue);
+                    for (EnvQualityConf envQualityConf : envQualityConfs) {
+                        String kpiName = envQualityConf.getKpiName();
+                        if ("溶解氧".equals(kpiName)) {
+                            continue;
+                        }
+                        if (envQualityConf.getLevel().equals(levelStandard)) {
+                            double v1 = Double.parseDouble(envQualityConf.getMaxVal());
+                            double v2 = (v - v1) / v1;
+                            String string = new BigDecimal(v2).setScale(4, BigDecimal.ROUND_HALF_EVEN).stripTrailingZeros().toPlainString();
+                            temp.put("beishu", itemName + "(" + envQualityConf.getMaxVal() + "/" + string + ")");
+                            break;
                         }
                     }
                 }
                 String value = stringBuilder.toString();
                 temp.put("main", value);
                 if (value.length() > 0) {
-
                     temp.put("exceed", "未达标$$");
-
                 } else {
                     temp.put("exceed", "达标");
                 }
@@ -295,6 +249,7 @@ public class ExceedStandardService {
             }
             list.add(temp);
         }
+        return list;
     }
 
     //查找主要污染源
@@ -343,7 +298,7 @@ public class ExceedStandardService {
             map.computeIfAbsent(siteId, k -> new ArrayList<>()).add(envHourData);
         }
         //分别查询超标数据
-        List<ExceedStandard> collect = map.entrySet().stream().map(e -> getExceedStandards(e.getKey() + "", true, e.getValue())).flatMap(List::stream).collect(Collectors.toList());
+        List<ExceedStandard> collect = map.entrySet().parallelStream().map(e -> getExceedStandards(e.getKey() + "", true, e.getValue())).flatMap(List::stream).collect(Collectors.toList());
         return collect;
     }
 }

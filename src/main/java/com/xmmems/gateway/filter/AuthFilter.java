@@ -47,12 +47,12 @@ public class AuthFilter extends HttpFilter {
         //校验白名单
         String method = request.getMethod();
         String remoteHost = request.getRemoteHost();
-        log.info("【过滤器】请求进入过滤器！"+request.getMethod() + "  " + request.getRequestURI()+"  "+remoteHost);
-        log.info("【过滤器】请求参数！"+ JsonUtils.toString(request.getParameterMap()));
 
         if (HttpMethod.OPTIONS.toString().equals(method)) {
             response.setStatus(HttpStatus.NO_CONTENT.value());
         } else {
+            log.info("【过滤器】请求进入过滤器！"+request.getMethod() + "  " + request.getRequestURI()+"  "+remoteHost);
+            log.info("【过滤器】请求参数！"+ JsonUtils.toString(request.getParameterMap()));
             if (isWhite(request.getRequestURI())) {
                 log.info("【过滤器】当前用户是白名单，无需认证，继续微服务访问！");
             } else {

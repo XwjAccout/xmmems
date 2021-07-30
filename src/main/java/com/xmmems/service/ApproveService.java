@@ -107,8 +107,9 @@ public class ApproveService {
             }
             if (isUpdate) {
                 hourData.put("content", monitorItems);
-                EnvHourData envHourData = EnvHourData.builder().id((Integer)hourData.get("id")).content(JsonUtils.toString(monitorItems)).build();
-
+                EnvHourData envHourData = new EnvHourData();
+                envHourData.setId((Integer)hourData.get("id"));
+                envHourData.setContent(JsonUtils.toString(monitorItems));
                 int i = envHourDataMapper.updateByPrimaryKeySelective(envHourData);
                 if (i < 1) {
                     log.error("更新envHourData数据失败");

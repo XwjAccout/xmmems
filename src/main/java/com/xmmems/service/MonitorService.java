@@ -292,7 +292,10 @@ public class MonitorService {
             for (Map<String, Object> site : list) {
                 String siteId = site.get("siteId") + "";
 
-                List<BaseSiteitemDTO> columns = getColumns(Integer.valueOf(siteId));
+                List<BaseSiteitemDTO> columns = commonService.getBaseSiteItemBySiteId(Integer.valueOf(siteId));
+                if (columns.isEmpty()) {
+                    continue;
+                }
                 List<String> collect = columns.stream().map(BaseSiteitemDTO::getItemName).collect(Collectors.toList());
 
                 List<Map<String, String>> monitorItemList = JsonUtils.nativeRead(site.get("content").toString(), TYPE);
@@ -1033,6 +1036,12 @@ public class MonitorService {
      * @param isAvg                 是否只处理平均值
      */
     private void handleOtherIntoReturnData(List<Map<String, String>> returnData, Map<String, List<String>> itemNameAndValuesList, Integer siteId, int dayNum, Map<String, Integer> itemNameAndNumbersMap, boolean isAvg, List<Integer> statistics, String flag, Map<String, List<String>> itemNameAndNumbersMapOfDay, String eH, String sH) {
+        List<BaseSiteitemDTO> list = commonService.getBaseSiteItemBySiteId(siteId);
+        if (list.isEmpty()) {
+            return;
+        }
+        List<String> itemNames = list.stream().map(BaseSiteitemDTO::getItemName).collect(Collectors.toList());
+
         Map<String, String> minMap = new HashMap<>(16);
         //最小值
         Map<String, String> maxMap = new HashMap<>(16);
@@ -1057,9 +1066,6 @@ public class MonitorService {
         //单项故障率
         Map<String, String> avgFailureMap = new HashMap<>(16);
         //平均故障率
-
-        List<BaseSiteitemDTO> list = getColumns(siteId);
-        List<String> itemNames = list.stream().map(BaseSiteitemDTO::getItemName).collect(Collectors.toList());
 
         for (Map.Entry<String, List<String>> entry : itemNameAndValuesList.entrySet()) {
             String itemName = entry.getKey();
@@ -1416,15 +1422,16 @@ public class MonitorService {
     }
 
     public EnvQualityConf waterQualityCategory(@NonNull String itemName, @NonNull String avg) {
-
+        if (avg == null || "".equals(avg)) {
+            return null;
+        }
         //方法3 查到一个质量类别直接进行比较，比方法为减少循环次数
-        if (avg != null && !"".equals(avg)) {
-            for (EnvQualityConf envQualityConf : commonService.getEnvQualityConfList()) {
-                String kpiName = envQualityConf.getKpiName();
-                if (itemName.equals(kpiName)) {
-                    if (Double.parseDouble(envQualityConf.getMinVal()) <= Double.parseDouble(avg) && Double.parseDouble(envQualityConf.getMaxVal()) >= Double.parseDouble(avg)) {
-                        return envQualityConf;
-                    }
+        Map<String, List<EnvQualityConf>> itemNameQualityConfMap = commonService.getItemNameQualityConfMap();
+        List<EnvQualityConf> envQualityConfs = itemNameQualityConfMap.get(itemName);
+        if (envQualityConfs != null) {
+            for (EnvQualityConf envQualityConf : envQualityConfs) {
+                if (Double.parseDouble(envQualityConf.getMinVal()) <= Double.parseDouble(avg) && Double.parseDouble(envQualityConf.getMaxVal()) >= Double.parseDouble(avg)) {
+                    return envQualityConf;
                 }
             }
         }
@@ -1441,7 +1448,7 @@ public class MonitorService {
                     d += aLong;
                     num++;
                 }
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException ignored) {
             }
         }
 
@@ -1509,7 +1516,7 @@ public class MonitorService {
         try {
             return new BigDecimal(value + "").setScale(digit, BigDecimal.ROUND_HALF_EVEN).stripTrailingZeros().toPlainString();
         } catch (NumberFormatException e) {
-            System.out.println("数据解析异常1605--->" + value);
+            System.out.println("数据解析异常1519--->" + value);
             return "";
         }
     }
@@ -1589,11 +1596,7 @@ public class MonitorService {
         //标准水质
         Integer standard = getSlevel(siteId + "");
         //质量类别转换为键值对形式
-        Map<String, List<EnvQualityConf>> eqMap = new HashMap<>(16);
-        for (EnvQualityConf envQualityConf : commonService.getEnvQualityConfList()) {
-            String kpiName = envQualityConf.getKpiName();
-            eqMap.computeIfAbsent(kpiName, k -> new ArrayList<>(6)).add(envQualityConf);
-        }
+        Map<String, List<EnvQualityConf>> eqMap = commonService.getItemNameQualityConfMap();
 
         List<Future<Boolean>> tt = new ArrayList<>(monthList.size());
         for (Map<String, String> dayList : monthList) {
@@ -1617,22 +1620,7 @@ public class MonitorService {
                             tempMap.put("time", value);
                         } else {
                             //key是监测指标名称，value是值，level是等级，这里只查询
-                            String level = "";
-                            if (value != null && !"".equals(value)) {
-                                List<EnvQualityConf> envQualityConfs = eqMap.get(key);
-                                if (envQualityConfs != null) {
-
-                                    for (EnvQualityConf temp : envQualityConfs) {
-                                        if (Double.parseDouble(temp.getMinVal()) <= Double.parseDouble(value) && Double.parseDouble(temp.getMaxVal()) >= Double.parseDouble(value)) {
-                                            String s = temp.getLevel();
-                                            if (WaterLevelTransformUtil.levelStringToLevelInt(s) > standard) {
-                                                level = s + "$$";
-                                            }
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
+                            String level = getString(key, value, eqMap, standard);
 
                             if (level.contains("$")) {
                                 tempMap.put("UN", Integer.parseInt(tempMap.get("UN")) + 1 + "");
@@ -1771,11 +1759,7 @@ public class MonitorService {
         //标准水质
         Integer standard = getSlevel(siteId + "");
         //质量类别转换为键值对形式
-        Map<String, List<EnvQualityConf>> eqMap = new HashMap<>(16);
-        for (EnvQualityConf envQualityConf : commonService.getEnvQualityConfList()) {
-            String kpiName = envQualityConf.getKpiName();
-            eqMap.computeIfAbsent(kpiName, k -> new ArrayList<>()).add(envQualityConf);
-        }
+        Map<String, List<EnvQualityConf>> eqMap = commonService.getItemNameQualityConfMap();
 
         List<Future<Boolean>> tt = new ArrayList<>(monthList.size());
         for (Map<String, String> dayList : monthList) {
@@ -1798,22 +1782,7 @@ public class MonitorService {
                             tempMap.put("time", value);
                         } else {
                             //key是监测指标名称，value是值，level是等级，这里只查询
-                            String level = "";
-                            if (value != null && !"".equals(value)) {
-                                List<EnvQualityConf> envQualityConfs = eqMap.get(key);
-                                if (envQualityConfs != null) {
-
-                                    for (EnvQualityConf temp : envQualityConfs) {
-                                        if (Double.parseDouble(temp.getMinVal()) <= Double.parseDouble(value) && Double.parseDouble(temp.getMaxVal()) >= Double.parseDouble(value)) {
-                                            String s = temp.getLevel();
-                                            if (WaterLevelTransformUtil.levelStringToLevelInt(s) > standard) {
-                                                level = s + "$$";
-                                            }
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
+                            String level = getString(key, value, eqMap, standard);
 
                             if (level.contains("$")) {
                                 tempMap.put("UN", Integer.parseInt(tempMap.get("UN")) + 1 + "");
@@ -1856,6 +1825,30 @@ public class MonitorService {
         }
         sortByTime(datas);
         return map;
+    }
+
+    //key是监测指标名称，value是值，level是等级，这里只查询
+    private static String getString(String key, String value, Map<String, List<EnvQualityConf>> eqMap, Integer standard) {
+        if (value == null || "".equals(value)) {
+            return "";
+        }
+
+        List<EnvQualityConf> envQualityConfs = eqMap.get(key);
+        if (envQualityConfs == null) {
+            return "";
+        }
+
+        for (EnvQualityConf temp : envQualityConfs) {
+            if (Double.parseDouble(temp.getMinVal()) <= Double.parseDouble(value) && Double.parseDouble(temp.getMaxVal()) >= Double.parseDouble(value)) {
+                String s = temp.getLevel();
+                if (WaterLevelTransformUtil.levelStringToLevelInt(s) > standard) {
+                    return  s + "$$";
+                }
+                break;
+            }
+        }
+
+        return "";
     }
 
     public Map<String, Object> monthCaptureRate(Integer siteId, Integer year, Integer month, Boolean isPercent) {

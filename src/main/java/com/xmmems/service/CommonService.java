@@ -42,6 +42,7 @@ public class CommonService {
     private static Map<String, BaseSite> ALL_SITE_MAP = new HashMap<>(16);
 
     private static List<EnvQualityConf> ENV_QUALITY_CONF_LIST = new ArrayList<>();
+    private static Map<String, List<EnvQualityConf>> ITEMNAME_QUALITYCONF_MAP = new HashMap<>(16);
 
     private static List<BaseItem> BASE_ITEM_LIST = new ArrayList<>();
     private static Map<String, BaseItem> BASE_ITEM_MAP = new HashMap<>(256);
@@ -79,6 +80,12 @@ public class CommonService {
     @PostConstruct
     public synchronized void initEnvQualityConf() {
         ENV_QUALITY_CONF_LIST = envQualityConfMapper.selectByExample(new EnvQualityConfExample());
+        //2、查询所有指标的质量类别集合,查询全部 一次性查询，在根据项目名进行处理
+        Map<String, List<EnvQualityConf>> allEnvQualityConfs = ITEMNAME_QUALITYCONF_MAP;
+        for (EnvQualityConf envQualityConf : ENV_QUALITY_CONF_LIST) {
+            String kpiName = envQualityConf.getKpiName();
+            allEnvQualityConfs.computeIfAbsent(kpiName, k -> new ArrayList<>()).add(envQualityConf);
+        }
     }
 
     @PostConstruct
@@ -140,5 +147,9 @@ public class CommonService {
     public List<BaseSiteitemDTO> getBaseSiteItemBySiteId(Integer siteId) {
         initBaseSiteItemMap2(siteId);
         return BASE_SITE_ITEM_MAP.get(siteId);
+    }
+
+    public Map<String, List<EnvQualityConf>> getItemNameQualityConfMap() {
+        return ITEMNAME_QUALITYCONF_MAP;
     }
 }

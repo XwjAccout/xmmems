@@ -49,6 +49,9 @@ public class PdfController {
         try {
             //数据列名,设置纸张大小
             List<BaseSiteitemDTO> columnsNames = monitorService.getColumns(siteId);
+            if (columnsNames.isEmpty()) {
+                return;
+            }
             if (isAutoPageSize && columnsNames.size() > 11) {//自动设置纸张大小
                 pageSize = "4A";
             }
